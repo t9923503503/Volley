@@ -586,15 +586,21 @@ body{
   transition:transform .1s;
 }
 .score-btn.minus{
-  width:46px;height:46px;font-size:22px;
+  width:52px;height:52px;font-size:26px;flex-shrink:0;
   background:#2a1a1a;color:var(--minus);
 }
 .score-btn.plus{
-  width:92px;height:92px;font-size:44px;border-radius:12px;
+  width:110px;height:110px;font-size:62px;border-radius:14px;flex-shrink:0;
   background:#1a2a1a;color:var(--plus);
 }
 .score-btn:disabled{opacity:.3;pointer-events:none}
 .score-btn:active{transform:scale(.91)}
+.card-bottom{
+  display:flex;align-items:center;gap:10px;
+  margin-top:8px;padding-top:8px;border-top:1px solid #1e1e34;
+}
+.auto-inline{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.auto-inline .p-name{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .score-disp{
   min-width:46px;text-align:center;
   font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text)
@@ -1787,20 +1793,19 @@ function renderCourt(ci) {
             <div class="p-partner">+ ${esc(ct.women[wi]||'—')}</div>
           </div>
           <div class="score-widget">
-            <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
             <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus"  data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+            <button class="score-btn plus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
           </div>
         </div>
-        <div class="mrow auto-row">
-          <span class="g-icon">👩</span>
-          <div class="p-info">
+        <div class="card-bottom">
+          <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
+          <div class="auto-inline">
+            <span class="g-icon">👩</span>
             <div class="p-name">${esc(ct.women[wi]||'—')}</div>
             ${ct.women[wi] ? playerRankBadge(ct.women[wi], 'W') : ''}
-            <div class="p-partner">+ ${esc(ct.men[mi]||'—')}</div>
+            <span class="auto-badge">AUTO</span>
+            <div class="auto-score" id="as-${ci}-${wi}-${ri}">${isNull?'–':scVal}</div>
           </div>
-          <span class="auto-badge">AUTO</span>
-          <div class="auto-score" id="as-${ci}-${wi}-${ri}">${isNull?'–':scVal}</div>
         </div>
       </div>`;
     }
@@ -2081,16 +2086,18 @@ function renderDivCourt(key, svodM, svodW) {
             <div class="p-partner">+ ${esc(women[wi]||'—')}</div>
           </div>
           <div class="score-widget">
-            <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
             <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus"  data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+            <button class="score-btn plus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
           </div>
         </div>
-        <div class="mrow auto-row">
-          <span class="g-icon">👩</span>
-          <div class="p-info"><div class="p-name">${esc(women[wi]||'—')}</div></div>
-          <span class="auto-badge">AUTO</span>
-          <div class="auto-score" id="das-${key}-${wi}-${ri}">${isNull?'–':scVal}</div>
+        <div class="card-bottom">
+          <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
+          <div class="auto-inline">
+            <span class="g-icon">👩</span>
+            <div class="p-name">${esc(women[wi]||'—')}</div>
+            <span class="auto-badge">AUTO</span>
+            <div class="auto-score" id="das-${key}-${wi}-${ri}">${isNull?'–':scVal}</div>
+          </div>
         </div>
       </div>`;
     }
