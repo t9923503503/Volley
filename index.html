@@ -859,7 +859,7 @@ body{
 }
 .timer-display{
   font-family:'Bebas Neue',sans-serif;
-  font-size:72px;
+  font-size:96px;
   line-height:1;
   letter-spacing:4px;
   color:var(--gold);
@@ -903,10 +903,7 @@ body{
   border-color:var(--gold);
   color:var(--gold);
 }
-.timer-custom{
-  display:flex;align-items:center;justify-content:center;
-  gap:8px;margin:6px 0 2px;
-}
+.timer-custom{display:none}
 .timer-custom-btn{
   width:34px;height:34px;border-radius:8px;border:1px solid #3a3a5e;
   background:var(--card);color:var(--text);font-size:20px;font-weight:700;
@@ -922,7 +919,7 @@ body{
 }
 .timer-custom-val.active{color:var(--gold);border-color:var(--gold);}
 .timer-controls{
-  display:flex;gap:8px;
+  display:flex;gap:8px;align-items:center;
   margin-top:8px;
 }
 .timer-btn{
@@ -3571,13 +3568,11 @@ function renderTimerBlock(ci) {
 
   return `<div class="timer-block">
     <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}">${display}</div>
-    <div class="timer-custom">
+    <div class="timer-controls">
       <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
       <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
       <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
-    </div>
-    <div class="timer-controls">
-      <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})">${startLabel}</button>
+      <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})" style="flex:1">${startLabel}</button>
       <button class="timer-btn timer-btn-reset" onclick="timerReset(${ci})">СБРОС</button>
     </div>
     <div class="timer-progress">
