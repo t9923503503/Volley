@@ -1905,7 +1905,7 @@ function renderSvod() {
       const avg = p.rPlayed>0 ? (p.pts/p.rPlayed).toFixed(1) : '—';
       t += `<tr>
         <td class="td-rank"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'<sup>=</sup>':''}</span></td>
-        <td><div class="td-name">${p.genderIcon} ${esc(p.name)}</div></td>
+        <td><div class="td-name">${esc(p.name)}</div></td>
         <td class="td-court" style="color:${p.courtColor}">${p.courtName}</td>
         <td class="td-pts">${p.pts}</td>
         <td class="td-avg">${avg}</td>
