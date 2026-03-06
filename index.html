@@ -972,6 +972,8 @@ const ALL_COURTS = [
 
 // scores[ci][mi][ri] — allocated dynamically based on nc × ppc
 let scores = makeBlankScores();
+// Timestamps for smart merge (race condition prevention)
+let scoreTs = {}; // { 'c0': ms, 'c1': ms, 'hard': ms, ... }
 function makeBlankScores() {
   return Array.from({length:4}, () =>
     Array.from({length:ppc}, () => Array(ppc).fill(null))
@@ -1905,7 +1907,11 @@ function updateDivisions() {
         JSON.stringify([...newWomen].sort())!==JSON.stringify([...oldWomen].sort())) {
       divRoster[key] = { men:newMen, women:newWomen };
       const Nd = Math.max(newMen.length, 1);
-      divScores[key] = Array.from({length:Nd}, ()=>Array(Nd).fill(null));
+      // Не сбрасываем если в финале уже есть введённые очки
+      const hasFinalsData = divScores[key]?.some(row => row?.some(v => v !== null && v > 0));
+      if (!hasFinalsData) {
+        divScores[key] = Array.from({length:Nd}, ()=>Array(Nd).fill(null));
+      }
     }
     const screen = document.getElementById(`screen-${key}`);
     if (screen) {
@@ -2225,6 +2231,8 @@ async function sbConnect() {
   if (!sbConfig.roomCode) {
     showToast('⚠️ Введите код комнаты'); return;
   }
+  // Disconnect existing channel to prevent duplicate subscriptions
+  if (sbChannel) { sbClient?.removeChannel(sbChannel); sbChannel = null; }
   sbSetStatus('connecting');
   try {
     // Init client
@@ -2309,8 +2317,26 @@ function sbPush() {
 function sbApplyRemoteState(state) {
   sbIsApplying = true;
   try {
-    if (state.scores)    scores    = state.scores;
-    if (state.divScores) divScores = state.divScores;
+    // Smart merge: apply only if incoming timestamp is newer
+    if (state.scores && state.scoreTs) {
+      state.scores.forEach((courtScores, ci) => {
+        const remoteTs = state.scoreTs['c'+ci] || 0;
+        const localTs  = scoreTs['c'+ci] || 0;
+        if (remoteTs >= localTs) scores[ci] = courtScores;
+      });
+    } else if (state.scores) {
+      scores = state.scores;
+    }
+    if (state.divScores && state.scoreTs) {
+      Object.keys(state.divScores).forEach(key => {
+        const remoteTs = state.scoreTs[key] || 0;
+        const localTs  = scoreTs[key] || 0;
+        if (remoteTs >= localTs) divScores[key] = state.divScores[key];
+      });
+    } else if (state.divScores) {
+      divScores = state.divScores;
+    }
+    if (state.scoreTs) scoreTs = { ...scoreTs, ...state.scoreTs };
     if (state.divRoster) divRoster = state.divRoster;
     if (state.roster) {
       state.roster.forEach((c, ci) => {
@@ -2322,6 +2348,9 @@ function sbApplyRemoteState(state) {
     }
     if (state.meta) tournamentMeta = { ...tournamentMeta, ...state.meta };
     if (state.cfg) { ppc = state.cfg.ppc || ppc; nc = state.cfg.nc || nc; }
+    // Save focus before rebuild
+    const _focusId    = document.activeElement?.id;
+    const _focusSel   = [document.activeElement?.selectionStart, document.activeElement?.selectionEnd];
     if (state.timers) {
       const now = Date.now();
       state.timers.forEach((s, ci) => {
@@ -2345,6 +2374,11 @@ function sbApplyRemoteState(state) {
     buildAll();
     const cur = document.querySelector('.screen.active');
     if (cur) switchTab(activeTabId);
+    // Restore focus after rebuild
+    if (_focusId) {
+      const el = document.getElementById(_focusId);
+      if (el) { el.focus(); try { el.setSelectionRange(_focusSel[0], _focusSel[1]); } catch(e){} }
+    }
   } finally {
     sbIsApplying = false;
   }
@@ -2358,7 +2392,8 @@ function sbGetLocalState() {
     divRoster,
     roster: ALL_COURTS.map(c => ({ men:[...c.men], women:[...c.women] })),
     meta:   tournamentMeta,
-    cfg:    { ppc, nc },
+    cfg:     { ppc, nc },
+    scoreTs: { ...scoreTs },
     timers: timerState.map(ts => ({
       preset: ts.preset, total: ts.total, remaining: ts.remaining,
       running: ts.running, startedAt: ts.startedAt, startRemaining: ts.startRemaining,
@@ -2908,6 +2943,7 @@ function scoreClickHandler(e) {
     const next = Math.max(0, Math.min(15, base + dir));
     if (old !== null && next === old) return;
     divScores[divKey][mi][ri] = next;
+    scoreTs[divKey] = Date.now();
     updateDivWidget(divKey, mi, ri, next);
     saveState();
   } else {
@@ -2918,6 +2954,7 @@ function scoreClickHandler(e) {
     const next = Math.max(0, Math.min(15, base + dir));
     if (old !== null && next === old) return;
     scores[ci][mi][ri] = next;
+    scoreTs['c'+ci] = Date.now();
     updateCourtWidget(ci, mi, ri, next);
     updateDivisions(); // recompute on every score change
     saveState();
