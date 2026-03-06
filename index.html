@@ -773,6 +773,37 @@ body{
   animation:ddFade .15s ease;
 }
 #confirm-overlay.open{display:flex;}
+#pwd-overlay{
+  display:none;position:fixed;inset:0;z-index:10001;
+  background:rgba(0,0,0,.85);align-items:center;justify-content:center;
+  animation:ddFade .15s ease;
+}
+#pwd-overlay.open{display:flex;}
+#pwd-box{
+  background:var(--dark3);border:1px solid #3a3a5e;border-radius:16px;
+  padding:28px 24px 20px;max-width:300px;width:90%;text-align:center;
+  box-shadow:0 24px 64px rgba(0,0,0,.8);
+}
+#pwd-box .pwd-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;}
+#pwd-box .pwd-sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
+#pwd-input{
+  width:100%;box-sizing:border-box;
+  background:#1a1a2e;border:1px solid #3a3a5e;border-radius:10px;
+  color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:22px;
+  font-weight:700;letter-spacing:6px;text-align:center;
+  padding:12px;margin-bottom:8px;outline:none;
+}
+#pwd-input:focus{border-color:var(--accent);}
+#pwd-error{color:var(--red);font-size:13px;min-height:18px;margin-bottom:12px;}
+#pwd-ok{
+  width:100%;padding:12px;background:var(--accent);border:none;border-radius:10px;
+  color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;
+}
+#pwd-cancel{
+  margin-top:8px;background:none;border:none;color:var(--muted);
+  font-size:13px;cursor:pointer;padding:4px;
+}
 #confirm-box{
   background:var(--dark3);border:1px solid #3a3a5e;border-radius:16px;
   padding:28px 24px 20px;max-width:320px;width:90%;text-align:center;
@@ -1471,12 +1502,13 @@ function safeRender() {
 // ════════════════════════════════════════════════════════════
 // 7. TAB SWITCHING
 // ════════════════════════════════════════════════════════════
-function switchTab(id) {
+async function switchTab(id) {
   closeDropdown();
   // Если запрошен неактивный дивизион — перенаправляем на первый активный
   if (typeof id === 'string' && DIV_KEYS.includes(id) && !activeDivKeys().includes(id)) {
     id = activeDivKeys()[0] || 0;
   }
+  const prevTabId = activeTabId;
   activeTabId = id;
 
   // Hide all, show target
@@ -1486,7 +1518,15 @@ function switchTab(id) {
 
   // Re-render content on demand
   if (id === 'svod')   screen.innerHTML = renderSvod();
-  if (id === 'roster') screen.innerHTML = renderRoster();
+  if (id === 'roster') {
+    if (!rosterUnlocked) {
+      screen.classList.add('active');
+      syncNavActive();
+      const ok = await showPasswordPrompt();
+      if (!ok) { activeTabId = prevTabId; switchTab(prevTabId || 'svod'); return; }
+    }
+    screen.innerHTML = renderRoster();
+  }
   if (id === 'stats')  screen.innerHTML = renderStats();
   if (id === 'hard' || id === 'advance' || id === 'medium' || id === 'lite') {
     updateDivisions();
@@ -3403,6 +3443,16 @@ timerTick(); // start global animation loop
 </script>
 
 <!-- Custom confirm modal -->
+<div id="pwd-overlay">
+  <div id="pwd-box">
+    <div class="pwd-title">🔒 РОСТЕР</div>
+    <div class="pwd-sub">Введите пароль для доступа</div>
+    <input id="pwd-input" type="password" inputmode="numeric" maxlength="10" placeholder="····">
+    <div id="pwd-error"></div>
+    <button id="pwd-ok">Войти</button>
+    <br><button id="pwd-cancel">Отмена</button>
+  </div>
+</div>
 <div id="confirm-overlay">
   <div id="confirm-box">
     <div id="confirm-msg"></div>
@@ -3413,6 +3463,43 @@ timerTick(); // start global animation loop
   </div>
 </div>
 <script>
+const ROSTER_PWD = '2525';
+let rosterUnlocked = sessionStorage.getItem('rosterUnlocked') === '1';
+
+function showPasswordPrompt() {
+  return new Promise(resolve => {
+    const ov = document.getElementById('pwd-overlay');
+    const inp = document.getElementById('pwd-input');
+    const err = document.getElementById('pwd-error');
+    inp.value = '';
+    err.textContent = '';
+    ov.classList.add('open');
+    setTimeout(() => inp.focus(), 100);
+
+    function cleanup(result) {
+      ov.classList.remove('open');
+      document.getElementById('pwd-ok').onclick = null;
+      document.getElementById('pwd-cancel').onclick = null;
+      inp.onkeydown = null;
+      resolve(result);
+    }
+    function tryUnlock() {
+      if (inp.value === ROSTER_PWD) {
+        rosterUnlocked = true;
+        sessionStorage.setItem('rosterUnlocked', '1');
+        cleanup(true);
+      } else {
+        err.textContent = '❌ Неверный пароль';
+        inp.value = '';
+        inp.focus();
+      }
+    }
+    document.getElementById('pwd-ok').onclick = tryUnlock;
+    document.getElementById('pwd-cancel').onclick = () => cleanup(false);
+    inp.onkeydown = e => { if (e.key === 'Enter') tryUnlock(); };
+  });
+}
+
 function showConfirm(msg) {
   return new Promise(resolve => {
     const ov = document.getElementById('confirm-overlay');
