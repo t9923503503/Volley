@@ -1176,6 +1176,7 @@ function saveState() {
     localStorage.setItem('kotc3_divroster',  JSON.stringify(divRoster));
     localStorage.setItem('kotc3_meta',       JSON.stringify(tournamentMeta));
   } catch(e){}
+  sbPush(); // синхронизировать с Supabase
 }
 
 function loadState() {
