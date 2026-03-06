@@ -50,10 +50,10 @@ body{
   border-bottom:1px solid #1e1e34;
   gap:4px;
 }
-.nav-logo{flex-shrink:0;margin-right:6px;display:flex;flex-direction:column;line-height:1.1}
-.brand-main{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
-.brand-sub{font-size:0.7rem;color:#fff;opacity:.8;font-weight:400;letter-spacing:.3px}
-@media(max-width:380px){.brand-main{font-size:1.1rem}}
+.nav-logo-container{flex-shrink:0;margin-right:4px;padding-left:4px;display:flex;flex-direction:column;justify-content:center;line-height:1;white-space:nowrap}
+.brand-main{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.brand-sub{font-size:.55rem;color:rgba(255,255,255,.7);font-weight:400;letter-spacing:.3px;margin-top:1px}
+@media(max-width:380px){.brand-main{font-size:.95rem}}
 .nav-spacer{flex:1}
 /* ── Нижние 2 ряда пиллов ─────────────────────────────────── */
 .nav-pills-row{
@@ -917,7 +917,7 @@ body{
 
 <!-- ── NAV ──────────────────────────────────────────────── -->
 <nav id="nav">
-  <div class="nav-logo"><div class="brand-main">Лютые пляжники !!</div><div class="brand-sub">King of the Court</div></div>
+  <div class="nav-logo-container"><div class="brand-main">ЛЮТЫЕ ПЛЯЖНИКИ !!</div><div class="brand-sub">King of the Court</div></div>
   <!-- buttons built by JS -->
 </nav>
 
@@ -1351,8 +1351,8 @@ function buildNav() {
   top.className = 'nav-top';
 
   const logo = document.createElement('div');
-  logo.className = 'nav-logo';
-  logo.innerHTML = '<div class="brand-main">Лютые пляжники !!</div><div class="brand-sub">King of the Court</div>';
+  logo.className = 'nav-logo-container';
+  logo.innerHTML = '<div class="brand-main">ЛЮТЫЕ ПЛЯЖНИКИ !!</div><div class="brand-sub">King of the Court</div>';
   top.appendChild(logo);
 
   const spacer = document.createElement('div');
