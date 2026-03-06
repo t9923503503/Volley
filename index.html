@@ -573,6 +573,10 @@ body{
   background:#5a2800;border-color:#ff7000;
   color:#ffaa55;box-shadow:0 0 10px rgba(255,112,0,.3);
 }
+.rnd-btn:disabled{
+  opacity:.35;cursor:not-allowed;pointer-events:none;
+  box-shadow:none;border-color:#2a2a44;
+}
 .round-lbl{
   font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;
@@ -1822,16 +1826,35 @@ function playerRankBadge(name, gender) {
   return `<div class="p-rank-badge"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'=':''}</span><span class="p-rank-badge-div ${divCls}">${DIV_LABELS[divKey]}</span><span>${p.pts}оч</span></div>`;
 }
 
-function renderCourt(ci) {
-  const ct   = ALL_COURTS[ci];
-  const meta = COURT_META[ci];
-  const roundNavHtml = Array.from({length:ppc},(_,ri)=>{
-    const hasScores = Array.from({length:ppc},(_,mi)=>scores[ci]?.[mi]?.[ri]).some(s=>s!==null&&s>0);
-    const isCur = ri === (courtRound[ci]||0);
-    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" id="rnd-${ci}-${ri}" onclick="setCourtRoundGuard(${ci},${ri})">
+/* ── Round nav helpers: generate buttons with lock logic ──── */
+function renderCourtNavInner(ci) {
+  return Array.from({length:ppc}, (_, ri) => {
+    const hasScores    = Array.from({length:ppc}, (_, mi) => scores[ci]?.[mi]?.[ri]).some(s => s !== null && s > 0);
+    const isCur        = ri === (courtRound[ci] || 0);
+    // Round N locked until round N-1 has at least one score
+    const prevUnlocked = ri === 0 || Array.from({length:ppc}, (_, mi) => scores[ci]?.[mi]?.[ri-1]).some(s => s !== null && s > 0);
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}"${prevUnlocked?'':' disabled'} id="rnd-${ci}-${ri}" onclick="setCourtRoundGuard(${ci},${ri})">
       <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
     </button>`;
   }).join('');
+}
+
+function renderDivNavInner(key) {
+  const Nd = divRoster[key].men.length;
+  return Array.from({length:Nd}, (_, ri) => {
+    const hasScores    = Array.from({length:Nd}, (_, mi) => (divScores[key][mi]??[])[ri]).some(s => s !== null && s > 0);
+    const isCur        = ri === (divRoundState[key] || 0);
+    const prevUnlocked = ri === 0 || Array.from({length:Nd}, (_, mi) => (divScores[key][mi]??[])[ri-1]).some(s => s !== null && s > 0);
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}"${prevUnlocked?'':' disabled'} id="rnd-${key}-${ri}" onclick="setDivRoundGuard('${key}',${ri})">
+      <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
+    </button>`;
+  }).join('');
+}
+
+function renderCourt(ci) {
+  const ct   = ALL_COURTS[ci];
+  const meta = COURT_META[ci];
+  const roundNavHtml = renderCourtNavInner(ci);
 
   let html = renderTimerBlock(ci, roundNavHtml) + `<div class="court-title" style="color:${meta.color}">${meta.name}</div>
   <div class="court-sub">нажимайте + и −</div>`;
@@ -2163,14 +2186,8 @@ function renderDivCourt(key, svodM, svodW) {
       <div class="div-empty">Недостаточно участников — введите очки на кортах Этапа 1</div>`;
   }
 
-  // Round nav для дивизиона
-  const divRoundNavHtml = Array.from({length:Nd},(_,ri)=>{
-    const hasScores = Array.from({length:Nd},(_,mi)=>(divScores[key][mi]??[])[ri]).some(s=>s!==null&&s>0);
-    const isCur = ri === (divRoundState[key]||0);
-    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" id="rnd-${key}-${ri}" onclick="setDivRoundGuard('${key}',${ri})">
-      <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
-    </button>`;
-  }).join('');
+  // Round nav для дивизиона (с логикой блокировки)
+  const divRoundNavHtml = renderDivNavInner(key);
 
   // Roster chips
   let html = renderTimerBlock(dci, divRoundNavHtml) +
@@ -3262,6 +3279,9 @@ function updateCourtWidget(ci, mi, ri, val) {
   // Totals
   const tot = document.getElementById(`totals-${ci}`);
   if (tot) tot.outerHTML = renderTotals(ci);
+  // Instantly unlock next round button if this was the first score
+  const courtNav = document.getElementById(`rnd-nav-${ci}`);
+  if (courtNav) courtNav.innerHTML = renderCourtNavInner(ci);
 }
 
 function updateDivWidget(key, mi, ri, val) {
@@ -3300,6 +3320,10 @@ function updateDivWidget(key, mi, ri, val) {
     })();
     dt.outerHTML = newHtml;
   }
+  // Instantly unlock next round button if this was the first score
+  const dci    = DIV_TIMER_IDX[key];
+  const divNav = document.getElementById(`rnd-nav-${dci}`);
+  if (divNav) divNav.innerHTML = renderDivNavInner(key);
 }
 
 // ════════════════════════════════════════════════════════════
