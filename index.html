@@ -900,6 +900,24 @@ body{
   border-color:var(--gold);
   color:var(--gold);
 }
+.timer-custom{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;margin:6px 0 2px;
+}
+.timer-custom-btn{
+  width:34px;height:34px;border-radius:8px;border:1px solid #3a3a5e;
+  background:var(--card);color:var(--text);font-size:20px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;touch-action:manipulation;
+}
+.timer-custom-btn:hover{border-color:#5a5a8e;}
+.timer-custom-val{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;
+  color:var(--muted);min-width:60px;text-align:center;
+  border:1px solid #3a3a5e;border-radius:8px;padding:4px 8px;
+  background:var(--card);cursor:default;
+}
+.timer-custom-val.active{color:var(--gold);border-color:var(--gold);}
 .timer-controls{
   display:flex;gap:8px;
   margin-top:8px;
@@ -3508,6 +3526,22 @@ function timerSetPreset(ci, minutes) {
   sbPush();
 }
 
+function timerCustomStep(ci, step) {
+  const ts = timerState[ci];
+  const cur = ts.preset;
+  const next = Math.min(20, Math.max(9, cur + step));
+  if (next === cur) return;
+  timerSetPreset(ci, next);
+  // обновляем отображение кастомного поля для всей группы
+  for (const i of _timerGroup(ci)) {
+    const val = document.getElementById(`tmr-custom-${i}`);
+    if (val) {
+      val.textContent = `${next} мин`;
+      val.classList.toggle('active', !TIMER_PRESETS.includes(next));
+    }
+  }
+}
+
 // ── Render helper (called inside renderCourt) ────────────────
 function renderTimerBlock(ci) {
   const ts = timerState[ci];
@@ -3524,12 +3558,18 @@ function renderTimerBlock(ci) {
                           : ts.running ? 'timer-btn timer-btn-start paused'
                           : 'timer-btn timer-btn-start';
 
+  const isCustom = !TIMER_PRESETS.includes(ts.preset);
   return `<div class="timer-block">
     <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}">${display}</div>
     <div class="timer-presets">
       ${TIMER_PRESETS.map(m=>`<button class="timer-preset${ts.preset===m?' active':''}"
         data-timer-ci="${ci}" data-timer-min="${m}"
         onclick="timerSetPreset(${ci},${m})">${m} мин</button>`).join('')}
+    </div>
+    <div class="timer-custom">
+      <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
+      <div class="timer-custom-val${isCustom?' active':''}" id="tmr-custom-${ci}">${ts.preset} мин</div>
+      <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
     </div>
     <div class="timer-controls">
       <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})">${startLabel}</button>
