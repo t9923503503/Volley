@@ -870,8 +870,11 @@ body{
   border-radius:14px;
   padding:14px 16px 12px;
   margin-bottom:16px;
-  position:relative;
+  position:sticky;
+  top:var(--nav-h);
+  z-index:100;
   overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
 }
 .timer-block::before{
   content:'';position:absolute;inset:0;
