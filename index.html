@@ -1470,6 +1470,10 @@ function safeRender() {
 // ════════════════════════════════════════════════════════════
 function switchTab(id) {
   closeDropdown();
+  // Если запрошен неактивный дивизион — перенаправляем на первый активный
+  if (typeof id === 'string' && DIV_KEYS.includes(id) && !activeDivKeys().includes(id)) {
+    id = activeDivKeys()[0] || 0;
+  }
   activeTabId = id;
 
   // Hide all, show target
@@ -1670,10 +1674,12 @@ function playerRankBadge(name, gender) {
   const arr = ranked[gender];
   const p = arr.find(x => x.name === name);
   if (!p || p.pts === 0) return '';
-  const divKey = p.globalRank <= ppc ? 'hard' : p.globalRank <= ppc*2 ? 'advance' : p.globalRank <= ppc*3 ? 'medium' : 'lite';
-  const divLabel = divKey === 'hard' ? '🔥HARD' : divKey === 'advance' ? '⚡ADV' : divKey === 'medium' ? '⚙️MED' : '🍀LITE';
+  const keys = activeDivKeys();
+  const divIdx = Math.min(Math.floor((p.globalRank - 1) / ppc), keys.length - 1);
+  const divKey = keys[divIdx];
+  const DIV_LABELS = { hard:'🔥HARD', advance:'⚡ADV', medium:'⚙️MED', lite:'🍀LITE' };
   const divCls = 'prb-' + divKey;
-  return `<div class="p-rank-badge"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'=':''}</span><span class="p-rank-badge-div ${divCls}">${divLabel}</span><span>${p.pts}оч</span></div>`;
+  return `<div class="p-rank-badge"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'=':''}</span><span class="p-rank-badge-div ${divCls}">${DIV_LABELS[divKey]}</span><span>${p.pts}оч</span></div>`;
 }
 
 function renderCourt(ci) {
