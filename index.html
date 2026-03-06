@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d0d1a">
-<title>King of the Court</title>
+<title>Лютые пляжники !! King of the Court</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +50,10 @@ body{
   border-bottom:1px solid #1e1e34;
   gap:4px;
 }
-.nav-logo{height:26px;flex-shrink:0;margin-right:6px}
+.nav-logo{flex-shrink:0;margin-right:6px;display:flex;flex-direction:column;line-height:1.1}
+.brand-main{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.brand-sub{font-size:0.7rem;color:#fff;opacity:.8;font-weight:400;letter-spacing:.3px}
+@media(max-width:380px){.brand-main{font-size:1.1rem}}
 .nav-spacer{flex:1}
 /* ── Нижние 2 ряда пиллов ─────────────────────────────────── */
 .nav-pills-row{
@@ -914,7 +917,7 @@ body{
 
 <!-- ── NAV ──────────────────────────────────────────────── -->
 <nav id="nav">
-  <img id="nav-logo" class="nav-logo" src="" alt="KOTC">
+  <div class="nav-logo"><div class="brand-main">Лютые пляжники !!</div><div class="brand-sub">King of the Court</div></div>
   <!-- buttons built by JS -->
 </nav>
 
@@ -1347,10 +1350,9 @@ function buildNav() {
   const top = document.createElement('div');
   top.className = 'nav-top';
 
-  const logo = document.createElement('img');
-  logo.id = 'nav-logo'; logo.className = 'nav-logo'; logo.alt = 'KOTC';
-  const savedLogo = localStorage.getItem('kotc3_logo');
-  if (savedLogo) logo.src = savedLogo;
+  const logo = document.createElement('div');
+  logo.className = 'nav-logo';
+  logo.innerHTML = '<div class="brand-main">Лютые пляжники !!</div><div class="brand-sub">King of the Court</div>';
   top.appendChild(logo);
 
   const spacer = document.createElement('div');
