@@ -1450,6 +1450,21 @@ function buildAll() {
   attachSwipe();
 }
 
+// Перерисовка с сохранением позиции прокрутки и фокуса
+function safeRender() {
+  const _scrollPos = window.scrollY;
+  const _focusId   = document.activeElement?.id;
+  const _focusSel  = [document.activeElement?.selectionStart, document.activeElement?.selectionEnd];
+  buildAll();
+  switchTab(activeTabId != null ? activeTabId : 0);
+  window.scrollTo(0, _scrollPos);
+  if (_focusId) {
+    const el = document.getElementById(_focusId);
+    if (el) { el.focus(); try { el.setSelectionRange(_focusSel[0], _focusSel[1]); } catch(e){} }
+  }
+}
+
+
 // ════════════════════════════════════════════════════════════
 // 7. TAB SWITCHING
 // ════════════════════════════════════════════════════════════
@@ -2352,9 +2367,6 @@ function sbApplyRemoteState(state) {
     }
     if (state.meta) tournamentMeta = { ...tournamentMeta, ...state.meta };
     if (state.cfg) { ppc = state.cfg.ppc || ppc; nc = state.cfg.nc || nc; }
-    // Save focus before rebuild
-    const _focusId    = document.activeElement?.id;
-    const _focusSel   = [document.activeElement?.selectionStart, document.activeElement?.selectionEnd];
     if (state.timers) {
       const now = Date.now();
       state.timers.forEach((s, ci) => {
@@ -2374,14 +2386,8 @@ function sbApplyRemoteState(state) {
         }
       });
     }
-    // Re-render current screen
-    buildAll();
-    switchTab(activeTabId != null ? activeTabId : 0);
-    // Restore focus after rebuild
-    if (_focusId) {
-      const el = document.getElementById(_focusId);
-      if (el) { el.focus(); try { el.setSelectionRange(_focusSel[0], _focusSel[1]); } catch(e){} }
-    }
+    // Перерисовка с сохранением скролла и фокуса
+    safeRender();
   } finally {
     sbIsApplying = false;
   }
