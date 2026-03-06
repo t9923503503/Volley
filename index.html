@@ -3010,6 +3010,31 @@ function playScoreSound(dir) {
   } catch(e) {}
 }
 
+function playComboSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523, 659, 784, 1047]; // до-ми-соль-до (мажорный аккорд вверх)
+    notes.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.09;
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    });
+    setTimeout(() => ctx.close(), 800);
+  } catch(e) {}
+}
+
+// Combo tracker: last pressed player key → timestamp + count
+const _comboTracker = {};
+const COMBO_WINDOW = 1500; // ms
+
 function scoreClickHandler(e) {
   const btn = e.target.closest('.score-btn');
   if (!btn) return;
@@ -3017,7 +3042,24 @@ function scoreClickHandler(e) {
   btn.dataset.busy = '1';
   setTimeout(() => delete btn.dataset.busy, 200);
   const dir    = +btn.dataset.dir;
-  playScoreSound(dir);
+
+  // Combo detection (только для +)
+  if (dir > 0) {
+    const key = `${btn.dataset.div||btn.dataset.ci}_${btn.dataset.mi}_${btn.dataset.ri}`;
+    const now = Date.now();
+    const tr  = _comboTracker[key];
+    if (tr && now - tr.t < COMBO_WINDOW) {
+      tr.count++;
+      tr.t = now;
+      if (tr.count >= 2) { playComboSound(); }
+      else               { playScoreSound(dir); }
+    } else {
+      _comboTracker[key] = { t: now, count: 1 };
+      playScoreSound(dir);
+    }
+  } else {
+    playScoreSound(dir);
+  }
   const mi     = +btn.dataset.mi;
   const ri     = +btn.dataset.ri;
   const divKey = btn.dataset.div;
