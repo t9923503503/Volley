@@ -546,9 +546,16 @@ body{
 }
 .match-card{
   background:var(--card);border-radius:10px;border:1px solid #2a2a40;
-  padding:10px 12px;margin-bottom:6px;transition:border-color .15s
+  padding:10px 12px;margin-bottom:6px;transition:border-color .15s;
+  border-left-width:4px;
 }
 .match-card.has-score{border-color:#3a3a5e}
+/* Цвета пар */
+.pair-0{border-left-color:#4da8da;background:linear-gradient(90deg,rgba(77,168,218,.08),transparent)}
+.pair-1{border-left-color:#6abf69;background:linear-gradient(90deg,rgba(106,191,105,.08),transparent)}
+.pair-2{border-left-color:#f5a623;background:linear-gradient(90deg,rgba(245,166,35,.08),transparent)}
+.pair-3{border-left-color:#c77dff;background:linear-gradient(90deg,rgba(199,125,255,.08),transparent)}
+.pair-4{border-left-color:#ff6b6b;background:linear-gradient(90deg,rgba(255,107,107,.08),transparent)}
 .mrow{display:flex;align-items:center;gap:10px}
 .mrow+.mrow{margin-top:7px;padding-top:7px;border-top:1px solid #1e1e34}
 .g-icon{font-size:16px;flex-shrink:0;width:20px}
@@ -1778,7 +1785,7 @@ function renderCourt(ci) {
       const scVal = isNull ? 0 : sc;
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html += `
-      <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
+      <div class="match-card pair-${mi}${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
         <div class="match-card-inner">
           <div class="match-card-rows">
             <div class="mrow">
@@ -2077,7 +2084,7 @@ function renderDivCourt(key, svodM, svodW) {
       const scVal = isNull ? 0 : sc;
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html+=`
-      <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
+      <div class="match-card pair-${mi}${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
         <div class="match-card-inner">
           <div class="match-card-rows">
             <div class="mrow">
