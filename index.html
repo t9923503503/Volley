@@ -2371,6 +2371,10 @@ function sbApplyRemoteState(state) {
       const now = Date.now();
       state.timers.forEach((s, ci) => {
         if (!timerState[ci]) return;
+        // Smart merge: применяем только если входящий ts новее локального
+        const remoteTs = (state.timerTs && state.timerTs[ci]) || 0;
+        const localTs  = timerTs[ci] || 0;
+        if (remoteTs < localTs) return;
         const ts = timerState[ci];
         ts.preset = s.preset ?? ts.preset;
         ts.total  = s.total  ?? ts.total;
@@ -2384,7 +2388,9 @@ function sbApplyRemoteState(state) {
         } else {
           ts.remaining = s.remaining ?? ts.remaining;
         }
+        timerTs[ci] = remoteTs; // фиксируем принятый ts
       });
+      saveTimerState();
     }
     // Перерисовка с сохранением скролла и фокуса
     safeRender();
@@ -2407,6 +2413,7 @@ function sbGetLocalState() {
       preset: ts.preset, total: ts.total, remaining: ts.remaining,
       running: ts.running, startedAt: ts.startedAt, startRemaining: ts.startRemaining,
     })),
+    timerTs: [...timerTs],
   };
 }
 
@@ -3113,6 +3120,7 @@ if ('serviceWorker' in navigator) {
 // Uses Date.now() anchoring so background/lock screen won't drift.
 // ════════════════════════════════════════════════════════════
 const TIMER_PRESETS = [10, 12, 15]; // minutes
+let timerTs = Array(8).fill(0); // last-action timestamp per timer (for smart merge)
 const timerState = Array.from({length:8}, () => ({  // 0-3: корты, 4-7: дивизионы
   preset:   10,           // selected preset in minutes
   total:    10 * 60,      // total seconds for current preset
@@ -3294,6 +3302,7 @@ function timerStartPause(ci) {
     // Unlock AudioContext on first user gesture
     try { getAudioCtx().resume(); } catch(e) {}
   }
+  timerTs[ci] = Date.now();
   updateTimerUI(ci);
   saveTimerState();
   sbPush();
@@ -3305,6 +3314,7 @@ function timerReset(ci) {
   ts.remaining      = ts.total;
   ts.startedAt      = null;
   ts.startRemaining = ts.total;
+  timerTs[ci] = Date.now();
   updateTimerUI(ci);
   // Sync preset buttons
   document.querySelectorAll(`[data-timer-ci="${ci}"]`).forEach(b => {
@@ -3321,11 +3331,13 @@ function timerSetPreset(ci, minutes) {
   ts.total     = minutes * 60;
   ts.remaining = ts.total;
   ts.startRemaining = ts.total;
+  timerTs[ci] = Date.now();
   updateTimerUI(ci);
   document.querySelectorAll(`[data-timer-ci="${ci}"]`).forEach(b => {
     b.classList.toggle('active', +b.dataset.timerMin === minutes);
   });
   saveTimerState();
+  sbPush();
 }
 
 // ── Render helper (called inside renderCourt) ────────────────
