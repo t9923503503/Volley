@@ -2239,6 +2239,14 @@ async function sbConnect() {
     if (data?.state) {
       sbApplyRemoteState(data.state);
       showToast('📥 Состояние загружено с сервера');
+    } else {
+      // Сервер пустой — пушим локальное состояние как мастер
+      await sbClient.from('kotc_sessions').upsert({
+        room_code:  sbConfig.roomCode,
+        state:      sbGetLocalState(),
+        updated_at: new Date().toISOString(),
+      });
+      showToast('📤 Локальное состояние отправлено на сервер');
     }
 
     // Subscribe to changes
@@ -3286,6 +3294,7 @@ function renderTimerBlock(ci) {
 loadState();
 loadTimerState(); // восстанавливаем таймеры после перезагрузки
 sbLoadConfig();    // загружаем настройки Supabase
+if (sbConfig.roomCode) sbConnect(); // автоподключение если был код комнаты
 gshLoadConfig();   // загружаем настройки Google Sheets
 // Дата по умолчанию — сегодня
 if (!tournamentMeta.date) tournamentMeta.date = new Date().toISOString().split('T')[0];
