@@ -3201,7 +3201,6 @@ function saveTimerState() {
     }));
     localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(snapshot));
   } catch(e) {}
-  sbPush();
 }
 
 function loadTimerState() {
@@ -3251,6 +3250,7 @@ function timerStartPause(ci) {
   }
   updateTimerUI(ci);
   saveTimerState();
+  sbPush();
 }
 
 function timerReset(ci) {
@@ -3265,6 +3265,7 @@ function timerReset(ci) {
     b.classList.toggle('active', +b.dataset.timerMin === ts.preset);
   });
   saveTimerState();
+  sbPush();
 }
 
 function timerSetPreset(ci, minutes) {
