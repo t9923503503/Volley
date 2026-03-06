@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0d0d1a">
 <title>Лютые пляжники !! King of the Court</title>
 <link rel="manifest" href="manifest.json">
@@ -19,15 +19,25 @@
   --dark:#0d0d1a;--dark2:#13131f;--dark3:#1a1a2e;--dark4:#16213e;
   --card:#1e1e32;--text:#e8e8f0;--muted:#6b6b8a;
   --plus:#22c55e;--minus:#ef4444;
-  --nav-h:96px;
+  --nav-base-h:96px;
+  --nav-h:calc(var(--nav-base-h) + env(safe-area-inset-top,0px));
 }
-html{font-size:16px;-webkit-text-size-adjust:100%}
+html{
+  font-size:16px;
+  -webkit-text-size-adjust:100%;
+  /* Prevent rubber-band bounce — app feels native */
+  overscroll-behavior-y:none;
+}
 body{
   font-family:'Barlow',sans-serif;
   background:var(--dark);color:var(--text);
-  min-height:100vh;
-  /* space for fixed nav */
+  min-height:100vh;          /* fallback for old browsers */
+  min-height:100dvh;         /* dynamic viewport — hides mobile browser chrome correctly */
+  /* space for fixed nav (includes safe-area-inset-top via --nav-h) */
   padding-top:var(--nav-h);
+  /* keep content above Home Indicator on iPhone */
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  overscroll-behavior-y:none;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -41,7 +51,11 @@ body{
   border-bottom:1px solid #2a2a40;
   display:flex;flex-direction:column;
   z-index:200;
-  padding:0;
+  /* Push nav content below status bar / Dynamic Island */
+  padding-top:env(safe-area-inset-top,0px);
+  /* Respect side notches in landscape */
+  padding-left:env(safe-area-inset-left,0px);
+  padding-right:env(safe-area-inset-right,0px);
 }
 /* ── Верхняя строка: лого + утилиты ──────────────────────── */
 .nav-top{
@@ -136,7 +150,7 @@ body{
 .dropdown{
   position:fixed;
   /* top/left set by JS */
-  z-index:9999;
+  z-index:501;
   background:var(--dark3);
   border:1px solid #3a3a5e;
   border-radius:0 0 12px 12px;
@@ -162,13 +176,28 @@ body{
 .dd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* transparent overlay to close dropdown on outside click */
+/* ── Z-INDEX MAP ────────────────────────────────────────────
+   10   — sticky table headers (below nav when scrolling)
+   100  — .timer-block sticky (below nav)
+   200  — #nav fixed
+   201  — #scrollTopBtn
+   300  — .sync-topbar (above nav, cosmetic)
+   500  — #dd-backdrop
+   501  — .dropdown
+   1000 — #confirm-overlay
+   1001 — #pwd-overlay
+   1002 — #toast (topmost — always readable)
+   ──────────────────────────────────────────────────────── */
 #dd-backdrop{
-  display:none;position:fixed;inset:0;z-index:9998;
+  display:none;position:fixed;inset:0;z-index:500;
 }
 #dd-backdrop.open{display:block}
 
 /* ── SCREENS ─────────────────────────────────────────────── */
-#screens{min-height:calc(100vh - var(--nav-h))}
+#screens{
+  min-height:calc(100vh  - var(--nav-h));   /* fallback */
+  min-height:calc(100dvh - var(--nav-h));   /* dvh — correct on mobile Safari */
+}
 .screen{display:none;padding:14px 14px 32px;max-width:680px;margin:0 auto}
 .screen.active{display:block}
 
@@ -289,11 +318,11 @@ body{
 /* Sync flash on score cards */
 .sync-flash{animation:syncFlash .5s ease-out}
 @keyframes syncFlash{0%{background:rgba(62,207,142,.2)}100%{}}
-/* Top sync indicator */
+/* Top sync indicator — above nav (200), below dropdowns */
 .sync-topbar{
   display:none;position:fixed;top:0;left:0;right:0;
   height:3px;background:linear-gradient(90deg,#3ecf8e,#36b87e);
-  z-index:9999;animation:syncBar .6s ease-out forwards;
+  z-index:300;animation:syncBar .6s ease-out forwards;
 }
 @keyframes syncBar{0%{width:0;opacity:1}80%{width:100%;opacity:1}100%{opacity:0}}
 
@@ -775,20 +804,24 @@ body{
 
 /* ── TOAST ───────────────────────────────────────────────── */
 #toast{
-  position:fixed;bottom:24px;left:50%;
+  position:fixed;
+  bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  left:50%;
   transform:translateX(-50%) translateY(70px);
   background:var(--card);color:var(--text);
   border:1px solid #3a3a5e;border-radius:10px;
   padding:10px 20px;
   font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
-  z-index:10000;transition:transform .3s ease;
+  z-index:1002;transition:transform .3s ease;   /* topmost — above modals */
   pointer-events:none;white-space:nowrap
 }
 #toast.show{transform:translateX(-50%) translateY(0)}
 
 /* ── SCROLL TO TOP ───────────────────────────────────────── */
 #scrollTopBtn{
-  position:fixed;bottom:20px;right:16px;
+  position:fixed;
+  bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  right:calc(16px + env(safe-area-inset-right,0px));
   width:40px;height:40px;border-radius:50%;
   background:var(--dark3);border:1px solid #3a3a5e;
   color:var(--muted);font-size:16px;cursor:pointer;
@@ -798,13 +831,13 @@ body{
 
 /* ── CUSTOM CONFIRM MODAL ──────────────────────────────────── */
 #confirm-overlay{
-  display:none;position:fixed;inset:0;z-index:10000;
+  display:none;position:fixed;inset:0;z-index:1000;
   background:rgba(0,0,0,.72);align-items:center;justify-content:center;
   animation:ddFade .15s ease;
 }
 #confirm-overlay.open{display:flex;}
 #pwd-overlay{
-  display:none;position:fixed;inset:0;z-index:10001;
+  display:none;position:fixed;inset:0;z-index:1001;
   background:rgba(0,0,0,.85);align-items:center;justify-content:center;
   animation:ddFade .15s ease;
 }
