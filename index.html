@@ -3569,17 +3569,11 @@ function renderTimerBlock(ci) {
                           : ts.running ? 'timer-btn timer-btn-start paused'
                           : 'timer-btn timer-btn-start';
 
-  const isCustom = !TIMER_PRESETS.includes(ts.preset);
   return `<div class="timer-block">
     <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}">${display}</div>
-    <div class="timer-presets">
-      ${TIMER_PRESETS.map(m=>`<button class="timer-preset${ts.preset===m?' active':''}"
-        data-timer-ci="${ci}" data-timer-min="${m}"
-        onclick="timerSetPreset(${ci},${m})">${m} мин</button>`).join('')}
-    </div>
     <div class="timer-custom">
       <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
-      <div class="timer-custom-val${isCustom?' active':''}" id="tmr-custom-${ci}">${ts.preset} мин</div>
+      <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
       <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
     </div>
     <div class="timer-controls">
