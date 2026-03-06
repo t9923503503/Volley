@@ -1792,7 +1792,7 @@ function renderCourt(ci) {
       const scVal = isNull ? 0 : sc;
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html += `
-      <div class="match-card pair-${manColorIdx(ct.men[mi])}${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
+      <div class="match-card pair-${mi}${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
         <div class="match-card-inner">
           <div class="match-card-rows">
             <div class="mrow">
@@ -2091,7 +2091,7 @@ function renderDivCourt(key, svodM, svodW) {
       const scVal = isNull ? 0 : sc;
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html+=`
-      <div class="match-card pair-${manColorIdx(men[mi])}${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
+      <div class="match-card pair-${mi}${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
         <div class="match-card-inner">
           <div class="match-card-rows">
             <div class="mrow">
