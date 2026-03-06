@@ -973,6 +973,7 @@ body{
   flex:0 0 80px;
 }
 .timer-btn-reset:hover{color:var(--text);border-color:#5a5a8e}
+.timer-btn-reset.confirm{background:#5a2800;border-color:#ff7000;color:#ffaa55;font-weight:700;}
 .timer-progress{
   height:3px;
   background:#2a2a40;
@@ -3549,6 +3550,29 @@ function timerReset(ci) {
   sbPush();
 }
 
+const _timerResetGuardTimers = {};
+function timerResetGuard(ci) {
+  const btn = document.getElementById(`tmr-reset-${ci}`);
+  if (!btn) { timerReset(ci); return; }
+  if (btn.dataset.confirming === '1') {
+    clearTimeout(_timerResetGuardTimers[ci]);
+    delete _timerResetGuardTimers[ci];
+    btn.dataset.confirming = '';
+    btn.textContent = 'СБРОС';
+    btn.classList.remove('confirm');
+    timerReset(ci);
+  } else {
+    btn.dataset.confirming = '1';
+    btn.textContent = '✓ ОК?';
+    btn.classList.add('confirm');
+    _timerResetGuardTimers[ci] = setTimeout(() => {
+      btn.dataset.confirming = '';
+      btn.textContent = 'СБРОС';
+      btn.classList.remove('confirm');
+    }, 2000);
+  }
+}
+
 function timerSetPreset(ci, minutes) {
   const group = _timerGroup(ci);
   if (group.some(i => timerState[i].running)) return; // нельзя менять пресет во время игры
@@ -3610,7 +3634,7 @@ function renderTimerBlock(ci, roundNavHtml='') {
           <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
           <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
           <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})" style="flex:1">${startLabel}</button>
-          <button class="timer-btn timer-btn-reset" onclick="timerReset(${ci})">СБРОС</button>
+          <button class="timer-btn timer-btn-reset" id="tmr-reset-${ci}" onclick="timerResetGuard(${ci})">СБРОС</button>
         </div>
         <div class="timer-progress" style="margin-top:0">
           <div class="timer-progress-fill${danger?' danger':''}" id="tmr-bar-${ci}" style="width:${pct}%"></div>
