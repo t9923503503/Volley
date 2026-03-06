@@ -512,7 +512,8 @@ body{
   font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:2px
 }
 .court-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
-.round-nav{display:flex;justify-content:center;gap:6px;padding:6px 0 10px}
+.round-nav{display:flex;justify-content:center;gap:6px;padding:6px 0 2px}
+.round-nav-inner{display:flex;justify-content:center;gap:6px;padding:8px 0 2px;border-top:1px solid #2a2a40;margin-top:8px}
 .rnd-btn{
   font-family:'Barlow Condensed',sans-serif;
   font-size:15px;font-weight:900;letter-spacing:.5px;
@@ -883,7 +884,7 @@ body{
 }
 .timer-display{
   font-family:'Bebas Neue',sans-serif;
-  font-size:96px;
+  font-size:64px;
   line-height:1;
   letter-spacing:4px;
   color:var(--gold);
@@ -1786,17 +1787,16 @@ function playerRankBadge(name, gender) {
 function renderCourt(ci) {
   const ct   = ALL_COURTS[ci];
   const meta = COURT_META[ci];
-  let html = renderTimerBlock(ci) + `<div class="court-title" style="color:${meta.color}">${meta.name}</div>
-  <div class="court-sub">Раундов: ${ppc} · нажимайте + и −</div>
-  <div class="round-nav" id="rnd-nav-${ci}">
-    ${Array.from({length:ppc},(_,ri)=>{
-      const hasScores = Array.from({length:ppc},(_,mi)=>scores[ci]?.[mi]?.[ri]).some(s=>s!==null&&s>0);
-      const isCur = ri === (courtRound[ci]||0);
-      return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setCourtRound(${ci},${ri})">
-        <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
-      </button>`;
-    }).join('')}
-  </div>`;
+  const roundNavHtml = Array.from({length:ppc},(_,ri)=>{
+    const hasScores = Array.from({length:ppc},(_,mi)=>scores[ci]?.[mi]?.[ri]).some(s=>s!==null&&s>0);
+    const isCur = ri === (courtRound[ci]||0);
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setCourtRound(${ci},${ri})">
+      <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
+    </button>`;
+  }).join('');
+
+  let html = renderTimerBlock(ci, roundNavHtml) + `<div class="court-title" style="color:${meta.color}">${meta.name}</div>
+  <div class="court-sub">нажимайте + и −</div>`;
 
   const curRi = courtRound[ci] || 0;
   for (let ri = 0; ri < ppc; ri++) {
@@ -2076,8 +2076,17 @@ function renderDivCourt(key, svodM, svodW) {
       <div class="div-empty">Недостаточно участников — введите очки на кортах Этапа 1</div>`;
   }
 
+  // Round nav для дивизиона
+  const divRoundNavHtml = Array.from({length:Nd},(_,ri)=>{
+    const hasScores = Array.from({length:Nd},(_,mi)=>(divScores[key][mi]??[])[ri]).some(s=>s!==null&&s>0);
+    const isCur = ri === (divRoundState[key]||0);
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setDivRound('${key}',${ri})">
+      <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
+    </button>`;
+  }).join('');
+
   // Roster chips
-  let html = renderTimerBlock(dci) +
+  let html = renderTimerBlock(dci, divRoundNavHtml) +
     `<div class="div-title" style="color:${info.color}">${info.label}</div>
   <div class="div-sub">${info.sub}</div>
   <div class="div-roster-bar">`;
@@ -2089,16 +2098,7 @@ function renderDivCourt(key, svodM, svodW) {
   });
   html+=`</div>`;
 
-  // Round nav buttons
-  html += `<div class="round-nav" id="rnd-nav-${key}">
-    ${Array.from({length:Nd},(_,ri)=>{
-      const hasScores = Array.from({length:Nd},(_,mi)=>(divScores[key][mi]??[])[ri]).some(s=>s!==null&&s>0);
-      const isCur = ri === (divRoundState[key]||0);
-      return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setDivRound('${key}',${ri})">
-        <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
-      </button>`;
-    }).join('')}
-  </div>`;
+  // Round nav будет внутри таймер-блока (см. renderTimerBlock)
 
   // Show only current round
   const curDivRi = divRoundState[key] || 0;
@@ -3586,7 +3586,7 @@ function timerCustomStep(ci, step) {
 }
 
 // ── Render helper (called inside renderCourt) ────────────────
-function renderTimerBlock(ci) {
+function renderTimerBlock(ci, roundNavHtml='') {
   const ts = timerState[ci];
   const rem = ts.remaining;
   const mins = Math.floor(rem / 60);
@@ -3601,18 +3601,23 @@ function renderTimerBlock(ci) {
                           : ts.running ? 'timer-btn timer-btn-start paused'
                           : 'timer-btn timer-btn-start';
 
-  return `<div class="timer-block">
-    <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}">${display}</div>
-    <div class="timer-controls">
-      <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
-      <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
-      <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
-      <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})" style="flex:1">${startLabel}</button>
-      <button class="timer-btn timer-btn-reset" onclick="timerReset(${ci})">СБРОС</button>
+  return `<div class="timer-block" id="timer-block-${ci}">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}" style="flex-shrink:0">${display}</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <div class="timer-controls" style="margin-top:0">
+          <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
+          <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
+          <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
+          <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPause(${ci})" style="flex:1">${startLabel}</button>
+          <button class="timer-btn timer-btn-reset" onclick="timerReset(${ci})">СБРОС</button>
+        </div>
+        <div class="timer-progress" style="margin-top:0">
+          <div class="timer-progress-fill${danger?' danger':''}" id="tmr-bar-${ci}" style="width:${pct}%"></div>
+        </div>
+      </div>
     </div>
-    <div class="timer-progress">
-      <div class="timer-progress-fill${danger?' danger':''}" id="tmr-bar-${ci}" style="width:${pct}%"></div>
-    </div>
+    ${roundNavHtml ? `<div class="round-nav-inner" id="rnd-nav-${ci}">${roundNavHtml}</div>` : ''}
   </div>`;
 }
 // ════════════════════════════════════════════════════════════
