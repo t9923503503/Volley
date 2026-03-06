@@ -586,15 +586,19 @@ body{
   transition:transform .1s;
 }
 .score-btn.minus{
-  width:46px;height:46px;font-size:22px;
+  width:52px;height:52px;font-size:24px;
   background:#2a1a1a;color:var(--minus);
 }
 .score-btn.plus{
-  width:92px;height:92px;font-size:44px;border-radius:12px;
-  background:#1a2a1a;color:var(--plus);
+  width:88px;align-self:stretch;min-height:88px;font-size:52px;border-radius:12px;
+  background:#1a2a1a;color:var(--plus);flex-shrink:0;
 }
 .score-btn:disabled{opacity:.3;pointer-events:none}
 .score-btn:active{transform:scale(.91)}
+/* новая карточка */
+.mrow.score-main{align-items:stretch;gap:10px}
+.p-head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.minus-row{display:flex;justify-content:flex-end;margin-top:6px}
 .score-disp{
   min-width:46px;text-align:center;
   font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text)
@@ -1779,18 +1783,20 @@ function renderCourt(ci) {
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html += `
       <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
-        <div class="mrow">
-          <span class="g-icon">🏋️</span>
-          <div class="p-info">
-            <div class="p-name">${esc(ct.men[mi]||'—')}</div>
+        <div class="mrow score-main">
+          <button class="score-btn plus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+          <div class="p-info" style="flex:1;min-width:0">
+            <div class="p-head">
+              <span class="g-icon">🏋️</span>
+              <div class="p-name" style="flex:1">${esc(ct.men[mi]||'—')}</div>
+              <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
+            </div>
             ${ct.men[mi] ? playerRankBadge(ct.men[mi], 'M') : ''}
             <div class="p-partner">+ ${esc(ct.women[wi]||'—')}</div>
           </div>
-          <div class="score-widget">
-            <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
-            <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus"  data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
-          </div>
+        </div>
+        <div class="minus-row">
+          <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
         </div>
         <div class="mrow auto-row">
           <span class="g-icon">👩</span>
@@ -2074,17 +2080,19 @@ function renderDivCourt(key, svodM, svodW) {
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html+=`
       <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
-        <div class="mrow">
-          <span class="g-icon">🏋️</span>
-          <div class="p-info">
-            <div class="p-name">${esc(men[mi]||'—')}</div>
+        <div class="mrow score-main">
+          <button class="score-btn plus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+          <div class="p-info" style="flex:1;min-width:0">
+            <div class="p-head">
+              <span class="g-icon">🏋️</span>
+              <div class="p-name" style="flex:1">${esc(men[mi]||'—')}</div>
+              <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
+            </div>
             <div class="p-partner">+ ${esc(women[wi]||'—')}</div>
           </div>
-          <div class="score-widget">
-            <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
-            <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus"  data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
-          </div>
+        </div>
+        <div class="minus-row">
+          <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
         </div>
         <div class="mrow auto-row">
           <span class="g-icon">👩</span>
