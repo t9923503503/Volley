@@ -569,6 +569,10 @@ body{
 .rnd-btn.active .rn-lbl{opacity:1;color:var(--gold)}
 .rnd-btn.rnd-has-scores{border-color:#3a3a5e}
 .rnd-btn.rnd-has-scores.active{border-color:var(--gold)}
+.rnd-btn.rnd-confirming{
+  background:#5a2800;border-color:#ff7000;
+  color:#ffaa55;box-shadow:0 0 10px rgba(255,112,0,.3);
+}
 .round-lbl{
   font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;
@@ -1824,7 +1828,7 @@ function renderCourt(ci) {
   const roundNavHtml = Array.from({length:ppc},(_,ri)=>{
     const hasScores = Array.from({length:ppc},(_,mi)=>scores[ci]?.[mi]?.[ri]).some(s=>s!==null&&s>0);
     const isCur = ri === (courtRound[ci]||0);
-    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setCourtRound(${ci},${ri})">
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" id="rnd-${ci}-${ri}" onclick="setCourtRoundGuard(${ci},${ri})">
       <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
     </button>`;
   }).join('');
@@ -1886,6 +1890,55 @@ function setDivRound(key, ri) {
     const svod = getSvod();
     screen.innerHTML = renderDivCourt(key, svod[key].M, svod[key].W);
   }
+}
+
+/* ── Round-switch guard (double-tap to confirm) ──────────── */
+let   _rndGuardPending = null;   // { btnId, fn }
+const _rndGuardTimer   = {};
+
+function _rndGuard(btnId, fn) {
+  const btn = document.getElementById(btnId);
+  if (!btn) { fn(); return; }
+  if (btn.classList.contains('active')) return; // уже этот раунд — ничего делать
+
+  // Если нажали другую кнопку — отменяем предыдущее ожидание
+  if (_rndGuardPending && _rndGuardPending.btnId !== btnId) {
+    clearTimeout(_rndGuardTimer[_rndGuardPending.btnId]);
+    const prev = document.getElementById(_rndGuardPending.btnId);
+    if (prev) {
+      prev.classList.remove('rnd-confirming');
+      prev.querySelector('.rn-num').textContent = prev.dataset.origNum;
+    }
+    _rndGuardPending = null;
+  }
+
+  if (_rndGuardPending && _rndGuardPending.btnId === btnId) {
+    // Второе нажатие — подтверждаем переключение
+    clearTimeout(_rndGuardTimer[btnId]);
+    btn.classList.remove('rnd-confirming');
+    btn.querySelector('.rn-num').textContent = btn.dataset.origNum;
+    _rndGuardPending = null;
+    fn();
+  } else {
+    // Первое нажатие — показываем запрос подтверждения
+    const numEl = btn.querySelector('.rn-num');
+    btn.dataset.origNum = numEl.textContent;
+    numEl.textContent = '✓';
+    btn.classList.add('rnd-confirming');
+    _rndGuardPending = { btnId, fn };
+    _rndGuardTimer[btnId] = setTimeout(() => {
+      btn.classList.remove('rnd-confirming');
+      numEl.textContent = btn.dataset.origNum;
+      _rndGuardPending = null;
+    }, 2000);
+  }
+}
+
+function setCourtRoundGuard(ci, ri) {
+  _rndGuard(`rnd-${ci}-${ri}`, () => setCourtRound(ci, ri));
+}
+function setDivRoundGuard(key, ri) {
+  _rndGuard(`rnd-${key}-${ri}`, () => setDivRound(key, ri));
 }
 
 function setCourtRound(ci, ri) {
@@ -2114,7 +2167,7 @@ function renderDivCourt(key, svodM, svodW) {
   const divRoundNavHtml = Array.from({length:Nd},(_,ri)=>{
     const hasScores = Array.from({length:Nd},(_,mi)=>(divScores[key][mi]??[])[ri]).some(s=>s!==null&&s>0);
     const isCur = ri === (divRoundState[key]||0);
-    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" onclick="setDivRound('${key}',${ri})">
+    return `<button class="rnd-btn${isCur?' active':''}${hasScores?' rnd-has-scores':''}" id="rnd-${key}-${ri}" onclick="setDivRoundGuard('${key}',${ri})">
       <span class="rn-num">${ri+1}</span><span class="rn-lbl">РАУНД</span>
     </button>`;
   }).join('');
