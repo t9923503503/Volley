@@ -586,17 +586,15 @@ body{
   transition:transform .1s;
 }
 .score-btn.minus{
-  width:52px;height:52px;font-size:24px;
+  width:46px;height:46px;font-size:22px;
   background:#2a1a1a;color:var(--minus);
 }
 .score-btn.plus{
-  width:96px;height:96px;font-size:54px;border-radius:14px;
-  background:#1a2a1a;color:var(--plus);flex-shrink:0;
+  width:92px;height:92px;font-size:44px;border-radius:12px;
+  background:#1a2a1a;color:var(--plus);
 }
 .score-btn:disabled{opacity:.3;pointer-events:none}
 .score-btn:active{transform:scale(.91)}
-.score-area{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.minus-row{display:flex;justify-content:flex-start;margin-top:5px;padding-top:5px;border-top:1px solid #1e1e34}
 .score-disp{
   min-width:46px;text-align:center;
   font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text)
@@ -1788,13 +1786,11 @@ function renderCourt(ci) {
             ${ct.men[mi] ? playerRankBadge(ct.men[mi], 'M') : ''}
             <div class="p-partner">+ ${esc(ct.women[wi]||'—')}</div>
           </div>
-          <div class="score-area">
+          <div class="score-widget">
+            <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
             <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+            <button class="score-btn plus"  data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
           </div>
-        </div>
-        <div class="minus-row">
-          <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
         </div>
         <div class="mrow auto-row">
           <span class="g-icon">👩</span>
@@ -2084,13 +2080,11 @@ function renderDivCourt(key, svodM, svodW) {
             <div class="p-name">${esc(men[mi]||'—')}</div>
             <div class="p-partner">+ ${esc(women[wi]||'—')}</div>
           </div>
-          <div class="score-area">
+          <div class="score-widget">
+            <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
             <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
+            <button class="score-btn plus"  data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
           </div>
-        </div>
-        <div class="minus-row">
-          <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
         </div>
         <div class="mrow auto-row">
           <span class="g-icon">👩</span>
