@@ -3286,56 +3286,64 @@ function loadTimerState() {
   } catch(e) {}
 }
 
-// ── Timer actions ─────────────────────────────────────────────
+// ── Timer actions (глобальные: действие на любом корте = действие на всех) ────
 function timerStartPause(ci) {
-  const ts = timerState[ci];
-  if (ts.remaining <= 0) { timerReset(ci); return; }
-  if (ts.running) {
-    // Pause
-    ts.running = false;
-    ts.remaining = Math.max(0, ts.startRemaining - (Date.now() - ts.startedAt) / 1000);
-  } else {
-    // Start / resume — anchor to wall clock
-    ts.startedAt      = Date.now();
-    ts.startRemaining = ts.remaining;
-    ts.running        = true;
-    // Unlock AudioContext on first user gesture
-    try { getAudioCtx().resume(); } catch(e) {}
+  const now = Date.now();
+  const ref = timerState[ci]; // решение старт/пауза берём с корта-инициатора
+  if (ref.remaining <= 0) { timerReset(ci); return; }
+  const willRun = !ref.running;
+  if (willRun) try { getAudioCtx().resume(); } catch(e) {}
+
+  for (let i = 0; i < 4; i++) {
+    const ts = timerState[i];
+    if (willRun) {
+      ts.startedAt      = now;
+      ts.startRemaining = ts.remaining;
+      ts.running        = true;
+    } else {
+      ts.running   = false;
+      ts.remaining = Math.max(0, ts.startRemaining - (now - ts.startedAt) / 1000);
+    }
+    timerTs[i] = now;
+    updateTimerUI(i);
   }
-  timerTs[ci] = Date.now();
-  updateTimerUI(ci);
   saveTimerState();
   sbPush();
 }
 
 function timerReset(ci) {
-  const ts = timerState[ci];
-  ts.running        = false;
-  ts.remaining      = ts.total;
-  ts.startedAt      = null;
-  ts.startRemaining = ts.total;
-  timerTs[ci] = Date.now();
-  updateTimerUI(ci);
-  // Sync preset buttons
-  document.querySelectorAll(`[data-timer-ci="${ci}"]`).forEach(b => {
-    b.classList.toggle('active', +b.dataset.timerMin === ts.preset);
-  });
+  const now = Date.now();
+  for (let i = 0; i < 4; i++) {
+    const ts = timerState[i];
+    ts.running        = false;
+    ts.remaining      = ts.total;
+    ts.startedAt      = null;
+    ts.startRemaining = ts.total;
+    timerTs[i] = now;
+    updateTimerUI(i);
+    document.querySelectorAll(`[data-timer-ci="${i}"]`).forEach(b => {
+      b.classList.toggle('active', +b.dataset.timerMin === ts.preset);
+    });
+  }
   saveTimerState();
   sbPush();
 }
 
 function timerSetPreset(ci, minutes) {
-  const ts = timerState[ci];
-  if (ts.running) return; // ignore preset change while running
-  ts.preset    = minutes;
-  ts.total     = minutes * 60;
-  ts.remaining = ts.total;
-  ts.startRemaining = ts.total;
-  timerTs[ci] = Date.now();
-  updateTimerUI(ci);
-  document.querySelectorAll(`[data-timer-ci="${ci}"]`).forEach(b => {
-    b.classList.toggle('active', +b.dataset.timerMin === minutes);
-  });
+  if (timerState.slice(0, 4).some(ts => ts.running)) return; // нельзя менять пресет во время игры
+  const now = Date.now();
+  for (let i = 0; i < 4; i++) {
+    const ts = timerState[i];
+    ts.preset         = minutes;
+    ts.total          = minutes * 60;
+    ts.remaining      = ts.total;
+    ts.startRemaining = ts.total;
+    timerTs[i] = now;
+    updateTimerUI(i);
+    document.querySelectorAll(`[data-timer-ci="${i}"]`).forEach(b => {
+      b.classList.toggle('active', +b.dataset.timerMin === minutes);
+    });
+  }
   saveTimerState();
   sbPush();
 }
