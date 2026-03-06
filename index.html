@@ -3104,6 +3104,11 @@ function scoreClickHandler(e) {
   setTimeout(() => delete btn.dataset.busy, 200);
   const dir    = +btn.dataset.dir;
 
+  // Вибрация
+  if (dir > 0) {
+    try { navigator.vibrate && navigator.vibrate(40); } catch(e) {}
+  }
+
   // Combo detection (только для +)
   if (dir > 0) {
     const key = `${btn.dataset.div||btn.dataset.ci}_${btn.dataset.mi}_${btn.dataset.ri}`;
@@ -3112,7 +3117,7 @@ function scoreClickHandler(e) {
     if (tr && now - tr.t < COMBO_WINDOW) {
       tr.count++;
       tr.t = now;
-      if (tr.count >= 2) { playComboSound(); }
+      if (tr.count >= 2) { playComboSound(); try { navigator.vibrate && navigator.vibrate([40,30,80]); } catch(e) {} }
       else               { playScoreSound(dir); }
     } else {
       _comboTracker[key] = { t: now, count: 1 };
