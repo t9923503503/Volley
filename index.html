@@ -1625,10 +1625,10 @@ function renderRoster() {
     for (let pi = 0; pi < ppc; pi++) {
       html += `
         <div class="rc-entry"><span class="rc-num">${pi+1}</span>
-          <input class="rc-inp men-input" type="text" value="${esc(men[pi]||'')}"
+          <input class="rc-inp men-input" type="text" id="rc-${ci}-men-${pi}" value="${esc(men[pi]||'')}"
             data-ci="${ci}" data-g="men" data-pi="${pi}" placeholder="Фамилия"></div>
         <div class="rc-entry"><span class="rc-num">${pi+1}</span>
-          <input class="rc-inp women-input" type="text" value="${esc(women[pi]||'')}"
+          <input class="rc-inp women-input" type="text" id="rc-${ci}-women-${pi}" value="${esc(women[pi]||'')}"
             data-ci="${ci}" data-g="women" data-pi="${pi}" placeholder="Фамилия"></div>`;
     }
     html += `</div>`;
@@ -2336,7 +2336,11 @@ function sbApplyRemoteState(state) {
     } else if (state.divScores) {
       divScores = state.divScores;
     }
-    if (state.scoreTs) scoreTs = { ...scoreTs, ...state.scoreTs };
+    if (state.scoreTs) {
+      Object.keys(state.scoreTs).forEach(k => {
+        scoreTs[k] = Math.max(scoreTs[k] || 0, state.scoreTs[k] || 0);
+      });
+    }
     if (state.divRoster) divRoster = state.divRoster;
     if (state.roster) {
       state.roster.forEach((c, ci) => {
@@ -2372,8 +2376,7 @@ function sbApplyRemoteState(state) {
     }
     // Re-render current screen
     buildAll();
-    const cur = document.querySelector('.screen.active');
-    if (cur) switchTab(activeTabId);
+    switchTab(activeTabId != null ? activeTabId : 0);
     // Restore focus after rebuild
     if (_focusId) {
       const el = document.getElementById(_focusId);
@@ -3355,14 +3358,16 @@ function renderTimerBlock(ci) {
 // 22. INIT
 // ════════════════════════════════════════════════════════════
 loadState();
-loadTimerState(); // восстанавливаем таймеры после перезагрузки
+loadTimerState();  // восстанавливаем таймеры после перезагрузки
 sbLoadConfig();    // загружаем настройки Supabase
-if (sbConfig.roomCode) sbConnect(); // автоподключение если был код комнаты
 gshLoadConfig();   // загружаем настройки Google Sheets
 // Дата по умолчанию — сегодня
 if (!tournamentMeta.date) tournamentMeta.date = new Date().toISOString().split('T')[0];
+// DOM строим до сетевых запросов, чтобы не было пустого экрана
 buildAll();
-switchTab(0);
+switchTab(activeTabId || 0);
+// После первичной отрисовки — подключаемся к Supabase
+if (sbConfig.roomCode) sbConnect();
 timerTick(); // start global animation loop
 </script>
 
