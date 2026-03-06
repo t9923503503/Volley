@@ -3286,15 +3286,21 @@ function loadTimerState() {
   } catch(e) {}
 }
 
-// ── Timer actions (глобальные: действие на любом корте = действие на всех) ────
+// ── Timer actions (глобальные: действие на любом корте/дивизионе = действие на всей группе) ────
+// ci < 4  → корты (группа 0-3)
+// ci >= 4 → дивизионы (группа 4-7)
+function _timerGroup(ci) {
+  return ci < 4 ? [0, 1, 2, 3] : [4, 5, 6, 7];
+}
+
 function timerStartPause(ci) {
-  const now = Date.now();
-  const ref = timerState[ci]; // решение старт/пауза берём с корта-инициатора
+  const now  = Date.now();
+  const ref  = timerState[ci]; // решение старт/пауза берём с инициатора
   if (ref.remaining <= 0) { timerReset(ci); return; }
   const willRun = !ref.running;
   if (willRun) try { getAudioCtx().resume(); } catch(e) {}
 
-  for (let i = 0; i < 4; i++) {
+  for (const i of _timerGroup(ci)) {
     const ts = timerState[i];
     if (willRun) {
       ts.startedAt      = now;
@@ -3313,7 +3319,7 @@ function timerStartPause(ci) {
 
 function timerReset(ci) {
   const now = Date.now();
-  for (let i = 0; i < 4; i++) {
+  for (const i of _timerGroup(ci)) {
     const ts = timerState[i];
     ts.running        = false;
     ts.remaining      = ts.total;
@@ -3330,9 +3336,10 @@ function timerReset(ci) {
 }
 
 function timerSetPreset(ci, minutes) {
-  if (timerState.slice(0, 4).some(ts => ts.running)) return; // нельзя менять пресет во время игры
+  const group = _timerGroup(ci);
+  if (group.some(i => timerState[i].running)) return; // нельзя менять пресет во время игры
   const now = Date.now();
-  for (let i = 0; i < 4; i++) {
+  for (const i of group) {
     const ts = timerState[i];
     ts.preset         = minutes;
     ts.total          = minutes * 60;
