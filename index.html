@@ -1351,6 +1351,7 @@ function buildNav() {
   top.className = 'nav-top';
 
   const logo = document.createElement('div');
+  logo.id = 'nav-logo'; // сохраняем id — инжект base64 делает getElementById('nav-logo').src
   logo.className = 'nav-logo-container';
   logo.innerHTML = '<div class="brand-main">ЛЮТЫЕ ПЛЯЖНИКИ !!</div><div class="brand-sub">King of the Court</div>';
   top.appendChild(logo);
