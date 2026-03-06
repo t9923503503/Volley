@@ -590,9 +590,12 @@ body{
   background:#2a1a1a;color:var(--minus);
 }
 .score-btn.plus{
-  width:110px;height:110px;font-size:62px;border-radius:14px;flex-shrink:0;
+  width:110px;font-size:62px;border-radius:14px;flex-shrink:0;
   background:#1a2a1a;color:var(--plus);
+  align-self:stretch;min-height:80px;
 }
+.match-card-inner{display:flex;gap:10px;align-items:stretch}
+.match-card-rows{flex:1;min-width:0}
 .score-btn:disabled{opacity:.3;pointer-events:none}
 .score-btn:active{transform:scale(.91)}
 .score-disp{
@@ -1779,28 +1782,32 @@ function renderCourt(ci) {
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html += `
       <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="card-${ci}-${mi}-${ri}">
-        <div class="mrow">
-          <span class="g-icon">🏋️</span>
-          <div class="p-info">
-            <div class="p-name">${esc(ct.men[mi]||'—')}</div>
-            ${ct.men[mi] ? playerRankBadge(ct.men[mi], 'M') : ''}
-            <div class="p-partner">+ ${esc(ct.women[wi]||'—')}</div>
+        <div class="match-card-inner">
+          <div class="match-card-rows">
+            <div class="mrow">
+              <span class="g-icon">🏋️</span>
+              <div class="p-info">
+                <div class="p-name">${esc(ct.men[mi]||'—')}</div>
+                ${ct.men[mi] ? playerRankBadge(ct.men[mi], 'M') : ''}
+                <div class="p-partner">+ ${esc(ct.women[wi]||'—')}</div>
+              </div>
+              <div class="score-widget">
+                <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
+                <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
+              </div>
+            </div>
+            <div class="mrow auto-row">
+              <span class="g-icon">👩</span>
+              <div class="p-info">
+                <div class="p-name">${esc(ct.women[wi]||'—')}</div>
+                ${ct.women[wi] ? playerRankBadge(ct.women[wi], 'W') : ''}
+                <div class="p-partner">+ ${esc(ct.men[mi]||'—')}</div>
+              </div>
+              <span class="auto-badge">AUTO</span>
+              <div class="auto-score" id="as-${ci}-${wi}-${ri}">${isNull?'–':scVal}</div>
+            </div>
           </div>
-          <div class="score-widget">
-            <button class="score-btn minus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
-            <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="sd-${ci}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
-          </div>
-        </div>
-        <div class="mrow auto-row">
-          <span class="g-icon">👩</span>
-          <div class="p-info">
-            <div class="p-name">${esc(ct.women[wi]||'—')}</div>
-            ${ct.women[wi] ? playerRankBadge(ct.women[wi], 'W') : ''}
-            <div class="p-partner">+ ${esc(ct.men[mi]||'—')}</div>
-          </div>
-          <span class="auto-badge">AUTO</span>
-          <div class="auto-score" id="as-${ci}-${wi}-${ri}">${isNull?'–':scVal}</div>
+          <button class="score-btn plus" data-ci="${ci}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
         </div>
       </div>`;
     }
@@ -2074,23 +2081,27 @@ function renderDivCourt(key, svodM, svodW) {
       const mx  = scVal>=15, zr = !isNull && scVal===0;
       html+=`
       <div class="match-card${(!isNull && scVal>0)?' has-score':''}" id="dcard-${key}-${mi}-${ri}">
-        <div class="mrow">
-          <span class="g-icon">🏋️</span>
-          <div class="p-info">
-            <div class="p-name">${esc(men[mi]||'—')}</div>
-            <div class="p-partner">+ ${esc(women[wi]||'—')}</div>
+        <div class="match-card-inner">
+          <div class="match-card-rows">
+            <div class="mrow">
+              <span class="g-icon">🏋️</span>
+              <div class="p-info">
+                <div class="p-name">${esc(men[mi]||'—')}</div>
+                <div class="p-partner">+ ${esc(women[wi]||'—')}</div>
+              </div>
+              <div class="score-widget">
+                <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
+                <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
+              </div>
+            </div>
+            <div class="mrow auto-row">
+              <span class="g-icon">👩</span>
+              <div class="p-info"><div class="p-name">${esc(women[wi]||'—')}</div></div>
+              <span class="auto-badge">AUTO</span>
+              <div class="auto-score" id="das-${key}-${wi}-${ri}">${isNull?'–':scVal}</div>
+            </div>
           </div>
-          <div class="score-widget">
-            <button class="score-btn minus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="-1"${(isNull||scVal<=0)?' disabled':''}>−</button>
-            <div class="score-disp${mx?' mx':zr?' zr':isNull?' zr':''}" id="dsd-${key}-${mi}-${ri}">${isNull?'–':scVal}<span class="score-max-lbl">${mx?'МАХ':isNull?'':'/15'}</span></div>
-            <button class="score-btn plus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
-          </div>
-        </div>
-        <div class="mrow auto-row">
-          <span class="g-icon">👩</span>
-          <div class="p-info"><div class="p-name">${esc(women[wi]||'—')}</div></div>
-          <span class="auto-badge">AUTO</span>
-          <div class="auto-score" id="das-${key}-${wi}-${ri}">${isNull?'–':scVal}</div>
+          <button class="score-btn plus" data-div="${key}" data-mi="${mi}" data-ri="${ri}" data-dir="1"${scVal>=15?' disabled':''}>+</button>
         </div>
       </div>`;
     }
