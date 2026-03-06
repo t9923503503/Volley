@@ -1664,7 +1664,11 @@ function renderRoster() {
   </div>
   <button class="btn-finish" onclick="finishTournament()">
     🏁 ЗАВЕРШИТЬ ТУРНИР
-  </button>`;
+  </button>
+  <div style="margin-top:12px;padding:14px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(233,69,96,.2);border-radius:12px">
+    <div style="color:var(--muted);font-size:12px;margin-bottom:10px;text-align:center">⚠️ Сброс очищает все результаты. Ростер сохраняется.</div>
+    <button class="btn-reset-tournament" onclick="resetTournament()">🗑 Сбросить турнир</button>
+  </div>`;
   return html;
 }
 
@@ -2145,11 +2149,6 @@ function renderStats() {
       }).join('')}
     </div>
 
-    <div class="stat-card" style="border-color:#3a1a1a">
-      <div class="stat-card-title">⚠️ УПРАВЛЕНИЕ ТУРНИРОМ</div>
-      <div style="color:var(--muted);font-size:13px;margin-bottom:12px">Сброс очищает все результаты. Ростер сохраняется.</div>
-      <button class="btn-reset-tournament" onclick="resetTournament()">🗑 Сбросить турнир</button>
-    </div>
   </div>
 
   ${renderHistory()}`;
