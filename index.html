@@ -1075,6 +1075,7 @@ body{
   box-shadow:0 4px 14px rgba(200,80,0,.35);
   color:#ffcc88;
 }
+.timer-btn-start.timer-btn-continue{font-size:7px;padding:3px 0;letter-spacing:0}
 .timer-btn-reset{
   background:var(--card);
   border:1px solid #3a3a5e;
@@ -3950,7 +3951,7 @@ function updateTimerUI(ci) {
       btn.className = 'timer-btn timer-btn-start paused';
     } else {
       btn.textContent = rem < ts.total ? 'ПРОДОЛЖИТЬ' : 'СТАРТ';
-      btn.className = 'timer-btn timer-btn-start';
+      btn.className = rem < ts.total ? 'timer-btn timer-btn-start timer-btn-continue' : 'timer-btn timer-btn-start';
     }
   }
 
@@ -4187,6 +4188,7 @@ function renderTimerBlock(ci, roundNavHtml='') {
   const startLabel = done ? 'ГОТОВО' : ts.running ? 'ПАУЗА' : rem < ts.total ? 'ПРОДОЛЖИТЬ' : 'СТАРТ';
   const startCls   = done ? 'timer-btn timer-btn-reset'
                           : ts.running ? 'timer-btn timer-btn-start paused'
+                          : rem < ts.total ? 'timer-btn timer-btn-start timer-btn-continue'
                           : 'timer-btn timer-btn-start';
 
   return `<div class="timer-block" id="timer-block-${ci}">
