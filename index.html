@@ -825,6 +825,27 @@ body{
 }
 #toast.show{transform:translateX(-50%) translateY(0)}
 
+/* ── HISTORY LOG ─────────────────────────────────────────── */
+.history-card{background:var(--dark3);border:1px solid #2a2a40;border-radius:12px;margin-top:20px;overflow:hidden}
+.history-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2a2a40}
+.history-hdr-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.btn-clear-log{font-size:11px;padding:3px 10px;border-radius:8px;background:transparent;border:1px solid #3a3a5e;color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px;transition:all .15s}
+.btn-clear-log:hover{border-color:var(--red);color:var(--red)}
+.history-list{max-height:260px;overflow-y:auto;scrollbar-width:thin}
+.history-list::-webkit-scrollbar{width:3px}
+.history-list::-webkit-scrollbar-thumb{background:#3a3a5e;border-radius:2px}
+.history-row{padding:4px 14px;border-bottom:1px solid #1a1a2e;display:grid;grid-template-columns:52px auto 1fr auto auto;gap:5px;align-items:center;font-family:'Barlow Condensed',monospace;font-size:12px;line-height:1.4}
+.history-row:last-child{border-bottom:none}
+.history-row.neg{background:rgba(233,69,96,.06)}
+.history-time{color:var(--muted);font-size:11px}
+.history-court{color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.history-player{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-delta{font-weight:700;text-align:right}
+.history-delta.pos{color:var(--plus)}
+.history-delta.neg{color:var(--minus)}
+.history-total{color:var(--muted);font-size:11px;white-space:nowrap}
+.history-empty{padding:24px;text-align:center;color:var(--muted);font-size:12px;font-family:'Barlow Condensed',sans-serif}
+
 /* ── SCROLL TO TOP ───────────────────────────────────────── */
 #scrollTopBtn{
   position:fixed;
@@ -1069,7 +1090,8 @@ const divRoundState = { hard:0, advance:0, medium:0, lite:0 }; // текущий
 const DIV_TIMER_IDX = { hard:4, advance:5, medium:6, lite:7 };
 
 // ── Tournament meta ─────────────────────────────────────────
-let tournamentMeta = { name: '', date: '' };
+let tournamentMeta    = { name: '', date: '' };
+let tournamentHistory = [];   // Лента событий (макс. 200 записей)
 
 // pending values while user fiddles with seg buttons (not yet applied)
 let _ppc = ppc;
@@ -1301,6 +1323,7 @@ function saveState() {
     localStorage.setItem('kotc3_divscores',  JSON.stringify(divScores));
     localStorage.setItem('kotc3_divroster',  JSON.stringify(divRoster));
     localStorage.setItem('kotc3_meta',       JSON.stringify(tournamentMeta));
+    localStorage.setItem('kotc3_eventlog',   JSON.stringify(tournamentHistory));
   } catch(e){}
   sbPush(); // синхронизировать с Supabase
 }
@@ -1348,6 +1371,8 @@ function loadState() {
     const mt = localStorage.getItem('kotc3_meta');
     if (mt) { try { tournamentMeta = JSON.parse(mt); } catch(e){} }
     if (dr) { const pd=JSON.parse(dr); if(pd) DIV_KEYS.forEach(k=>{if(pd[k]) divRoster[k]=pd[k];}); }
+    const hs = localStorage.getItem('kotc3_eventlog');
+    if (hs) { try { tournamentHistory = JSON.parse(hs) || []; } catch(e){} }
   } catch(e){}
 }
 
@@ -1708,7 +1733,53 @@ async function resetRosterNames() {
 }
 
 // ════════════════════════════════════════════════════════════
-// 10. RENDER: ROSTER
+// 10. HISTORY LOG
+// ════════════════════════════════════════════════════════════
+const DIV_COURT_LABELS = { hard:'🔥 HARD', advance:'⚡ ADV', medium:'⚙️ MED', lite:'🍀 LITE' };
+
+function addHistoryEntry(courtName, playerName, delta, newScore) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  tournamentHistory.unshift({
+    time:   `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+    court:  courtName,
+    player: playerName,
+    delta,
+    score:  newScore
+  });
+  if (tournamentHistory.length > 200) tournamentHistory.length = 200;
+  // Живое обновление если вкладка РОСТЕР открыта
+  const el = document.getElementById('admin-history-log');
+  if (el) el.innerHTML = renderHistoryLog();
+}
+
+function renderHistoryLog() {
+  if (!tournamentHistory.length)
+    return `<div class="history-empty">Событий пока нет — нажмите «+» на любом корте</div>`;
+  return tournamentHistory.map(e => {
+    const pos  = e.delta > 0;
+    const sign = pos ? '+1' : '−1';
+    const dcls = pos ? 'pos' : 'neg';
+    const rowCls = pos ? '' : ' neg';
+    return `<div class="history-row${rowCls}">
+      <span class="history-time">[${e.time}]</span>
+      <span class="history-court">${esc(e.court)}</span>
+      <span class="history-player">| ${esc(e.player)}</span>
+      <span class="history-delta ${dcls}">${sign}</span>
+      <span class="history-total">(${e.score})</span>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  tournamentHistory = [];
+  saveState();
+  const el = document.getElementById('admin-history-log');
+  if (el) el.innerHTML = renderHistoryLog();
+}
+
+// ════════════════════════════════════════════════════════════
+// 11. RENDER: ROSTER
 // ════════════════════════════════════════════════════════════
 function renderRoster() {
   const today = new Date().toISOString().split('T')[0];
@@ -1798,6 +1869,13 @@ function renderRoster() {
   <div style="margin-top:12px;padding:14px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(233,69,96,.2);border-radius:12px">
     <div style="color:var(--muted);font-size:12px;margin-bottom:10px;text-align:center">⚠️ Сброс очищает все результаты. Ростер сохраняется.</div>
     <button class="btn-reset-tournament" onclick="resetTournament()">🗑 Сбросить турнир</button>
+  </div>
+  <div class="history-card">
+    <div class="history-hdr">
+      <span class="history-hdr-title">📋 Лента событий</span>
+      <button class="btn-clear-log" onclick="clearHistory()">Очистить</button>
+    </div>
+    <div class="history-list" id="admin-history-log">${renderHistoryLog()}</div>
   </div>`;
   return html;
 }
@@ -3238,6 +3316,7 @@ function scoreClickHandler(e) {
     if (old !== null && next === old) return;
     divScores[divKey][mi][ri] = next;
     scoreTs[divKey] = Date.now();
+    addHistoryEntry(DIV_COURT_LABELS[divKey] || divKey, divRoster[divKey].men[mi] || '—', dir, next);
     updateDivWidget(divKey, mi, ri, next);
     saveState();
   } else {
@@ -3249,6 +3328,7 @@ function scoreClickHandler(e) {
     if (old !== null && next === old) return;
     scores[ci][mi][ri] = next;
     scoreTs['c'+ci] = Date.now();
+    addHistoryEntry(COURT_META[ci].name, ALL_COURTS[ci].men[mi] || '—', dir, next);
     updateCourtWidget(ci, mi, ri, next);
     updateDivisions(); // recompute on every score change
     saveState();
