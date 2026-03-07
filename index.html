@@ -790,8 +790,9 @@ body{
 .stat-card{background:var(--card);border:1px solid #2a2a40;border-radius:14px;padding:16px}
 .stat-card-title{
   font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:14px
+  letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px
 }
+.stat-card-desc{font-size:10px;color:var(--muted);opacity:.65;margin-bottom:12px;line-height:1.4;font-style:italic}
 .voltage-card{border-color:#3a2a10;background:linear-gradient(135deg,#1a1208,var(--card))}
 .voltage-num{font-family:'Bebas Neue',sans-serif;font-size:68px;line-height:1;color:var(--gold);text-shadow:0 0 28px rgba(255,215,0,.3)}
 .voltage-sub{font-size:12px;color:var(--muted);margin:4px 0 12px}
@@ -1719,6 +1720,7 @@ async function switchTab(id) {
       const ok = await showPasswordPrompt();
       if (!ok) { activeTabId = prevTabId; switchTab(prevTabId || 'svod'); return; }
     }
+    historyFilter = 'all'; // сбросить фильтр при открытии ростера
     screen.innerHTML = renderRoster();
   }
   if (id === 'stats')  screen.innerHTML = renderStats();
@@ -2623,6 +2625,7 @@ function renderStats() {
   return `${finalsSection}<div class="stats-grid">
     <div class="stat-card voltage-card">
       <div class="stat-card-title">⚡ ВОЛЬТАЖ ТУРНИРА</div>
+      <div class="stat-card-desc">Общая сумма всех набранных очков за турнир — чем выше, тем активнее игра</div>
       <div class="voltage-num">${total}</div>
       <div class="voltage-sub">${allP.length} игроков · ${rPlayed} сыгранных раундов</div>
       <div class="voltage-row"><span>Среднее / игрок</span><strong>${avgGlob}</strong></div>
@@ -2631,6 +2634,7 @@ function renderStats() {
 
     <div class="stat-card">
       <div class="stat-card-title">🏅 ТОП-5 ИГРОКОВ</div>
+      <div class="stat-card-desc">Рейтинг по сумме очков за оба этапа · avg — среднее очков за один сыгранный раунд</div>
       ${top5.map((p,i)=>{
         const pct=Math.round(p.pts/maxPts*100);
         const pb=pbCls(p.globalRank);
@@ -2651,6 +2655,7 @@ function renderStats() {
 
     <div class="stat-card">
       <div class="stat-card-title">🎯 СТАБИЛЬНОСТЬ</div>
+      <div class="stat-card-desc">Кто играл ровно, без провалов и взлётов · чем меньше разброс очков по раундам — тем выше в списке</div>
       ${consist.map((p,i)=>`
         <div class="consist-row">
           <span class="consist-rank">${i+1}</span>
@@ -2674,6 +2679,7 @@ function renderStats() {
       return `<div class="stat-card" style="position:relative">
         <button class="share-btn" onclick="shareTopAvg()" title="Поделиться">📤</button>
         <div class="stat-card-title">📈 ТОП ПО ЭФФЕКТИВНОСТИ</div>
+        <div class="stat-card-desc">Среднее очков за один сыгранный раунд · кто выжимал максимум из каждой игры</div>
         ${topAvg.map((p,i) => {
           const pct = Math.round(p.avgVal / maxAvg * 100);
           return `<div class="avg-row">
@@ -2734,6 +2740,7 @@ function renderStats() {
       return `<div class="stat-card chem-card" style="position:relative">
         <button class="share-btn" onclick="shareChemistry()" title="Поделиться">📤</button>
         <div class="stat-card-title">💜 ИДЕАЛЬНАЯ ХИМИЯ — ТОП 5</div>
+        <div class="stat-card-desc">Лучшие смешанные пары (М+Ж) по сумме очков, набранных вместе за все раунды</div>
         ${entries.map(([key, pts], i) => {
           const [man, woman] = key.split('\x00');
           const pct = Math.round(pts / maxPts * 100);
@@ -2753,6 +2760,7 @@ function renderStats() {
 
     <div class="stat-card">
       <div class="stat-card-title">🏐 ЭФФЕКТИВНОСТЬ КОРТОВ</div>
+      <div class="stat-card-desc">Сумма и среднее очков по каждому корту · avg/р — среднее за один раунд на корте</div>
       ${courtEff.map(c=>{
         const pct=Math.round(c.total/((total||2)/2)*100);
         return `<div class="court-eff-row">
