@@ -931,8 +931,8 @@ body{
 .pcard-r-score.lo{background:rgba(233,69,96,.15);color:#e94560}
 .pcard-r-score.rest{background:transparent;color:var(--muted);font-size:10px;font-weight:400}
 .pcard-r-partner{font-size:12px;color:var(--muted)}
-.player-tap{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.25);text-underline-offset:3px;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none}
-.player-tap:active{opacity:.7}
+button.player-tap{background:none;border:none;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.3);text-underline-offset:3px;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none;display:inline;line-height:inherit}
+button.player-tap:active{opacity:.6}
 
 /* ── CUSTOM CONFIRM MODAL ──────────────────────────────────── */
 #confirm-overlay{
@@ -2773,7 +2773,7 @@ function renderStats() {
         return `<div class="bar-row">
           <div class="bar-lbl">
             <span class="pb ${pb}" style="font-size:11px;padding:2px 5px">${p.globalRank}</span>
-            <span class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</span>
+            <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
             <span class="bar-court">${p.courtName}</span>
             <span class="bar-avg">avg ${avg}</span>
             <span class="bar-pts">${p.totalPts}</span>
@@ -2789,7 +2789,7 @@ function renderStats() {
       ${consist.map((p,i)=>`
         <div class="consist-row">
           <span class="consist-rank">${i+1}</span>
-          <span class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</span>
+          <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
           <span class="bar-court">${p.courtName}</span>
           <div class="consist-bar"><div class="consist-fill" style="width:${Math.max(5,100-p.vari*5)}%"></div></div>
           <span class="bar-pts">${p.totalPts??p.pts}</span>
@@ -2816,7 +2816,7 @@ function renderStats() {
             <span class="avg-rank">${medals[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
-                <span class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</span>
+                <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
                 <span class="bar-court">${p.courtName}</span>
                 <span class="avg-num">${p.avgVal.toFixed(1)}</span>
               </div>
@@ -2878,7 +2878,7 @@ function renderStats() {
             <span class="avg-rank">${medals[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
-                <span class="bar-name" style="font-size:13px"><span class="player-tap" onclick="showPlayerCard(${JSON.stringify(man)},'M')">🏋️ ${esc(man)}</span> <span style="color:#9b5de5">+</span> <span class="player-tap" onclick="showPlayerCard(${JSON.stringify(woman)},'W')">👩 ${esc(woman)}</span></span>
+                <span class="bar-name" style="font-size:13px"><button class="player-tap" onclick="showPlayerCard(${JSON.stringify(man)},'M')">🏋️ ${esc(man)}</button> <span style="color:#9b5de5">+</span> <button class="player-tap" onclick="showPlayerCard(${JSON.stringify(woman)},'W')">👩 ${esc(woman)}</button></span>
                 <span class="avg-num">${pts}</span>
               </div>
               <div class="avg-track"><div class="avg-fill" style="width:${pct}%;background:linear-gradient(90deg,#5a1e8a,#c77dff)"></div></div>
