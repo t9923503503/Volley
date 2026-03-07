@@ -689,11 +689,13 @@ body{
 .t-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)}
 .t-lbl{font-size:11px;color:var(--muted)}
 .btn-reset-court{
-  display:block;width:100%;margin-top:16px;padding:12px;
-  background:var(--dark3);border:1px solid #3a3a5e;border-radius:10px;
+  display:inline-block;margin-top:14px;padding:4px 12px;
+  background:var(--dark3);border:1px solid #3a3a5e;border-radius:8px;
   color:var(--muted);font-family:'Barlow Condensed',sans-serif;
-  font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;
+  font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;opacity:.7;
 }
+.btn-reset-court.rc-warn1{border-color:#b04000;color:#f07030;opacity:1}
+.btn-reset-court.rc-warn2{border-color:#e94560;color:#ff6080;background:#2a0010;opacity:1}
 /* place badges */
 .pb{
   display:inline-flex;align-items:center;justify-content:center;
@@ -2014,7 +2016,7 @@ function renderCourt(ci) {
       </div>`;
     }
   }
-  html += `<button class="btn-reset-court" onclick="resetCourt(${ci})">↺ Сбросить очки ${meta.name}</button>`;
+  html += `<button class="btn-reset-court" id="rcbtn-${ci}" onclick="resetCourtGuard(${ci},'↺ Сбросить очки ${meta.name}')">↺ Сбросить очки ${meta.name}</button>`;
   return html;
 }
 
@@ -2455,7 +2457,7 @@ function renderDivCourt(key, svodM, svodW) {
     }
   }
 
-  html+=`<button class="btn-reset-court" onclick="resetDivision('${key}')">↺ Сброс очков ${info.label}</button>`;
+  html+=`<button class="btn-reset-court" id="rcbtn-${key}" onclick="resetDivGuard('${key}','↺ Сброс очков ${info.label}')">↺ Сброс очков ${info.label}</button>`;
   return html;
 }
 
@@ -3602,6 +3604,62 @@ function updateDivWidget(key, mi, ri, val) {
 // ════════════════════════════════════════════════════════════
 // 17. COURT RESETS
 // ════════════════════════════════════════════════════════════
+
+/* Triple-tap guard for reset buttons.
+   Tap 1 → orange warning "⚠️ Ещё раз?"
+   Tap 2 → red warning "🔴 Точно сбросить?"
+   Tap 3 → execute reset
+   Resets to idle after 3 s of inactivity. */
+const _rcGuard = {};   // btnId → { step, timer }
+
+function _resetGuard(btnId, fn) {
+  const btn = document.getElementById(btnId);
+  if (!btn) { fn(); return; }
+
+  const state = _rcGuard[btnId] || { step: 0 };
+  clearTimeout(state.timer);
+  state.step = (state.step || 0) + 1;
+
+  if (state.step === 1) {
+    btn.textContent = '⚠️ Ещё раз?';
+    btn.classList.add('rc-warn1');
+    btn.classList.remove('rc-warn2');
+    state.timer = setTimeout(() => _rcReset(btnId, btn), 3000);
+    _rcGuard[btnId] = state;
+  } else if (state.step === 2) {
+    btn.textContent = '🔴 Точно сбросить?';
+    btn.classList.add('rc-warn2');
+    btn.classList.remove('rc-warn1');
+    state.timer = setTimeout(() => _rcReset(btnId, btn), 3000);
+    _rcGuard[btnId] = state;
+  } else {
+    _rcReset(btnId, btn);
+    fn();
+  }
+}
+
+function _rcReset(btnId, btn) {
+  delete _rcGuard[btnId];
+  if (!btn) return;
+  btn.classList.remove('rc-warn1', 'rc-warn2');
+  // Restore original label from data attribute
+  btn.textContent = btn.dataset.origLabel || '↺ Сброс';
+}
+
+function resetCourtGuard(ci, origLabel) {
+  const btnId = `rcbtn-${ci}`;
+  const btn = document.getElementById(btnId);
+  if (btn) btn.dataset.origLabel = origLabel;
+  _resetGuard(btnId, () => resetCourt(ci));
+}
+
+function resetDivGuard(key, origLabel) {
+  const btnId = `rcbtn-${key}`;
+  const btn = document.getElementById(btnId);
+  if (btn) btn.dataset.origLabel = origLabel;
+  _resetGuard(btnId, () => resetDivision(key));
+}
+
 async function resetCourt(ci) {
   if (!await showConfirm(`Сбросить очки ${COURT_META[ci].name}?`)) return;
   scores[ci] = Array.from({length:ppc}, ()=>Array(ppc).fill(null));
