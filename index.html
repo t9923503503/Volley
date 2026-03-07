@@ -318,6 +318,13 @@ body{
 .btn-sb.connect:hover{background:#36b87e}
 .btn-sb.disconnect{background:var(--dark3);color:var(--muted);border:1px solid #3a3a5e}
 .btn-sb:disabled{opacity:.4;cursor:not-allowed}
+/* SQL setup block */
+.sb-sql-block{margin-top:14px;border:1px solid #1e3a2a;border-radius:10px;overflow:hidden}
+.sb-sql-block summary{padding:9px 12px;font-size:12px;font-weight:700;color:#3ecf8e;cursor:pointer;background:rgba(62,207,142,.06);list-style:none;user-select:none}
+.sb-sql-block summary::-webkit-details-marker{display:none}
+.sb-sql-hint{padding:8px 12px 0;font-size:11px;color:var(--muted)}
+.sb-sql-pre{margin:8px 12px;padding:10px;background:#0d1a10;border-radius:8px;font-size:10px;color:#7fff9a;white-space:pre;overflow-x:auto;font-family:monospace;line-height:1.5}
+.btn-sb-sql-copy{display:block;margin:0 12px 12px;padding:7px 14px;background:rgba(62,207,142,.12);border:1px solid #3ecf8e;border-radius:8px;color:#3ecf8e;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}
 /* Sync flash on score cards */
 .sync-flash{animation:syncFlash .5s ease-out}
 @keyframes syncFlash{0%{background:rgba(62,207,142,.2)}100%{}}
@@ -2844,11 +2851,9 @@ async function sbConnect() {
   if (!sbConfig.roomCode) {
     showToast('⚠️ Введите код комнаты'); return;
   }
-  // Disconnect existing channel to prevent duplicate subscriptions
   if (sbChannel) { sbClient?.removeChannel(sbChannel); sbChannel = null; }
   sbSetStatus('connecting');
   try {
-    // Init client
     sbClient = supabase.createClient(sbConfig.url, sbConfig.anonKey);
 
     // Pull current state from server
@@ -2858,16 +2863,32 @@ async function sbConnect() {
       .eq('room_code', sbConfig.roomCode)
       .single();
 
+    // error.code 'PGRST116' = "0 rows" (нормально — новая комната)
+    if (error && error.code !== 'PGRST116') {
+      sbSetStatus('offline');
+      if (error.code === '42P01') {
+        showToast('❌ Таблица не найдена — создайте её через SQL (см. кнопку ниже в Ростере)');
+      } else {
+        showToast('❌ Ошибка БД: ' + (error.message || error.code));
+      }
+      sbRefreshCard(); return;
+    }
+
     if (data?.state) {
       sbApplyRemoteState(data.state);
       showToast('📥 Состояние загружено с сервера');
     } else {
-      // Сервер пустой — пушим локальное состояние как мастер
-      await sbClient.from('kotc_sessions').upsert({
+      // Новая комната — пушим локальное состояние как мастер
+      const { error: upErr } = await sbClient.from('kotc_sessions').upsert({
         room_code:  sbConfig.roomCode,
         state:      sbGetLocalState(),
         updated_at: new Date().toISOString(),
       });
+      if (upErr) {
+        sbSetStatus('offline');
+        showToast('❌ Ошибка записи: ' + (upErr.message || upErr.code));
+        sbRefreshCard(); return;
+      }
       showToast('📤 Локальное состояние отправлено на сервер');
     }
 
@@ -2889,12 +2910,24 @@ async function sbConnect() {
           sbRefreshCard();
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           sbSetStatus('offline');
+          sbRefreshCard();
         }
       });
   } catch(e) {
     sbSetStatus('offline');
-    showToast('❌ Ошибка: ' + e.message);
+    const msg = e.message || '';
+    if (msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network') || msg.toLowerCase().includes('failed')) {
+      showToast('❌ Нет соединения — проверьте сеть или разбудите проект на supabase.com');
+    } else {
+      showToast('❌ Ошибка: ' + msg);
+    }
+    sbRefreshCard();
   }
+}
+
+function sbCopySql() {
+  const sql = `-- 1. Создать таблицу\nCREATE TABLE IF NOT EXISTS kotc_sessions (\n  room_code  TEXT PRIMARY KEY,\n  state      JSONB,\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);\n\n-- 2. Включить Realtime\nALTER PUBLICATION supabase_realtime ADD TABLE kotc_sessions;\n\n-- 3. Отключить RLS (открытый доступ)\nALTER TABLE kotc_sessions DISABLE ROW LEVEL SECURITY;`;
+  navigator.clipboard?.writeText(sql).then(() => showToast('✅ SQL скопирован'));
 }
 
 function sbDisconnect() {
@@ -3056,6 +3089,20 @@ function renderSupabaseCard() {
           </button>`
       }
     </div>
+
+    <details class="sb-sql-block">
+      <summary>🛠 Первый запуск: создать таблицу в Supabase</summary>
+      <div class="sb-sql-hint">Откройте <a href="https://supabase.com/dashboard/project/rscctyllkqcpxkxrveoz/sql/new" target="_blank" style="color:#3ecf8e">SQL Editor</a>, вставьте и выполните:</div>
+      <pre class="sb-sql-pre">CREATE TABLE IF NOT EXISTS kotc_sessions (
+  room_code  TEXT PRIMARY KEY,
+  state      JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE kotc_sessions;
+ALTER TABLE kotc_sessions DISABLE ROW LEVEL SECURITY;</pre>
+      <button class="btn-sb-sql-copy" onclick="sbCopySql()">📋 Копировать SQL</button>
+    </details>
   </div>`;
 }
 
