@@ -810,6 +810,27 @@ body{
 }
 .stats-empty{text-align:center;padding:60px 24px;color:var(--muted)}
 
+/* ── SVOD GENDER FILTER ──────────────────────────────────── */
+.svod-filter-bar{display:flex;gap:6px;margin-bottom:12px}
+.svod-filter-bar .seg-btn{padding:5px 16px;font-size:13px;border-radius:20px;flex:1;text-align:center}
+
+/* ── STAT CARD: TOP AVG ───────────────────────────────────── */
+.avg-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.avg-rank{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);width:22px;text-align:center;flex-shrink:0}
+.avg-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px}
+.avg-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--blue);letter-spacing:1px;flex-shrink:0}
+.avg-track{height:5px;background:#1a1a2e;border-radius:3px;overflow:hidden}
+.avg-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2e6da8,var(--blue));transition:width .5s}
+
+/* ── STAT CARD: BEST PAIRING ──────────────────────────────── */
+.chem-card{border-color:#3a1e5a;background:linear-gradient(135deg,#160e24,var(--card))}
+.chem-heart{font-size:36px;text-align:center;margin-bottom:8px}
+.chem-names{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.chem-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--text)}
+.chem-vs{font-size:20px;color:#9b5de5}
+.chem-score{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:48px;color:#c77dff;line-height:1;letter-spacing:2px;text-shadow:0 0 20px rgba(199,125,255,.4)}
+.chem-sub{text-align:center;font-size:11px;color:var(--muted);margin-top:4px}
+
 /* ── TOAST ───────────────────────────────────────────────── */
 #toast{
   position:fixed;
@@ -1092,6 +1113,7 @@ const DIV_TIMER_IDX = { hard:4, advance:5, medium:6, lite:7 };
 // ── Tournament meta ─────────────────────────────────────────
 let tournamentMeta    = { name: '', date: '' };
 let tournamentHistory = [];   // Лента событий (макс. 200 записей)
+let svodGenderFilter  = 'all'; // 'all' | 'M' | 'W'
 
 // pending values while user fiddles with seg buttons (not yet applied)
 let _ppc = ppc;
@@ -2077,6 +2099,12 @@ function renderTotals(ci) {
 // ════════════════════════════════════════════════════════════
 // 12. RENDER: СВОДКА
 // ════════════════════════════════════════════════════════════
+function setSvodFilter(f) {
+  svodGenderFilter = f;
+  const s = document.getElementById('screen-svod');
+  if (s) s.innerHTML = renderSvod();
+}
+
 function renderSvod() {
   // ── Check if finals are active ──────────────────────────────
   const divsActive = activeDivKeys().some(k => divRoster[k].men.length > 0);
@@ -2111,7 +2139,10 @@ function renderSvod() {
         <th class="td-pts">Оч·1</th>
         <th class="td-avg">avg/р</th>
       </tr></thead><tbody>`;
-    const allPlayers = [...mpl,...wpl];
+    const allPlayers = [
+      ...(svodGenderFilter !== 'W' ? mpl : []),
+      ...(svodGenderFilter !== 'M' ? wpl : []),
+    ];
     // Динамические разделители по activeDivKeys
     const sepLabels = {};
     const ALL_SEP = { advance:{cls:'sep-advance',label:'⚡ ADVANCE'}, medium:{cls:'sep-medium',label:'⚙️ MEDIUM'}, lite:{cls:'sep-lite',label:'🍀 LITE'} };
@@ -2157,7 +2188,11 @@ function renderSvod() {
         <th class="td-rank" style="text-align:right" title="Итоговое место">Итог</th>
       </tr></thead><tbody>`;
 
-    [...men,...women].forEach(p => {
+    const finCombined = [
+      ...(svodGenderFilter !== 'W' ? men : []),
+      ...(svodGenderFilter !== 'M' ? women : []),
+    ];
+    finCombined.forEach(p => {
       const avg = p.rPlayed>0 ? (p.pts/p.rPlayed).toFixed(1) : '—';
       const globalPlace = globalOffset + p.place;
       t += `<tr>
@@ -2171,8 +2206,16 @@ function renderSvod() {
     return t + `</tbody></table></div>`;
   }
 
+  const fAll = svodGenderFilter === 'all';
+  const fM   = svodGenderFilter === 'M';
+  const fW   = svodGenderFilter === 'W';
   let html = `<div class="page-h">📊 СВОДКА</div>
-  <div class="page-sub">${nc} корта · ${ppc} игроков${divsActive ? ' · <strong style="color:var(--gold)">Финалы активны</strong>' : ' · актуально в реальном времени'}</div>`;
+  <div class="page-sub">${nc} корта · ${ppc} игроков${divsActive ? ' · <strong style="color:var(--gold)">Финалы активны</strong>' : ' · актуально в реальном времени'}</div>
+  <div class="svod-filter-bar">
+    <button class="seg-btn${fAll?' on':''}" onclick="setSvodFilter('all')">Все</button>
+    <button class="seg-btn${fM?' on':''}"  onclick="setSvodFilter('M')">🏋️ Мужчины</button>
+    <button class="seg-btn${fW?' on':''}"  onclick="setSvodFilter('W')">👩 Женщины</button>
+  </div>`;
 
   groups.forEach(g => {
     const mpl = svod[g.key].M;
@@ -2424,6 +2467,88 @@ function renderStats() {
           <span class="bar-pts">${p.totalPts??p.pts}</span>
         </div>`).join('')}
     </div>
+
+    ${(() => {
+      // ── Топ по эффективности (AVG за раунд, мин. 1 раунд) ─────
+      const topAvg = [...allPEnriched]
+        .filter(p => p.rTotal > 0)
+        .map(p => ({ ...p, avgVal: p.totalPts / p.rTotal }))
+        .sort((a,b) => b.avgVal - a.avgVal)
+        .slice(0, 3);
+      if (!topAvg.length) return '';
+      const maxAvg = topAvg[0].avgVal || 1;
+      const medals = ['🥇','🥈','🥉'];
+      return `<div class="stat-card">
+        <div class="stat-card-title">📈 ТОП ПО ЭФФЕКТИВНОСТИ</div>
+        ${topAvg.map((p,i) => {
+          const pct = Math.round(p.avgVal / maxAvg * 100);
+          return `<div class="avg-row">
+            <span class="avg-rank">${medals[i]}</span>
+            <div class="avg-bar-wrap">
+              <div class="bar-lbl" style="margin-bottom:2px">
+                <span class="bar-name">${p.genderIcon} ${esc(p.name)}</span>
+                <span class="bar-court">${p.courtName}</span>
+                <span class="avg-num">${p.avgVal.toFixed(1)}</span>
+              </div>
+              <div class="avg-track"><div class="avg-fill" style="width:${pct}%"></div></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    })()}
+
+    ${(() => {
+      // ── Идеальная химия (Best Pairing) ────────────────────────
+      const pairMap = {};
+      // Stage 1 courts
+      for (let ci = 0; ci < nc; ci++) {
+        const ct = ALL_COURTS[ci];
+        for (let mi = 0; mi < ppc; mi++) {
+          const manName = ct.men[mi] || '';
+          for (let ri = 0; ri < ppc; ri++) {
+            const sc = scores[ci]?.[mi]?.[ri] ?? null;
+            if (sc === null || sc === 0) continue;
+            const womanName = ct.women[partnerW(mi, ri)] || '';
+            if (!manName || !womanName) continue;
+            const k = `${manName}\x00${womanName}`;
+            pairMap[k] = (pairMap[k] || 0) + sc;
+          }
+        }
+      }
+      // Division courts
+      DIV_KEYS.forEach(dkey => {
+        const men   = divRoster[dkey].men;
+        const women = divRoster[dkey].women;
+        const Nd    = men.length;
+        if (!Nd) return;
+        for (let mi = 0; mi < Nd; mi++) {
+          const manName = men[mi] || '';
+          for (let ri = 0; ri < Nd; ri++) {
+            const sc = (divScores[dkey][mi] ?? [])[ri] ?? null;
+            if (sc === null || sc === 0) continue;
+            const womanName = women[divPartnerW(mi, ri, Nd)] || '';
+            if (!manName || !womanName) continue;
+            const k = `${manName}\x00${womanName}`;
+            pairMap[k] = (pairMap[k] || 0) + sc;
+          }
+        }
+      });
+      const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]);
+      if (!entries.length) return '';
+      const [bestKey, bestPts] = entries[0];
+      const [bestMan, bestWoman] = bestKey.split('\x00');
+      return `<div class="stat-card chem-card">
+        <div class="stat-card-title">💜 ИДЕАЛЬНАЯ ХИМИЯ</div>
+        <div class="chem-heart">❤️‍🔥</div>
+        <div class="chem-names">
+          <span class="chem-name">🏋️ ${esc(bestMan)}</span>
+          <span class="chem-vs">+</span>
+          <span class="chem-name">👩 ${esc(bestWoman)}</span>
+        </div>
+        <div class="chem-score">${bestPts}</div>
+        <div class="chem-sub">очков вместе · лучшая пара турнира</div>
+      </div>`;
+    })()}
 
     <div class="stat-card">
       <div class="stat-card-title">🏐 ЭФФЕКТИВНОСТЬ КОРТОВ</div>
