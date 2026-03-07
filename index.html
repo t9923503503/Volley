@@ -2426,7 +2426,6 @@ function renderDivCourt(key, svodM, svodW) {
   if (!Nd) {
     return renderTimerBlock(dci) +
       `<div class="div-title" style="color:${info.color}">${info.label}</div>
-      <div class="div-sub">${info.sub}</div>
       <div class="div-empty">Недостаточно участников — введите очки на кортах Этапа 1</div>`;
   }
 
@@ -2434,8 +2433,7 @@ function renderDivCourt(key, svodM, svodW) {
   const divRoundNavHtml = renderDivNavInner(key);
 
   let html = renderTimerBlock(dci, divRoundNavHtml) +
-    `<div class="div-title" style="color:${info.color}">${info.label}</div>
-  <div class="div-sub">${info.sub}</div>`;
+    `<div class="div-title" style="color:${info.color}">${info.label}</div>`;
 
   // Round nav будет внутри таймер-блока (см. renderTimerBlock)
 
