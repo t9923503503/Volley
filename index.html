@@ -867,6 +867,9 @@ body{
 /* ── HISTORY LOG ─────────────────────────────────────────── */
 .history-card{background:var(--dark3);border:1px solid #2a2a40;border-radius:12px;margin-top:20px;overflow:hidden}
 .history-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2a2a40}
+.history-filter-bar{display:flex;gap:4px;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid #2a2a40}
+.hf-btn{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.5px;padding:3px 8px;border-radius:8px;border:1px solid #3a3a5e;background:transparent;color:var(--muted);cursor:pointer;touch-action:manipulation;transition:all .15s}
+.hf-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
 .history-hdr-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 .btn-clear-log{font-size:11px;padding:3px 10px;border-radius:8px;background:transparent;border:1px solid #3a3a5e;color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px;transition:all .15s}
 .btn-clear-log:hover{border-color:var(--red);color:var(--red)}
@@ -1131,7 +1134,8 @@ const DIV_TIMER_IDX = { hard:4, advance:5, medium:6, lite:7 };
 
 // ── Tournament meta ─────────────────────────────────────────
 let tournamentMeta    = { name: '', date: '' };
-let tournamentHistory = [];   // Лента событий (макс. 200 записей)
+let tournamentHistory = [];   // Лента событий (макс. 450 записей)
+let historyFilter = 'all';    // 'all' | 'k0'..'k3' | 'hard'|'advance'|'medium'|'lite'
 let svodGenderFilter  = 'all'; // 'all' | 'M' | 'W'
 
 // pending values while user fiddles with seg buttons (not yet applied)
@@ -1804,7 +1808,7 @@ async function resetRosterNames() {
 // ════════════════════════════════════════════════════════════
 const DIV_COURT_LABELS = { hard:'🔥 HARD', advance:'⚡ ADV', medium:'⚙️ MED', lite:'🍀 LITE' };
 
-function addHistoryEntry(courtName, playerName, delta, newScore) {
+function addHistoryEntry(courtName, playerName, delta, newScore, courtKey) {
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
   tournamentHistory.unshift({
@@ -1812,23 +1816,36 @@ function addHistoryEntry(courtName, playerName, delta, newScore) {
     court:  courtName,
     player: playerName,
     delta,
-    score:  newScore
+    score:  newScore,
+    key:    courtKey || 'all'
   });
-  if (tournamentHistory.length > 200) tournamentHistory.length = 200;
+  if (tournamentHistory.length > 450) tournamentHistory.length = 450;
   // Живое обновление если вкладка РОСТЕР открыта
   const el = document.getElementById('admin-history-log');
   if (el) el.innerHTML = renderHistoryLog();
 }
 
+function setHistoryFilter(f) {
+  historyFilter = f;
+  const el = document.getElementById('admin-history-log');
+  if (el) el.innerHTML = renderHistoryLog();
+  // Update filter bar buttons
+  document.querySelectorAll('.hf-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.f === f);
+  });
+}
+
 function renderHistoryLog() {
-  if (!tournamentHistory.length)
-    return `<div class="history-empty">Событий пока нет — нажмите «+» на любом корте</div>`;
-  return tournamentHistory.map(e => {
+  const filtered = historyFilter === 'all'
+    ? tournamentHistory
+    : tournamentHistory.filter(e => e.key === historyFilter);
+  if (!filtered.length)
+    return `<div class="history-empty">${tournamentHistory.length ? 'Нет событий по этому фильтру' : 'Событий пока нет — нажмите «+» на любом корте'}</div>`;
+  return filtered.map(e => {
     const pos  = e.delta > 0;
     const sign = pos ? '+1' : '−1';
     const dcls = pos ? 'pos' : 'neg';
-    const rowCls = pos ? '' : ' neg';
-    return `<div class="history-row${rowCls}">
+    return `<div class="history-row${pos ? '' : ' neg'}">
       <span class="history-time">[${e.time}]</span>
       <span class="history-court">${esc(e.court)}</span>
       <span class="history-player">| ${esc(e.player)}</span>
@@ -1939,8 +1956,21 @@ function renderRoster() {
   </div>
   <div class="history-card">
     <div class="history-hdr">
-      <span class="history-hdr-title">📋 Лента событий</span>
+      <span class="history-hdr-title">📋 Лента событий (450)</span>
       <button class="btn-clear-log" onclick="clearHistory()">Очистить</button>
+    </div>
+    <div class="history-filter-bar">
+      ${[
+        {f:'all',   label:'Все'},
+        {f:'k0',    label:'К1'},
+        {f:'k1',    label:'К2'},
+        {f:'k2',    label:'К3'},
+        {f:'k3',    label:'К4'},
+        {f:'hard',    label:'🔥'},
+        {f:'advance', label:'⚡'},
+        {f:'medium',  label:'⚙️'},
+        {f:'lite',    label:'🍀'},
+      ].map(({f,label})=>`<button class="hf-btn${historyFilter===f?' on':''}" data-f="${f}" onclick="setHistoryFilter('${f}')">${label}</button>`).join('')}
     </div>
     <div class="history-list" id="admin-history-log">${renderHistoryLog()}</div>
   </div>`;
@@ -3561,7 +3591,7 @@ function scoreClickHandler(e) {
     if (old !== null && next === old) return;
     divScores[divKey][mi][ri] = next;
     scoreTs[divKey] = Date.now();
-    addHistoryEntry(DIV_COURT_LABELS[divKey] || divKey, divRoster[divKey].men[mi] || '—', dir, next);
+    addHistoryEntry(DIV_COURT_LABELS[divKey] || divKey, divRoster[divKey].men[mi] || '—', dir, next, divKey);
     updateDivWidget(divKey, mi, ri, next);
     saveState();
   } else {
@@ -3573,7 +3603,7 @@ function scoreClickHandler(e) {
     if (old !== null && next === old) return;
     scores[ci][mi][ri] = next;
     scoreTs['c'+ci] = Date.now();
-    addHistoryEntry(COURT_META[ci].name, ALL_COURTS[ci].men[mi] || '—', dir, next);
+    addHistoryEntry(COURT_META[ci].name, ALL_COURTS[ci].men[mi] || '—', dir, next, `k${ci}`);
     updateCourtWidget(ci, mi, ri, next);
     updateDivisions(); // recompute on every score change
     saveState();
