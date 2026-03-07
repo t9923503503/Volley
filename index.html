@@ -537,14 +537,15 @@ body{
 .rc-warn{
   font-size:11px;color:var(--red);padding:4px 14px 8px;font-style:italic
 }
-.roster-save-bar{display:flex;gap:8px;margin-top:14px}
+.roster-save-bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .btn-rsr{
-  flex:1;padding:13px;border-radius:10px;border:none;cursor:pointer;
+  flex:1 1 30%;padding:13px;border-radius:10px;border:none;cursor:pointer;
   font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
   touch-action:manipulation;
 }
 .btn-rsr.primary{background:var(--gold);color:#000}
 .btn-rsr.sec{background:var(--dark3);color:var(--text);border:1px solid #3a3a5e}
+.btn-rsr.danger{background:rgba(233,69,96,.1);color:#e94560;border:1px solid rgba(233,69,96,.45)}
 
 /* ── COURT / ROUNDS ──────────────────────────────────────── */
 .court-title{
@@ -1802,6 +1803,20 @@ function applyRoster() {
   showToast('✅ Ростер сохранён');
 }
 
+async function clearRoster() {
+  if (!await showConfirm('Удалить текущий состав и начать заполнение с чистого листа?')) return;
+  // 1. Убрать кэш из localStorage
+  localStorage.removeItem('kotc3_roster');
+  // 2. Обнулить глобальные массивы ALL_COURTS
+  for (let ci = 0; ci < 4; ci++) {
+    ALL_COURTS[ci].men   = Array(ppc).fill('');
+    ALL_COURTS[ci].women = Array(ppc).fill('');
+  }
+  // 3. Очистить DOM-поля (если ростер уже отрисован)
+  document.querySelectorAll('.rc-inp').forEach(inp => { inp.value = ''; });
+  showToast('🧹 Состав очищен — введите новые имена и нажмите Сохранить');
+}
+
 async function resetRosterNames() {
   if (!await showConfirm('Сбросить имена к стандартным?')) return;
   const defaults = [
@@ -1980,6 +1995,7 @@ function renderRoster() {
   html += `<div class="roster-save-bar">
     <button class="btn-rsr primary"   onclick="applyRoster()">✅ Сохранить</button>
     <button class="btn-rsr sec"       onclick="resetRosterNames()">↺ Сброс имён</button>
+    <button class="btn-rsr danger"    onclick="clearRoster()">🧹 Новый состав</button>
   </div>
   <button class="btn-finish" onclick="finishTournament()">
     🏁 ЗАВЕРШИТЬ ТУРНИР
