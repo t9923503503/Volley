@@ -2279,56 +2279,6 @@ function renderSvod() {
     return t + `</tbody></table></div>`;
   }
 
-  // ── Helper: render finals results table ─────────────────────
-  function renderFinalsTable(g) {
-    const men   = divGetRanked(g.key, 'M');
-    const women = divGetRanked(g.key, 'W');
-    if (!men.length && !women.length)
-      return `<div class="div-empty">Финал ещё не начат</div>`;
-
-    // For HARD: place=1 → absolute champion. Encode global offset.
-    const globalOffset = g.key==='hard' ? 0 : g.key==='advance' ? ppc : g.key==='medium' ? ppc*2 : ppc*3;
-
-    let t = `<div class="svod-table-wrap"><table class="svod-table">
-      <thead><tr>
-        <th class="td-rank" title="Место в финале">Фин</th>
-        <th>Имя</th>
-        <th class="td-pts">Оч·2</th>
-        <th class="td-avg">avg/р</th>
-        <th class="td-rank" style="text-align:right" title="Итоговое место">Итог</th>
-      </tr></thead><tbody>`;
-
-    // Stage 1 avg map for trend comparison
-    const s1AvgMap = {};
-    [...svod[g.key].M, ...svod[g.key].W].forEach(p => {
-      if (p.rPlayed > 0) s1AvgMap[p.name] = p.pts / p.rPlayed;
-    });
-
-    const finCombined = [
-      ...(svodGenderFilter !== 'W' ? men : []),
-      ...(svodGenderFilter !== 'M' ? women : []),
-    ];
-    finCombined.forEach(p => {
-      const finAvg = p.rPlayed > 0 ? p.pts / p.rPlayed : null;
-      const avg    = finAvg != null ? finAvg.toFixed(1) : '—';
-      const s1Avg  = s1AvgMap[p.name];
-      let trend = '';
-      if (finAvg != null && s1Avg != null) {
-        if (finAvg > s1Avg + 0.05)      trend = `<span class="avg-trend up">↑</span>`;
-        else if (finAvg < s1Avg - 0.05) trend = `<span class="avg-trend dn">↓</span>`;
-      }
-      const globalPlace = globalOffset + p.place;
-      t += `<tr>
-        <td class="td-rank"><span class="pb ${pbCls(p.place)}">${p.place}</span></td>
-        <td><div class="td-name">${esc(p.name)}</div></td>
-        <td class="td-pts">${p.pts}</td>
-        <td class="td-avg">${avg}${trend}</td>
-        <td class="td-rank" style="text-align:right"><span class="pb ${pbCls(globalPlace)}" style="font-size:10px;padding:2px 4px">${globalPlace}</span></td>
-      </tr>`;
-    });
-    return t + `</tbody></table></div>`;
-  }
-
   const fAll = svodGenderFilter === 'all';
   const fM   = svodGenderFilter === 'M';
   const fW   = svodGenderFilter === 'W';
@@ -2349,22 +2299,7 @@ function renderSvod() {
         <span class="level-desc">${mpl.length}м · ${wpl.length}ж</span>
       </div>`;
 
-    if (!divsActive) {
-      // Mode 1: only Stage 1
-      html += renderStage1Table(g);
-    } else {
-      // Mode 2: Stage 1 seeding + Finals results side by side (stacked on mobile)
-      html += `<div class="svod-dual">
-        <div class="svod-half">
-          <div class="svod-half-lbl">Этап 1 — Квалификация</div>
-          ${renderStage1Table(g)}
-        </div>
-        <div class="svod-half">
-          <div class="svod-half-lbl">Финал — Итог</div>
-          ${renderFinalsTable(g)}
-        </div>
-      </div>`;
-    }
+    html += renderStage1Table(g);
     html += `</div>`;
   });
   return html;
@@ -2528,7 +2463,83 @@ function renderStats() {
     return { name:COURT_META[ci].name, color:COURT_META[ci].color, total:t, avg:(t/n).toFixed(1) };
   });
 
-  return `<div class="stats-grid">
+  // ── Финалы и итоговый рейтинг (только если финалы активны) ─
+  const finalsSection = (() => {
+    if (!divsActive) return '';
+    const svod = getSvod();
+    const DIV_META = {
+      hard:    { icon:'🔥', cls:'lh-hard',    offset:0       },
+      advance: { icon:'⚡', cls:'lh-advance', offset:ppc     },
+      medium:  { icon:'⚙️', cls:'lh-medium',  offset:ppc*2   },
+      lite:    { icon:'🍀', cls:'lh-lite',    offset:ppc*3   },
+    };
+
+    let out = `<div class="page-h" style="font-size:18px;margin:0 0 10px">🏆 ФИНАЛЫ — РЕЗУЛЬТАТЫ</div>`;
+
+    activeDivKeys().forEach(key => {
+      const { icon, cls, offset } = DIV_META[key];
+      const men   = divGetRanked(key, 'M');
+      const women = divGetRanked(key, 'W');
+      if (!men.length && !women.length) return;
+      const s1AvgMap = {};
+      [...svod[key].M, ...svod[key].W].forEach(p => {
+        if (p.rPlayed > 0) s1AvgMap[p.name] = p.pts / p.rPlayed;
+      });
+      out += `<div class="level-block" style="margin-bottom:10px">
+        <div class="level-hdr ${cls}"><span>${icon} ${key.toUpperCase()}</span></div>
+        <div class="svod-table-wrap"><table class="svod-table">
+          <thead><tr>
+            <th class="td-rank">Фин</th><th>Имя</th>
+            <th class="td-pts">Оч·2</th><th class="td-avg">avg/р</th>
+            <th class="td-rank" style="text-align:right">Итог</th>
+          </tr></thead><tbody>`;
+      [...men, ...women].forEach(p => {
+        const finAvg = p.rPlayed > 0 ? p.pts / p.rPlayed : null;
+        const avg    = finAvg != null ? finAvg.toFixed(1) : '—';
+        const s1Avg  = s1AvgMap[p.name];
+        let trend = '';
+        if (finAvg != null && s1Avg != null) {
+          if (finAvg > s1Avg + 0.05)      trend = `<span class="avg-trend up">↑</span>`;
+          else if (finAvg < s1Avg - 0.05) trend = `<span class="avg-trend dn">↓</span>`;
+        }
+        const gp = offset + p.place;
+        out += `<tr>
+          <td class="td-rank"><span class="pb ${pbCls(p.place)}">${p.place}</span></td>
+          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td class="td-pts">${p.pts}</td>
+          <td class="td-avg">${avg}${trend}</td>
+          <td class="td-rank" style="text-align:right"><span class="pb ${pbCls(gp)}" style="font-size:10px;padding:2px 4px">${gp}</span></td>
+        </tr>`;
+      });
+      out += `</tbody></table></div></div>`;
+    });
+
+    // Combined leaderboard: Stage 1 + Finals
+    const combined = [...allPEnriched].sort((a,b) => b.totalPts - a.totalPts);
+    if (combined.some(p => p.totalPts > 0)) {
+      out += `<div class="page-h" style="font-size:18px;margin:12px 0 10px">📊 ИТОГО ЗА ДВА ЭТАПА</div>
+        <div class="svod-table-wrap"><table class="svod-table">
+          <thead><tr>
+            <th class="td-rank">#</th><th>Имя</th>
+            <th class="td-pts">Оч·1</th><th class="td-pts">Оч·2</th>
+            <th class="td-pts" style="color:var(--gold)">Σ</th>
+          </tr></thead><tbody>`;
+      combined.filter(p => p.pts > 0 || p.totalPts > 0).forEach((p, i) => {
+        const fin2 = p.totalPts - p.pts;
+        out += `<tr>
+          <td class="td-rank"><span class="pb ${pbCls(i+1)}">${i+1}</span></td>
+          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td class="td-pts">${p.pts}</td>
+          <td class="td-pts">${fin2 > 0 ? fin2 : '—'}</td>
+          <td class="td-pts" style="color:var(--gold);font-weight:700">${p.totalPts}</td>
+        </tr>`;
+      });
+      out += `</tbody></table></div>`;
+    }
+    return out;
+  })();
+
+  return `${finalsSection}<div class="stats-grid">
     <div class="stat-card voltage-card">
       <div class="stat-card-title">⚡ ВОЛЬТАЖ ТУРНИРА</div>
       <div class="voltage-num">${total}</div>
