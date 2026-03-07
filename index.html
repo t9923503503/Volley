@@ -2544,6 +2544,7 @@ function renderStats() {
   });
 
   // ── Финалы и итоговый рейтинг (только если финалы активны) ─
+  const divsActive = activeDivKeys().some(k => divRoster[k].men.length > 0);
   const finalsSection = (() => {
     if (!divsActive) return '';
     const svod = getSvod();
