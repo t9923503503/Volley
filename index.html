@@ -2432,18 +2432,9 @@ function renderDivCourt(key, svodM, svodW) {
   // Round nav для дивизиона (с логикой блокировки)
   const divRoundNavHtml = renderDivNavInner(key);
 
-  // Roster chips
   let html = renderTimerBlock(dci, divRoundNavHtml) +
     `<div class="div-title" style="color:${info.color}">${info.label}</div>
-  <div class="div-sub">${info.sub}</div>
-  <div class="div-roster-bar">`;
-  svodM.forEach(p=>{
-    html+=`<span class="div-chip"><span class="pb ${pbCls(p.globalRank)}" style="font-size:10px;padding:2px 5px">${p.globalRank}</span>${esc(p.name)}<span class="div-chip-pts">${p.pts}оч</span></span>`;
-  });
-  svodW.forEach(p=>{
-    html+=`<span class="div-chip w"><span class="pb ${pbCls(p.globalRank)}" style="font-size:10px;padding:2px 5px">${p.globalRank}</span>${esc(p.name)}<span class="div-chip-pts">${p.pts}оч</span></span>`;
-  });
-  html+=`</div>`;
+  <div class="div-sub">${info.sub}</div>`;
 
   // Round nav будет внутри таймер-блока (см. renderTimerBlock)
 
