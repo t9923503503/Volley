@@ -123,6 +123,9 @@ body{
 }
 .nav-pill.pill-div-btn{min-width:64px;}
 .nav-pill.pill-div-btn .pill-main{font-size:11px;letter-spacing:.8px;}
+.nav-pill.pill-div-locked{opacity:.45;filter:grayscale(1);cursor:not-allowed!important}
+.nav-pill.pill-div-locked .pill-main::after{content:' 🔒';font-size:10px}
+.nav-pill.pill-div-locked.active{border-color:#3a3a5e;box-shadow:none}
 .nav-pill-sep{
   width:1px;height:40px;background:#2a2a44;flex-shrink:0;margin:0 3px;
 }
@@ -1525,6 +1528,25 @@ function toggleDropdown(id, btn) {
 // ════════════════════════════════════════════════════════════
 // 5. NAVIGATION BUILD — pill buttons
 // ════════════════════════════════════════════════════════════
+function hasRound5Score() {
+  const lastRi = ppc - 1;
+  for (let ci = 0; ci < nc; ci++) {
+    for (let mi = 0; mi < ppc; mi++) {
+      if ((scores[ci]?.[mi]?.[lastRi] ?? null) > 0) return true;
+    }
+  }
+  return false;
+}
+
+function syncDivLock() {
+  const unlocked = hasRound5Score();
+  const tip = `Добавьте очки в раунде ${ppc} на кортах 1–${nc}, чтобы открыть`;
+  document.querySelectorAll('.pill-div-btn').forEach(p => {
+    p.classList.toggle('pill-div-locked', !unlocked);
+    p.title = unlocked ? '' : tip;
+  });
+}
+
 function buildNav() {
   const nav = document.getElementById('nav');
   nav.innerHTML = '';
@@ -1591,6 +1613,7 @@ function buildNav() {
 
   nav.appendChild(row);
   syncNavActive();
+  syncDivLock();
 }
 
 function syncNavActive() {
@@ -1681,6 +1704,12 @@ async function switchTab(id) {
   }
   if (id === 'stats')  screen.innerHTML = renderStats();
   if (id === 'hard' || id === 'advance' || id === 'medium' || id === 'lite') {
+    if (!hasRound5Score()) {
+      showToast(`🔒 Добавьте очки в раунде ${ppc} на кортах 1–${nc}`);
+      activeTabId = prevTabId;
+      syncNavActive();
+      return;
+    }
     updateDivisions();
   }
 
@@ -3574,6 +3603,8 @@ function updateCourtWidget(ci, mi, ri, val) {
   // Instantly unlock next round button if this was the first score
   const courtNav = document.getElementById(`rnd-nav-${ci}`);
   if (courtNav) courtNav.innerHTML = renderCourtNavInner(ci);
+  // Unlock division tabs when last round gets its first score
+  syncDivLock();
 }
 
 function updateDivWidget(key, mi, ri, val) {
