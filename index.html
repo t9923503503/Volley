@@ -2159,11 +2159,14 @@ function shareChemistry() {
       }
     }
   });
-  const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]);
+  const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
   if (!entries.length) return;
-  const [bestKey, bestPts] = entries[0];
-  const [bestMan, bestWoman] = bestKey.split('\x00');
-  shareText(`❤️‍🔥 Идеальная химия турнира\n🏋️ ${bestMan} + 👩 ${bestWoman}\n${bestPts} очков вместе\n#KingBeach`);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  const lines = entries.map(([key, pts], i) => {
+    const [man, woman] = key.split('\x00');
+    return `${medals[i]} ${man} + ${woman} — ${pts}оч`;
+  });
+  shareText(`💜 Идеальная химия — Топ 5\n${lines.join('\n')}\n#KingBeach`);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2611,21 +2614,27 @@ function renderStats() {
           }
         }
       });
-      const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]);
+      const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
       if (!entries.length) return '';
-      const [bestKey, bestPts] = entries[0];
-      const [bestMan, bestWoman] = bestKey.split('\x00');
+      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+      const maxPts = entries[0][1] || 1;
       return `<div class="stat-card chem-card" style="position:relative">
         <button class="share-btn" onclick="shareChemistry()" title="Поделиться">📤</button>
-        <div class="stat-card-title">💜 ИДЕАЛЬНАЯ ХИМИЯ</div>
-        <div class="chem-heart">❤️‍🔥</div>
-        <div class="chem-names">
-          <span class="chem-name">🏋️ ${esc(bestMan)}</span>
-          <span class="chem-vs">+</span>
-          <span class="chem-name">👩 ${esc(bestWoman)}</span>
-        </div>
-        <div class="chem-score">${bestPts}</div>
-        <div class="chem-sub">очков вместе · лучшая пара турнира</div>
+        <div class="stat-card-title">💜 ИДЕАЛЬНАЯ ХИМИЯ — ТОП 5</div>
+        ${entries.map(([key, pts], i) => {
+          const [man, woman] = key.split('\x00');
+          const pct = Math.round(pts / maxPts * 100);
+          return `<div class="avg-row">
+            <span class="avg-rank">${medals[i]}</span>
+            <div class="avg-bar-wrap">
+              <div class="bar-lbl" style="margin-bottom:2px">
+                <span class="bar-name" style="font-size:13px">🏋️ ${esc(man)} <span style="color:#9b5de5">+</span> 👩 ${esc(woman)}</span>
+                <span class="avg-num">${pts}</span>
+              </div>
+              <div class="avg-track"><div class="avg-fill" style="width:${pct}%;background:linear-gradient(90deg,#5a1e8a,#c77dff)"></div></div>
+            </div>
+          </div>`;
+        }).join('')}
       </div>`;
     })()}
 
