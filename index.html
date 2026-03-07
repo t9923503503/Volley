@@ -1607,10 +1607,10 @@ function buildNav() {
   row.appendChild(sep);
 
   const ALL_DIV_DEFS = {
-    hard:    { icon:'🔥', main:'HARD',    sub:'ТОП',     color:'#e94560' },
-    advance: { icon:'⚡', main:'ADVANCE', sub:'2-й ЭШ.', color:'#f5a623' },
-    medium:  { icon:'⚙️', main:'MEDIUM',  sub:'3-й ЭШ.', color:'#4DA8DA' },
-    lite:    { icon:'🍀', main:'LITE',    sub:'4-й ЭШ.', color:'#6ABF69' },
+    hard:    { icon:'🔥', main:'HD', sub:'ТОП',     color:'#e94560' },
+    advance: { icon:'⚡', main:'AV', sub:'2-й ЭШ.', color:'#f5a623' },
+    medium:  { icon:'⚙️', main:'MD', sub:'3-й ЭШ.', color:'#4DA8DA' },
+    lite:    { icon:'🍀', main:'LT', sub:'4-й ЭШ.', color:'#6ABF69' },
   };
   activeDivKeys().map(id => ({id, ...ALL_DIV_DEFS[id]})).forEach(({id,icon,main,sub,color}) => {
     const p = document.createElement('button');
