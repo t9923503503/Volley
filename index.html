@@ -1031,28 +1031,28 @@ body{
 }
 .timer-custom{display:none}
 .timer-custom-btn{
-  width:34px;height:34px;border-radius:8px;border:1px solid #3a3a5e;
-  background:var(--card);color:var(--text);font-size:20px;font-weight:700;
+  width:28px;height:28px;border-radius:7px;border:1px solid #3a3a5e;
+  background:var(--card);color:var(--text);font-size:16px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;touch-action:manipulation;
+  transition:all .15s;touch-action:manipulation;flex-shrink:0;
 }
 .timer-custom-btn:hover{border-color:#5a5a8e;}
 .timer-custom-val{
-  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;
-  color:var(--muted);min-width:60px;text-align:center;
-  border:1px solid #3a3a5e;border-radius:8px;padding:4px 8px;
-  background:var(--card);cursor:default;
+  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.5px;
+  color:var(--muted);min-width:44px;text-align:center;
+  border:1px solid #3a3a5e;border-radius:7px;padding:3px 4px;
+  background:var(--card);cursor:default;flex-shrink:0;
 }
 .timer-custom-val.active{color:var(--gold);border-color:var(--gold);}
 .timer-controls{
-  display:flex;gap:8px;align-items:center;
+  display:flex;gap:5px;align-items:center;
   margin-top:8px;
 }
 .timer-btn{
   font-family:'Bebas Neue',sans-serif;
-  font-size:18px;letter-spacing:1px;
-  padding:10px 0;
-  border:none;border-radius:10px;
+  font-size:15px;letter-spacing:.5px;
+  padding:7px 0;
+  border:none;border-radius:9px;
   cursor:pointer;
   transition:all .15s;
   flex:1;
@@ -1071,7 +1071,8 @@ body{
   background:var(--card);
   border:1px solid #3a3a5e;
   color:var(--muted);
-  flex:0 0 80px;
+  flex:0 0 56px;
+  font-size:13px;
 }
 .timer-btn-reset:hover{color:var(--text);border-color:#5a5a8e}
 .timer-btn-reset.confirm{background:#5a2800;border-color:#ff7000;color:#ffaa55;font-weight:700;}
