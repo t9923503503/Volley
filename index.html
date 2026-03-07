@@ -1923,15 +1923,16 @@ function renderRoster() {
 
   <div class="settings-card">
     <div class="sc-title">⏱ Длительность таймера</div>
+    ${Array.from({length:nc},(_,ci)=>`
     <div class="sc-row">
-      <span class="sc-lbl">Корты (К1–К${nc})</span>
+      <span class="sc-lbl">${COURT_META[ci].name}</span>
       <div style="display:flex;align-items:center;gap:6px">
-        <button class="timer-custom-btn" onclick="timerCustomStep(0,-1)">−</button>
-        <div class="timer-custom-val active" id="roster-tmr-courts">${timerState[0].preset} мин</div>
-        <button class="timer-custom-btn" onclick="timerCustomStep(0,1)">+</button>
+        <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
+        <div class="timer-custom-val active" id="roster-tmr-${ci}">${timerState[ci].preset} мин</div>
+        <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
       </div>
-    </div>
-    <div class="sc-row">
+    </div>`).join('')}
+    <div class="sc-row" style="border-top:1px solid #2a2a40;margin-top:6px;padding-top:10px">
       <span class="sc-lbl">Финалы (HD/AV/MD/LT)</span>
       <div style="display:flex;align-items:center;gap:6px">
         <button class="timer-custom-btn" onclick="timerCustomStep(4,-1)">−</button>
@@ -4033,7 +4034,7 @@ function loadTimerState() {
 // ci < 4  → корты (группа 0-3)
 // ci >= 4 → дивизионы (группа 4-7)
 function _timerGroup(ci) {
-  return ci < 4 ? [0, 1, 2, 3] : [4, 5, 6, 7];
+  return ci < 4 ? [ci] : [4, 5, 6, 7]; // каждый корт независим, финалы — одна группа
 }
 
 function playTimerStart() {
@@ -4186,7 +4187,7 @@ function timerCustomStep(ci, step) {
   if (next === cur) return;
   timerSetPreset(ci, next);
   // обновляем отображение в Ростере
-  const rosterId = ci < 4 ? 'roster-tmr-courts' : 'roster-tmr-divs';
+  const rosterId = ci < 4 ? `roster-tmr-${ci}` : 'roster-tmr-divs';
   const val = document.getElementById(rosterId);
   if (val) val.textContent = `${next} мин`;
 }
