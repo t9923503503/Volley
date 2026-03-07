@@ -831,6 +831,19 @@ body{
 .chem-score{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:48px;color:#c77dff;line-height:1;letter-spacing:2px;text-shadow:0 0 20px rgba(199,125,255,.4)}
 .chem-sub{text-align:center;font-size:11px;color:var(--muted);margin-top:4px}
 
+/* ── BUBBLE ZONE ──────────────────────────────────────────── */
+@keyframes bubblePulse{0%,100%{box-shadow:inset 3px 0 0 #e94560}50%{box-shadow:inset 3px 0 0 rgba(233,69,96,.2)}}
+.bubble-risk{animation:bubblePulse 1.6s ease-in-out infinite;background:rgba(233,69,96,.04)!important}
+
+/* ── AVG TREND ────────────────────────────────────────────── */
+.avg-trend{font-size:11px;font-weight:900;margin-left:2px;vertical-align:middle}
+.avg-trend.up{color:#6abf69}
+.avg-trend.dn{color:#e94560}
+
+/* ── SHARE BUTTON ─────────────────────────────────────────── */
+.share-btn{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid #3a3a5e;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
+.share-btn:active{background:rgba(255,255,255,.15)}
+
 /* ── TOAST ───────────────────────────────────────────────── */
 #toast{
   position:fixed;
@@ -2097,6 +2110,64 @@ function renderTotals(ci) {
 }
 
 // ════════════════════════════════════════════════════════════
+// 11b. SHARE HELPERS
+// ════════════════════════════════════════════════════════════
+async function shareText(text) {
+  try {
+    if (navigator.share) { await navigator.share({ text }); return; }
+  } catch(e) { /* cancelled or unsupported */ }
+  try { await navigator.clipboard.writeText(text); showToast('✅ Текст скопирован'); } catch(e) {}
+}
+
+function shareTopAvg() {
+  const allP = getAllRanked();
+  const topAvg = allP
+    .map(p => {
+      const rounds = getAllRoundsForPlayer(p);
+      const total  = rounds.reduce((s,r) => s + (r.pts||0), 0);
+      return { ...p, avgVal: rounds.length ? total / rounds.length : 0, rTotal: rounds.length };
+    })
+    .filter(p => p.rTotal > 0)
+    .sort((a,b) => b.avgVal - a.avgVal)
+    .slice(0, 3);
+  const medals = ['🥇','🥈','🥉'];
+  const lines  = topAvg.map((p,i) => `${medals[i]} ${p.name} — ${p.avgVal.toFixed(1)} avg/раунд`);
+  shareText(`📈 Топ по эффективности\n${lines.join('\n')}\n#KingBeach`);
+}
+
+function shareChemistry() {
+  const pairMap = {};
+  for (let ci = 0; ci < nc; ci++) {
+    const ct = ALL_COURTS[ci];
+    for (let mi = 0; mi < ppc; mi++) {
+      for (let ri = 0; ri < ppc; ri++) {
+        const sc = scores[ci]?.[mi]?.[ri] ?? null;
+        if (!sc) continue;
+        const k = `${ct.men[mi]||''}\x00${ct.women[partnerW(mi,ri)]||''}`;
+        pairMap[k] = (pairMap[k]||0) + sc;
+      }
+    }
+  }
+  DIV_KEYS.forEach(dkey => {
+    const men = divRoster[dkey].men, women = divRoster[dkey].women, Nd = men.length;
+    if (!Nd) return;
+    for (let mi = 0; mi < Nd; mi++) {
+      for (let ri = 0; ri < Nd; ri++) {
+        const sc = (divScores[dkey][mi]??[])[ri]??null;
+        if (!sc) continue;
+        const k = `${men[mi]||''}\x00${women[divPartnerW(mi,ri,Nd)]||''}`;
+        pairMap[k] = (pairMap[k]||0) + sc;
+      }
+    }
+  });
+  const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]);
+  if (!entries.length) return;
+  const [bestKey, bestPts] = entries[0];
+  const [bestMan, bestWoman] = bestKey.split('\x00');
+  shareText(`❤️‍🔥 Идеальная химия турнира\n🏋️ ${bestMan} + 👩 ${bestWoman}\n${bestPts} очков вместе\n#KingBeach`);
+}
+
+// ════════════════════════════════════════════════════════════
 // 12. RENDER: СВОДКА
 // ════════════════════════════════════════════════════════════
 function setSvodFilter(f) {
@@ -2146,14 +2217,19 @@ function renderSvod() {
     // Динамические разделители по activeDivKeys
     const sepLabels = {};
     const ALL_SEP = { advance:{cls:'sep-advance',label:'⚡ ADVANCE'}, medium:{cls:'sep-medium',label:'⚙️ MEDIUM'}, lite:{cls:'sep-lite',label:'🍀 LITE'} };
+    // Зона риска: ±1 от каждой границы дивизиона
+    const bubbleRanks = new Set();
     activeDivKeys().forEach((key, i) => {
       if (i === 0) return; // первый дивизион — разделитель перед ним не нужен
       const boundary = i * ppc; // после этого глобального ранга
       if (ALL_SEP[key]) sepLabels[boundary] = ALL_SEP[key];
+      bubbleRanks.add(boundary);      // последний в верхнем дивизионе
+      bubbleRanks.add(boundary + 1);  // первый в нижнем дивизионе
     });
     allPlayers.forEach(p => {
       const avg = p.rPlayed>0 ? (p.pts/p.rPlayed).toFixed(1) : '—';
-      t += `<tr>
+      const isBubble = bubbleRanks.has(p.globalRank);
+      t += `<tr${isBubble ? ' class="bubble-risk"' : ''}>
         <td class="td-rank"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'<sup>=</sup>':''}</span></td>
         <td><div class="td-name">${esc(p.name)}</div></td>
         <td class="td-court" style="color:${p.courtColor}">${p.courtName}</td>
@@ -2188,18 +2264,31 @@ function renderSvod() {
         <th class="td-rank" style="text-align:right" title="Итоговое место">Итог</th>
       </tr></thead><tbody>`;
 
+    // Stage 1 avg map for trend comparison
+    const s1AvgMap = {};
+    [...svod[g.key].M, ...svod[g.key].W].forEach(p => {
+      if (p.rPlayed > 0) s1AvgMap[p.name] = p.pts / p.rPlayed;
+    });
+
     const finCombined = [
       ...(svodGenderFilter !== 'W' ? men : []),
       ...(svodGenderFilter !== 'M' ? women : []),
     ];
     finCombined.forEach(p => {
-      const avg = p.rPlayed>0 ? (p.pts/p.rPlayed).toFixed(1) : '—';
+      const finAvg = p.rPlayed > 0 ? p.pts / p.rPlayed : null;
+      const avg    = finAvg != null ? finAvg.toFixed(1) : '—';
+      const s1Avg  = s1AvgMap[p.name];
+      let trend = '';
+      if (finAvg != null && s1Avg != null) {
+        if (finAvg > s1Avg + 0.05)      trend = `<span class="avg-trend up">↑</span>`;
+        else if (finAvg < s1Avg - 0.05) trend = `<span class="avg-trend dn">↓</span>`;
+      }
       const globalPlace = globalOffset + p.place;
       t += `<tr>
         <td class="td-rank"><span class="pb ${pbCls(p.place)}">${p.place}</span></td>
         <td><div class="td-name">${esc(p.name)}</div></td>
         <td class="td-pts">${p.pts}</td>
-        <td class="td-avg">${avg}</td>
+        <td class="td-avg">${avg}${trend}</td>
         <td class="td-rank" style="text-align:right"><span class="pb ${pbCls(globalPlace)}" style="font-size:10px;padding:2px 4px">${globalPlace}</span></td>
       </tr>`;
     });
@@ -2478,7 +2567,8 @@ function renderStats() {
       if (!topAvg.length) return '';
       const maxAvg = topAvg[0].avgVal || 1;
       const medals = ['🥇','🥈','🥉'];
-      return `<div class="stat-card">
+      return `<div class="stat-card" style="position:relative">
+        <button class="share-btn" onclick="shareTopAvg()" title="Поделиться">📤</button>
         <div class="stat-card-title">📈 ТОП ПО ЭФФЕКТИВНОСТИ</div>
         ${topAvg.map((p,i) => {
           const pct = Math.round(p.avgVal / maxAvg * 100);
@@ -2537,7 +2627,8 @@ function renderStats() {
       if (!entries.length) return '';
       const [bestKey, bestPts] = entries[0];
       const [bestMan, bestWoman] = bestKey.split('\x00');
-      return `<div class="stat-card chem-card">
+      return `<div class="stat-card chem-card" style="position:relative">
+        <button class="share-btn" onclick="shareChemistry()" title="Поделиться">📤</button>
         <div class="stat-card-title">💜 ИДЕАЛЬНАЯ ХИМИЯ</div>
         <div class="chem-heart">❤️‍🔥</div>
         <div class="chem-names">
