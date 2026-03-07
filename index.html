@@ -1919,6 +1919,27 @@ function renderRoster() {
       <button class="btn-dist"  onclick="autoDistribute()">📋 Распределить</button>
     </div>
     <div class="sc-warn">⚠️ Изменение настроек сбросит очки</div>
+  </div>
+
+  <div class="settings-card">
+    <div class="sc-title">⏱ Длительность таймера</div>
+    <div class="sc-row">
+      <span class="sc-lbl">Корты (К1–К${nc})</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="timer-custom-btn" onclick="timerCustomStep(0,-1)">−</button>
+        <div class="timer-custom-val active" id="roster-tmr-courts">${timerState[0].preset} мин</div>
+        <button class="timer-custom-btn" onclick="timerCustomStep(0,1)">+</button>
+      </div>
+    </div>
+    <div class="sc-row">
+      <span class="sc-lbl">Финалы (HD/AV/MD/LT)</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="timer-custom-btn" onclick="timerCustomStep(4,-1)">−</button>
+        <div class="timer-custom-val active" id="roster-tmr-divs">${timerState[4].preset} мин</div>
+        <button class="timer-custom-btn" onclick="timerCustomStep(4,1)">+</button>
+      </div>
+    </div>
+    <div class="sc-info">Диапазон: 9–20 минут</div>
   </div>`;
 
   for (let ci = 0; ci < nc; ci++) {
@@ -4164,14 +4185,10 @@ function timerCustomStep(ci, step) {
   const next = Math.min(20, Math.max(9, cur + step));
   if (next === cur) return;
   timerSetPreset(ci, next);
-  // обновляем отображение кастомного поля для всей группы
-  for (const i of _timerGroup(ci)) {
-    const val = document.getElementById(`tmr-custom-${i}`);
-    if (val) {
-      val.textContent = `${next} мин`;
-      val.classList.toggle('active', !TIMER_PRESETS.includes(next));
-    }
-  }
+  // обновляем отображение в Ростере
+  const rosterId = ci < 4 ? 'roster-tmr-courts' : 'roster-tmr-divs';
+  const val = document.getElementById(rosterId);
+  if (val) val.textContent = `${next} мин`;
 }
 
 // ── Render helper (called inside renderCourt) ────────────────
@@ -4196,9 +4213,6 @@ function renderTimerBlock(ci, roundNavHtml='') {
       <div class="timer-display${danger?' danger':done?' done':''}" id="tmr-disp-${ci}" style="flex-shrink:0">${display}</div>
       <div style="flex:1;display:flex;flex-direction:column;gap:6px">
         <div class="timer-controls" style="margin-top:0">
-          <button class="timer-custom-btn" onclick="timerCustomStep(${ci},-1)">−</button>
-          <div class="timer-custom-val active" id="tmr-custom-${ci}">${ts.preset} мин</div>
-          <button class="timer-custom-btn" onclick="timerCustomStep(${ci},1)">+</button>
           <button class="${startCls}" id="tmr-btn-${ci}" onclick="timerStartPauseGuard(${ci})" style="flex:1">${startLabel}</button>
           <button class="timer-btn timer-btn-reset" id="tmr-reset-${ci}" onclick="timerResetGuard(${ci})">СБРОС</button>
         </div>
