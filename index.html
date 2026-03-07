@@ -2014,7 +2014,6 @@ function renderCourt(ci) {
       </div>`;
     }
   }
-  html += renderTotals(ci);
   html += `<button class="btn-reset-court" onclick="resetCourt(${ci})">↺ Сбросить очки ${meta.name}</button>`;
   return html;
 }
@@ -2453,18 +2452,7 @@ function renderDivCourt(key, svodM, svodW) {
     }
   }
 
-  // Division totals
-  html+=`<div class="totals-section" id="dtotals-${key}">
-    <div class="totals-title">🏆 ИТОГО — МУЖЧИНЫ</div>`;
-  divGetRanked(key,'M').forEach(r=>{
-    html+=`<div class="totals-row"><div class="pb ${pbCls(r.place)}">${r.place}</div><div class="t-name">${esc(r.name)}</div><div class="t-pts">${r.pts}</div><div class="t-lbl">оч</div></div>`;
-  });
-  html+=`<div class="totals-title" style="border-top:1px solid #1e1e34">🏆 ИТОГО — ЖЕНЩИНЫ</div>`;
-  divGetRanked(key,'W').forEach(r=>{
-    html+=`<div class="totals-row"><div class="pb ${pbCls(r.place)}">${r.place}</div><div class="t-name">${esc(r.name)}</div><div class="t-pts">${r.pts}</div><div class="t-lbl">оч</div></div>`;
-  });
-  html+=`</div>
-  <button class="btn-reset-court" onclick="resetDivision('${key}')">↺ Сброс очков ${info.label}</button>`;
+  html+=`<button class="btn-reset-court" onclick="resetDivision('${key}')">↺ Сброс очков ${info.label}</button>`;
   return html;
 }
 
@@ -3572,9 +3560,6 @@ function updateCourtWidget(ci, mi, ri, val) {
   const wi = partnerW(mi, ri);
   const as = document.getElementById(`as-${ci}-${wi}-${ri}`);
   if (as) as.textContent = val;
-  // Totals
-  const tot = document.getElementById(`totals-${ci}`);
-  if (tot) tot.outerHTML = renderTotals(ci);
   // Instantly unlock next round button if this was the first score
   const courtNav = document.getElementById(`rnd-nav-${ci}`);
   if (courtNav) courtNav.innerHTML = renderCourtNavInner(ci);
@@ -3599,23 +3584,6 @@ function updateDivWidget(key, mi, ri, val) {
   const wi = divPartnerW(mi, ri, Nd);
   const as = document.getElementById(`das-${key}-${wi}-${ri}`);
   if (as) as.textContent = val;
-  // Re-render div totals in-place
-  const dt = document.getElementById(`dtotals-${key}`);
-  if (dt) {
-    const newHtml = (() => {
-      let h = `<div class="totals-section" id="dtotals-${key}">
-        <div class="totals-title">🏆 ИТОГО — МУЖЧИНЫ</div>`;
-      divGetRanked(key,'M').forEach(r=>{
-        h+=`<div class="totals-row"><div class="pb ${pbCls(r.place)}">${r.place}</div><div class="t-name">${esc(r.name)}</div><div class="t-pts">${r.pts}</div><div class="t-lbl">оч</div></div>`;
-      });
-      h+=`<div class="totals-title" style="border-top:1px solid #1e1e34">🏆 ИТОГО — ЖЕНЩИНЫ</div>`;
-      divGetRanked(key,'W').forEach(r=>{
-        h+=`<div class="totals-row"><div class="pb ${pbCls(r.place)}">${r.place}</div><div class="t-name">${esc(r.name)}</div><div class="t-pts">${r.pts}</div><div class="t-lbl">оч</div></div>`;
-      });
-      return h+'</div>';
-    })();
-    dt.outerHTML = newHtml;
-  }
   // Instantly unlock next round button if this was the first score
   const dci    = DIV_TIMER_IDX[key];
   const divNav = document.getElementById(`rnd-nav-${dci}`);
