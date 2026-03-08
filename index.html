@@ -1267,6 +1267,72 @@ button.player-tap:active{opacity:.6}
 .home-sec-title span{color:var(--gold)}
 .home-sec-count{font-size:11px;color:var(--muted)}
 
+/* ── Archive tab (past tournaments) ── */
+.arch-add-toggle{width:100%;padding:10px 14px;border-radius:10px;
+  border:1px dashed #3a3a5e;background:rgba(255,255,255,.03);
+  color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:13px;letter-spacing:.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;margin-bottom:10px;touch-action:manipulation}
+.arch-add-toggle:hover{border-color:var(--gold);background:rgba(255,215,0,.06)}
+
+.arch-add-form{background:#131320;border:1px solid rgba(255,215,0,.2);
+  border-radius:12px;padding:14px;margin-bottom:12px;
+  animation:fadeSlideIn .2s ease}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.arch-form-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;
+  margin-bottom:10px}
+.arch-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.arch-form-full{grid-column:1/-1}
+.arch-form-inp,.arch-form-sel{
+  background:#0f0f1e;border:1px solid #2a2a44;border-radius:8px;
+  padding:8px 10px;color:#fff;font-size:13px;outline:none;
+  font-family:'Barlow',sans-serif;width:100%;transition:border-color .18s;
+  -webkit-appearance:none;appearance:none}
+.arch-form-inp:focus,.arch-form-sel:focus{border-color:var(--gold)}
+.arch-form-inp::placeholder{color:var(--muted)}
+.arch-form-sel option{background:#1a1a2e}
+.arch-save-btn{width:100%;padding:10px;border-radius:9px;border:none;
+  cursor:pointer;background:var(--gold);color:#111;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:14px;letter-spacing:.5px;text-transform:uppercase;
+  transition:all .18s;touch-action:manipulation}
+.arch-save-btn:hover{background:#ffe833}
+
+.arch-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+.arch-empty-icon{font-size:34px;margin-bottom:8px}
+
+.arch-card{background:var(--card);border:1px solid #2a2a40;border-radius:13px;
+  overflow:hidden;margin-bottom:8px;transition:border-color .2s}
+.arch-card:hover{border-color:#3a3a58}
+.arch-card-accent{height:2px;
+  background:linear-gradient(90deg,rgba(255,215,0,.4),rgba(255,215,0,.1),transparent)}
+.arch-card-body{padding:12px 14px}
+.arch-card-top{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:8px;margin-bottom:8px}
+.arch-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:15px;color:#fff;line-height:1.2}
+.arch-date{font-size:11px;color:var(--muted);margin-top:2px}
+.arch-badges{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.arch-src{font-size:9px;padding:3px 7px;border-radius:99px;
+  font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.arch-src.app   {background:rgba(77,168,218,.12);border:1px solid rgba(77,168,218,.25);color:#4DA8DA}
+.arch-src.manual{background:rgba(255,255,255,.05);border:1px solid #2a2a44;color:var(--muted)}
+.arch-del-btn{width:22px;height:22px;border-radius:5px;border:1px solid #3a2a2a;
+  background:rgba(233,69,96,.08);color:rgba(233,69,96,.5);cursor:pointer;
+  font-size:10px;display:flex;align-items:center;justify-content:center;
+  transition:all .18s;flex-shrink:0;touch-action:manipulation}
+.arch-del-btn:hover{background:rgba(233,69,96,.22);color:var(--red);border-color:var(--red)}
+.arch-meta{display:flex;gap:5px;flex-wrap:wrap}
+.arch-chip{font-size:10px;padding:3px 8px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid #2a2a40;color:var(--muted)}
+.arch-chip.gold{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.25);color:var(--gold)}
+.arch-chip.blue{background:rgba(77,168,218,.1);border-color:rgba(77,168,218,.25);color:#4DA8DA}
+.arch-divider{display:flex;align-items:center;gap:8px;margin:14px 0 10px}
+.arch-divider-line{flex:1;height:1px;background:#2a2a40}
+.arch-divider-txt{font-size:10px;color:var(--muted);white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.8px}
+
 /* ── Players banner button ── */
 .plr-banner{
   position:relative;overflow:hidden;
@@ -1504,7 +1570,8 @@ function makeBlankDivRoster(){
 let activeTabId = 0;  // current tab id (number = court index, or string)
 
 // ── HOME DASHBOARD STATE ────────────────────────────────────
-let homeActiveTab = 'schedule';
+let homeActiveTab = 'schedule';   // 'schedule' | 'calendar' | 'archive'
+let homeArchiveFormOpen = false;
 
 // ── PLAYER DATABASE STATE ───────────────────────────────────
 let playersGender = 'M';
@@ -3395,6 +3462,40 @@ function renderPlayers() {
 // ════════════════════════════════════════════════════════════
 function setHomeTab(tab) {
   homeActiveTab = tab;
+  if (tab !== 'archive') homeArchiveFormOpen = false;
+  const s = document.getElementById('screen-home');
+  if (s) s.innerHTML = renderHome();
+}
+
+// ── Manual past tournaments CRUD ───────────────────────────
+function loadManualTournaments() {
+  try { return JSON.parse(localStorage.getItem('kotc3_past_manual') || '[]'); } catch(e){ return []; }
+}
+function saveManualTournaments(arr) {
+  localStorage.setItem('kotc3_past_manual', JSON.stringify(arr));
+}
+function submitManualTournament() {
+  const v = id => document.getElementById(id)?.value;
+  const name   = (v('arch-inp-name')  || '').trim();
+  const date   =  v('arch-inp-date')  || '';
+  const format =  v('arch-inp-fmt')   || 'King of the Court';
+  const division = v('arch-inp-div')  || 'Мужской';
+  const playersCount = parseInt(v('arch-inp-players') || '0') || 0;
+  const winner = (v('arch-inp-winner') || '').trim();
+  if (!name || !date) { showToast('⚠️ Введите название и дату'); return; }
+  const arr = loadManualTournaments();
+  arr.unshift({ id: Date.now(), name, date, format, division, playersCount, winner, source: 'manual' });
+  saveManualTournaments(arr);
+  homeArchiveFormOpen = false;
+  setHomeTab('archive');
+  showToast('✅ Турнир добавлен в архив');
+}
+function deleteManualTournament(id) {
+  saveManualTournaments(loadManualTournaments().filter(t => t.id !== id));
+  setHomeTab('archive');
+}
+function toggleArchiveForm() {
+  homeArchiveFormOpen = !homeArchiveFormOpen;
   const s = document.getElementById('screen-home');
   if (s) s.innerHTML = renderHome();
 }
@@ -3488,6 +3589,102 @@ function renderHome() {
 </div>`).join('');
 
   const isS = homeActiveTab === 'schedule';
+  const isC = homeActiveTab === 'calendar';
+  const isA = homeActiveTab === 'archive';
+
+  // ── Archive content builder ─────────────────────────────
+  function archCardHtml(t) {
+    const isApp = t.source === 'app';
+    let dateStr = '—';
+    try { dateStr = t.date ? new Date(t.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}) : '—'; } catch(e){}
+    const winner = t.winner || (t.players && t.players[0] ? t.players[0].name : '');
+    const cnt    = t.playersCount || (t.players ? t.players.length : 0);
+    const rds    = t.rPlayed ? `🏐 ${t.rPlayed} раундов` : '';
+    return `
+<div class="arch-card">
+  <div class="arch-card-accent"></div>
+  <div class="arch-card-body">
+    <div class="arch-card-top">
+      <div>
+        <div class="arch-name">${esc(t.name)}</div>
+        <div class="arch-date">📅 ${dateStr}</div>
+      </div>
+      <div class="arch-badges">
+        <span class="arch-src ${isApp?'app':'manual'}">${isApp?'📱 Приложение':'✏️ Вручную'}</span>
+        ${!isApp?`<button class="arch-del-btn" onclick="deleteManualTournament(${t.id})" title="Удалить">✕</button>`:''}
+      </div>
+    </div>
+    <div class="arch-meta">
+      <span class="arch-chip">${esc(t.format||'King of the Court')}</span>
+      <span class="arch-chip">${esc(t.division||'—')}</span>
+      ${cnt?`<span class="arch-chip blue">👥 ${cnt} игроков</span>`:''}
+      ${rds?`<span class="arch-chip blue">${rds}</span>`:''}
+      ${winner?`<span class="arch-chip gold">🥇 ${esc(winner)}</span>`:''}
+    </div>
+  </div>
+</div>`;
+  }
+
+  const archiveHtml = (() => {
+    const appT = (() => {
+      try {
+        return (JSON.parse(localStorage.getItem('kotc3_history')||'[]'))
+          .map(t => ({...t, source:'app', playersCount:t.players?.length||0,
+            winner: t.players?.[0]?.name||'',
+            format: t.format||'King of the Court', division: t.division||'Смешанный'}));
+      } catch(e){ return []; }
+    })();
+    const manT = loadManualTournaments();
+    const all  = [...appT, ...manT].sort((a,b) => (b.date||'') > (a.date||'') ? 1 : -1);
+
+    const formHtml = homeArchiveFormOpen ? `
+<div class="arch-add-form">
+  <div class="arch-form-title">✏️ Добавить прошедший турнир</div>
+  <div class="arch-form-grid">
+    <input class="arch-form-inp arch-form-full" id="arch-inp-name"
+      type="text" placeholder="Название турнира *">
+    <input class="arch-form-inp" id="arch-inp-date"
+      type="date" value="${new Date().toISOString().split('T')[0]}">
+    <input class="arch-form-inp" id="arch-inp-players"
+      type="number" min="2" max="200" placeholder="Кол-во игроков">
+    <select class="arch-form-sel" id="arch-inp-fmt">
+      <option>King of the Court</option>
+      <option>Round Robin</option>
+      <option>Олимпийская система</option>
+      <option>Другой</option>
+    </select>
+    <select class="arch-form-sel" id="arch-inp-div">
+      <option>Мужской</option>
+      <option>Женский</option>
+      <option>Смешанный</option>
+    </select>
+    <input class="arch-form-inp" id="arch-inp-winner"
+      type="text" placeholder="Победитель (фамилия)">
+  </div>
+  <button class="arch-save-btn" onclick="submitManualTournament()">💾 Сохранить в архив</button>
+</div>` : '';
+
+    const listHtml = all.length === 0 ? `
+<div class="arch-empty">
+  <div class="arch-empty-icon">🏆</div>
+  Архив пуст. Завершите турнир в приложении<br>или добавьте прошедший вручную.
+</div>` : (() => {
+      const appOnes = all.filter(t=>t.source==='app');
+      const manOnes = all.filter(t=>t.source==='manual');
+      let html = '';
+      if (appOnes.length) {
+        html += `<div class="arch-divider"><div class="arch-divider-line"></div><span class="arch-divider-txt">📱 Из приложения (${appOnes.length})</span><div class="arch-divider-line"></div></div>`;
+        html += appOnes.map(archCardHtml).join('');
+      }
+      if (manOnes.length) {
+        html += `<div class="arch-divider"><div class="arch-divider-line"></div><span class="arch-divider-txt">✏️ Добавлены вручную (${manOnes.length})</span><div class="arch-divider-line"></div></div>`;
+        html += manOnes.map(archCardHtml).join('');
+      }
+      return html;
+    })();
+
+    return formHtml + listHtml;
+  })();
 
   return `
 <div class="home-wrap">
@@ -3535,11 +3732,14 @@ function renderHome() {
 
   <!-- Tabs -->
   <div class="home-tabs">
-    <button class="home-tab-btn ${isS?'active':''}" onclick="setHomeTab('schedule')">
-      ⚔️ РАСПИСАНИЕ ТУРНИРОВ ⚔️
+    <button class="home-tab-btn ${isS?'active':''}" onclick="setHomeTab('schedule')" style="font-size:11px">
+      ⚔️ РАСПИСАНИЕ
     </button>
-    <button class="home-tab-btn ${!isS?'active':''}" onclick="setHomeTab('calendar')">
+    <button class="home-tab-btn ${isC?'active':''}" onclick="setHomeTab('calendar')" style="font-size:11px">
       📅 КАЛЕНДАРЬ
+    </button>
+    <button class="home-tab-btn ${isA?'active':''}" onclick="setHomeTab('archive')" style="font-size:11px">
+      🏆 АРХИВ
     </button>
   </div>
 
@@ -3553,12 +3753,23 @@ function renderHome() {
   </div>
 
   <!-- Calendar -->
-  <div style="display:${!isS?'block':'none'}">
+  <div style="display:${isC?'block':'none'}">
     <div class="home-sec-hdr">
       <span class="home-sec-title">КАЛЕНДАРЬ <span>СОБЫТИЙ</span></span>
       <span class="home-sec-count">Март — Апрель 2026</span>
     </div>
     ${calHtml}
+  </div>
+
+  <!-- Archive -->
+  <div style="display:${isA?'block':'none'}">
+    <div class="home-sec-hdr">
+      <span class="home-sec-title">АРХИВ <span>ТУРНИРОВ</span></span>
+    </div>
+    <button class="arch-add-toggle" onclick="toggleArchiveForm()">
+      ${homeArchiveFormOpen ? '− Свернуть форму' : '+ Добавить прошедший турнир'}
+    </button>
+    ${archiveHtml}
   </div>
 </div>`;
 }
