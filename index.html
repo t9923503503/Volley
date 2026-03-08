@@ -2625,10 +2625,21 @@ function migrateProjectData() {
 /** Non-finished tournaments with computed `registered` for old home render */
 function loadUpcomingTournaments() {
   const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const MON_NAMES_SHORT = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                           'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   return getTournaments()
     .filter(t => t.status !== 'finished' && t.status !== 'cancelled')
     .filter(t => !t.date || t.date >= today) // скрываем прошедшие с главной
-    .map(t => ({ ...t, registered: t.participants.length }));
+    .map(t => {
+      const d = t.date ? new Date(t.date + 'T12:00:00') : null;
+      return {
+        ...t,
+        registered: t.participants.length,
+        dayNum: d ? d.getDate() : '',
+        dayStr: d ? _TRN_DAY_NAMES[d.getDay()] : '',
+        month:  d ? MON_NAMES_SHORT[d.getMonth()] + ' ' + d.getFullYear() : '',
+      };
+    });
 }
 /** Finished tournaments in the legacy manual-archive shape */
 function loadManualTournaments() {
