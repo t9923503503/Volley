@@ -116,6 +116,11 @@ body{
   scrollbar-width:none;
 }
 .nav-pills-row::-webkit-scrollbar{display:none}
+.nav-bottom-row{
+  display:flex;justify-content:center;align-items:center;
+  padding:6px 8px;gap:4px;
+  border-top:1px solid #1e1e34;
+}
 .nav-pill{
   font-family:'Barlow Condensed',sans-serif;
   padding:5px 10px 4px;min-width:52px;
@@ -4630,18 +4635,6 @@ function buildNav() {
   spacer.className = 'nav-spacer';
   top.appendChild(spacer);
 
-  // ── Solar toggle button ──
-  const solarBtn = document.createElement('button');
-  solarBtn.className = 'nb solar-toggle';
-  solarBtn.title = 'Тема: Пляж / Ночь';
-  solarBtn.textContent = localStorage.getItem('kotc3_solar') === '1' ? '🌙' : '☀️';
-  solarBtn.addEventListener('click', () => {
-    const on = document.body.classList.toggle('solar');
-    localStorage.setItem('kotc3_solar', on ? '1' : '0');
-    solarBtn.textContent = on ? '🌙' : '☀️';
-    document.querySelector('meta[name=theme-color]')?.setAttribute('content', on ? '#000000' : '#0d0d1a');
-  });
-  top.appendChild(solarBtn);
 
   [
     { label:'🏠',   tab:'home'    },
@@ -4692,6 +4685,23 @@ function buildNav() {
   });
 
   nav.appendChild(row);
+
+  // ── Solar toggle button (at bottom) ──
+  const solarBtn = document.createElement('button');
+  solarBtn.className = 'nb solar-toggle';
+  solarBtn.title = 'Тема: Пляж / Ночь';
+  solarBtn.textContent = localStorage.getItem('kotc3_solar') === '1' ? '🌙' : '☀️';
+  solarBtn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('solar');
+    localStorage.setItem('kotc3_solar', on ? '1' : '0');
+    solarBtn.textContent = on ? '🌙' : '☀️';
+    document.querySelector('meta[name=theme-color]')?.setAttribute('content', on ? '#000000' : '#0d0d1a');
+  });
+  const bottomRow = document.createElement('div');
+  bottomRow.className = 'nav-bottom-row';
+  bottomRow.appendChild(solarBtn);
+  nav.appendChild(bottomRow);
+
   syncNavActive();
   syncDivLock();
 }
