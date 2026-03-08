@@ -5672,7 +5672,7 @@ function renderSvod() {
       const isBubble = bubbleRanks.has(p.globalRank);
       t += `<tr${isBubble ? ' class="bubble-risk"' : ''}>
         <td class="td-rank"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'<sup>=</sup>':''}</span></td>
-        <td><div class="td-name">${esc(p.name)}</div></td>
+        <td><div class="td-name" style="cursor:pointer" ondblclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')" title="Двойной клик для карточки">${esc(p.name)}</div></td>
         <td class="td-court" style="color:${p.courtColor}">${p.courtName}</td>
         <td class="td-pts">${p.pts}</td>
         <td class="td-avg">${avg}</td>
@@ -5913,7 +5913,7 @@ function renderStats() {
         const gp = offset + p.place;
         out += `<tr>
           <td class="td-rank"><span class="pb ${pbCls(p.place)}">${p.place}</span></td>
-          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td><div class="td-name" style="cursor:pointer" ondblclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')" title="Двойной клик для карточки">${esc(p.name)}</div></td>
           <td class="td-pts">${p.pts}</td>
           <td class="td-avg">${avg}${trend}</td>
           <td class="td-rank" style="text-align:right"><span class="pb ${pbCls(gp)}" style="font-size:10px;padding:2px 4px">${gp}</span></td>
@@ -5936,7 +5936,7 @@ function renderStats() {
         const fin2 = p.totalPts - p.pts;
         out += `<tr>
           <td class="td-rank"><span class="pb ${pbCls(i+1)}">${i+1}</span></td>
-          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td><div class="td-name" style="cursor:pointer" ondblclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')" title="Двойной клик для карточки">${esc(p.name)}</div></td>
           <td class="td-pts">${p.pts}</td>
           <td class="td-pts">${fin2 > 0 ? fin2 : '—'}</td>
           <td class="td-pts" style="color:var(--gold);font-weight:700">${p.totalPts}</td>
