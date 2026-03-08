@@ -1299,6 +1299,43 @@ button.player-tap:active{opacity:.6}
   transition:all .18s;touch-action:manipulation}
 .arch-save-btn:hover{background:#ffe833}
 
+/* player results in manual form */
+.arch-plr-section{margin-top:12px;border-top:1px solid #2a2a40;padding-top:12px}
+.arch-plr-section-title{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:8px;font-weight:700}
+.arch-plr-add-row{display:flex;gap:5px;align-items:center;margin-bottom:8px}
+.arch-plr-name{flex:1;min-width:0}
+.arch-plr-pts{width:62px;flex-shrink:0;text-align:center}
+.arch-plr-gender-wrap{display:flex;gap:2px;flex-shrink:0}
+.arch-plr-g-btn{width:28px;height:34px;border-radius:6px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.05);color:var(--muted);font-size:11px;font-weight:700;
+  cursor:pointer;transition:all .15s;touch-action:manipulation}
+.arch-plr-g-btn.sel-M{background:rgba(77,168,218,.2);border-color:#4DA8DA;color:#4DA8DA}
+.arch-plr-g-btn.sel-W{background:rgba(199,125,255,.2);border-color:#C77DFF;color:#C77DFF}
+.arch-plr-add-btn{padding:0 10px;height:34px;border-radius:7px;border:none;
+  background:rgba(255,215,0,.15);color:var(--gold);font-size:18px;font-weight:700;
+  cursor:pointer;transition:all .15s;flex-shrink:0;touch-action:manipulation}
+.arch-plr-add-btn:hover{background:var(--gold);color:#111}
+.arch-plr-list{display:flex;flex-direction:column;gap:4px;max-height:220px;
+  overflow-y:auto;margin-bottom:8px}
+.arch-plr-row{display:flex;align-items:center;gap:6px;padding:6px 8px;
+  background:rgba(255,255,255,.04);border-radius:7px;border:1px solid #2a2a40}
+.arch-plr-row-rank{font-size:11px;color:var(--muted);width:20px;text-align:center;flex-shrink:0}
+.arch-plr-row-name{flex:1;font-size:13px;color:#fff;font-weight:600;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arch-plr-row-g{font-size:9px;padding:2px 5px;border-radius:4px;font-weight:700;flex-shrink:0}
+.arch-plr-row-g.M{background:rgba(77,168,218,.15);color:#4DA8DA}
+.arch-plr-row-g.W{background:rgba(199,125,255,.15);color:#C77DFF}
+.arch-plr-row-pts{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);
+  width:36px;text-align:right;flex-shrink:0}
+.arch-plr-row-del{width:20px;height:20px;border-radius:4px;border:none;
+  background:transparent;color:rgba(233,69,96,.4);cursor:pointer;font-size:11px;
+  flex-shrink:0;transition:color .15s;touch-action:manipulation;padding:0}
+.arch-plr-row-del:hover{color:var(--red)}
+.arch-plr-empty{font-size:11px;color:var(--muted);text-align:center;padding:10px;
+  border:1px dashed #2a2a40;border-radius:7px;margin-bottom:8px}
+.arch-plr-count{font-size:10px;color:var(--muted);margin-bottom:4px}
+
 .arch-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
 .arch-empty-icon{font-size:34px;margin-bottom:8px}
 
@@ -1572,6 +1609,8 @@ let activeTabId = 0;  // current tab id (number = court index, or string)
 // ── HOME DASHBOARD STATE ────────────────────────────────────
 let homeActiveTab = 'schedule';   // 'schedule' | 'calendar' | 'archive'
 let homeArchiveFormOpen = false;
+let homeArchiveFormPlayers = [];   // [{name, pts, gender}]
+let homeArchiveFormGender  = 'M';  // default gender for next player
 
 // ── PLAYER DATABASE STATE ───────────────────────────────────
 let playersGender = 'M';
@@ -3476,19 +3515,36 @@ function saveManualTournaments(arr) {
 }
 function submitManualTournament() {
   const v = id => document.getElementById(id)?.value;
-  const name   = (v('arch-inp-name')  || '').trim();
-  const date   =  v('arch-inp-date')  || '';
-  const format =  v('arch-inp-fmt')   || 'King of the Court';
-  const division = v('arch-inp-div')  || 'Мужской';
-  const playersCount = parseInt(v('arch-inp-players') || '0') || 0;
-  const winner = (v('arch-inp-winner') || '').trim();
+  const name     = (v('arch-inp-name') || '').trim();
+  const date     =  v('arch-inp-date') || '';
+  const format   =  v('arch-inp-fmt')  || 'King of the Court';
+  const division =  v('arch-inp-div')  || 'Мужской';
   if (!name || !date) { showToast('⚠️ Введите название и дату'); return; }
+
+  const playerResults = [...homeArchiveFormPlayers].sort((a,b) => b.pts - a.pts);
+  const playersCount  = playerResults.length || (parseInt(v('arch-inp-players')||'0')||0);
+  const winner        = playerResults[0]?.name || (v('arch-inp-winner')||'').trim();
+
+  // Save to archive
   const arr = loadManualTournaments();
-  arr.unshift({ id: Date.now(), name, date, format, division, playersCount, winner, source: 'manual' });
+  arr.unshift({ id: Date.now(), name, date, format, division,
+    playersCount, winner, playerResults, source: 'manual' });
   saveManualTournaments(arr);
+
+  // Sync players → playerDB (each player gets +1 tournament, +pts)
+  if (playerResults.length) {
+    syncPlayersFromTournament(
+      playerResults.map(p => ({ name: p.name, gender: p.gender, totalPts: p.pts })),
+      date
+    );
+    showToast(`✅ Турнир сохранён · ${playerResults.length} игроков в базу`);
+  } else {
+    showToast('✅ Турнир добавлен в архив');
+  }
+
   homeArchiveFormOpen = false;
+  homeArchiveFormPlayers = [];
   setHomeTab('archive');
-  showToast('✅ Турнир добавлен в архив');
 }
 function deleteManualTournament(id) {
   saveManualTournaments(loadManualTournaments().filter(t => t.id !== id));
@@ -3496,8 +3552,57 @@ function deleteManualTournament(id) {
 }
 function toggleArchiveForm() {
   homeArchiveFormOpen = !homeArchiveFormOpen;
+  if (homeArchiveFormOpen) homeArchiveFormPlayers = [];
   const s = document.getElementById('screen-home');
   if (s) s.innerHTML = renderHome();
+}
+
+function setArchFormGender(g) {
+  homeArchiveFormGender = g;
+  // just update the buttons visually without full re-render
+  ['M','W'].forEach(x => {
+    const b = document.getElementById('arch-g-btn-'+x);
+    if (b) b.className = 'arch-plr-g-btn' + (x===g?' sel-'+g:'');
+  });
+}
+
+function addArchFormPlayer() {
+  const nameEl = document.getElementById('arch-plr-inp');
+  const ptsEl  = document.getElementById('arch-plr-pts-inp');
+  const name   = (nameEl?.value || '').trim();
+  const pts    = parseInt(ptsEl?.value || '0') || 0;
+  if (!name) { showToast('⚠️ Введите фамилию'); return; }
+  homeArchiveFormPlayers.push({ name, pts, gender: homeArchiveFormGender });
+  homeArchiveFormPlayers.sort((a,b) => b.pts - a.pts);
+  nameEl.value = ''; ptsEl.value = '';
+  _refreshArchPlrList();
+  nameEl.focus();
+}
+
+function removeArchFormPlayer(idx) {
+  homeArchiveFormPlayers.splice(idx, 1);
+  _refreshArchPlrList();
+}
+
+function _refreshArchPlrList() {
+  const el = document.getElementById('arch-plr-list-wrap');
+  if (el) el.innerHTML = _archPlrListHtml();
+}
+
+function _archPlrListHtml() {
+  const medals = ['🥇','🥈','🥉'];
+  if (!homeArchiveFormPlayers.length)
+    return '<div class="arch-plr-empty">Игроки не добавлены — очки не запишутся в базу</div>';
+  return `<div class="arch-plr-count">${homeArchiveFormPlayers.length} игроков</div>
+<div class="arch-plr-list">` +
+    homeArchiveFormPlayers.map((p,i) => `
+  <div class="arch-plr-row">
+    <span class="arch-plr-row-rank">${medals[i]||i+1}</span>
+    <span class="arch-plr-row-name">${esc(p.name)}</span>
+    <span class="arch-plr-row-g ${p.gender}">${p.gender==='M'?'М':'Ж'}</span>
+    <span class="arch-plr-row-pts">${p.pts}</span>
+    <button class="arch-plr-row-del" onclick="removeArchFormPlayer(${i})">✕</button>
+  </div>`).join('') + '</div>';
 }
 
 function renderHome() {
@@ -3621,6 +3726,17 @@ function renderHome() {
       ${rds?`<span class="arch-chip blue">${rds}</span>`:''}
       ${winner?`<span class="arch-chip gold">🥇 ${esc(winner)}</span>`:''}
     </div>
+    ${t.playerResults?.length>1 ? `
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:3px">
+      ${t.playerResults.slice(0,5).map((p,i)=>{
+        const medals=['🥇','🥈','🥉'];
+        return `<span style="font-size:10px;padding:2px 7px;border-radius:5px;
+          background:rgba(255,255,255,.05);border:1px solid #2a2a40;color:var(--muted)">
+          ${medals[i]||'·'} ${esc(p.name)} ${p.pts?`<b style="color:var(--gold)">${p.pts}</b>`:''}
+        </span>`;
+      }).join('')}
+      ${t.playerResults.length>5?`<span style="font-size:10px;color:var(--muted)">+${t.playerResults.length-5}</span>`:''}
+    </div>` : ''}
   </div>
 </div>`;
   }
@@ -3645,8 +3761,6 @@ function renderHome() {
       type="text" placeholder="Название турнира *">
     <input class="arch-form-inp" id="arch-inp-date"
       type="date" value="${new Date().toISOString().split('T')[0]}">
-    <input class="arch-form-inp" id="arch-inp-players"
-      type="number" min="2" max="200" placeholder="Кол-во игроков">
     <select class="arch-form-sel" id="arch-inp-fmt">
       <option>King of the Court</option>
       <option>Round Robin</option>
@@ -3658,10 +3772,30 @@ function renderHome() {
       <option>Женский</option>
       <option>Смешанный</option>
     </select>
-    <input class="arch-form-inp" id="arch-inp-winner"
-      type="text" placeholder="Победитель (фамилия)">
   </div>
-  <button class="arch-save-btn" onclick="submitManualTournament()">💾 Сохранить в архив</button>
+
+  <!-- Player results section -->
+  <div class="arch-plr-section">
+    <div class="arch-plr-section-title">👥 Результаты игроков (необязательно)</div>
+    <div class="arch-plr-add-row">
+      <input class="arch-form-inp arch-plr-name" id="arch-plr-inp"
+        type="text" placeholder="Фамилия"
+        onkeydown="if(event.key==='Enter')addArchFormPlayer()">
+      <input class="arch-form-inp arch-plr-pts" id="arch-plr-pts-inp"
+        type="number" min="0" max="999" placeholder="Очки"
+        onkeydown="if(event.key==='Enter')addArchFormPlayer()">
+      <div class="arch-plr-gender-wrap">
+        <button id="arch-g-btn-M" class="arch-plr-g-btn sel-M" onclick="setArchFormGender('M')">М</button>
+        <button id="arch-g-btn-W" class="arch-plr-g-btn" onclick="setArchFormGender('W')">Ж</button>
+      </div>
+      <button class="arch-plr-add-btn" onclick="addArchFormPlayer()">+</button>
+    </div>
+    <div id="arch-plr-list-wrap">${_archPlrListHtml()}</div>
+  </div>
+
+  <button class="arch-save-btn" onclick="submitManualTournament()">
+    💾 Сохранить${homeArchiveFormPlayers.length ? ` (${homeArchiveFormPlayers.length} игроков → база)` : ' в архив'}
+  </button>
 </div>` : '';
 
     const listHtml = all.length === 0 ? `
