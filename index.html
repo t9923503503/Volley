@@ -1266,6 +1266,86 @@ button.player-tap:active{opacity:.6}
 .home-sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px}
 .home-sec-title span{color:var(--gold)}
 .home-sec-count{font-size:11px;color:var(--muted)}
+
+/* ════════════════════════════════════════════════════════════
+   PLAYER DATABASE SCREEN
+   ════════════════════════════════════════════════════════════ */
+.plr-wrap{padding:14px 12px 40px;max-width:680px;margin:0 auto}
+.plr-header{margin-bottom:14px}
+.plr-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:#fff}
+.plr-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* search */
+.plr-search-wrap{position:relative;margin-bottom:12px}
+.plr-search{width:100%;background:#1a1a2e;border:1px solid #2a2a44;border-radius:10px;
+  padding:10px 14px 10px 36px;color:#fff;font-size:14px;outline:none;
+  font-family:'Barlow',sans-serif;transition:border-color .18s}
+.plr-search:focus{border-color:var(--gold)}
+.plr-search::placeholder{color:var(--muted)}
+.plr-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:14px;pointer-events:none}
+
+/* gender tabs */
+.plr-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);
+  padding:4px;border-radius:10px;border:1px solid #2a2a40;margin-bottom:12px}
+.plr-tab{flex:1;padding:8px;border-radius:7px;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;
+  border:none;cursor:pointer;transition:all .18s;
+  color:var(--muted);background:transparent;touch-action:manipulation}
+.plr-tab.active{background:var(--gold);color:#111;box-shadow:0 3px 10px rgba(255,215,0,.25)}
+
+/* add player form */
+.plr-add-form{display:flex;gap:8px;margin-bottom:14px;align-items:stretch}
+.plr-add-input{flex:1;background:#1a1a2e;border:1px solid #2a2a44;border-radius:10px;
+  padding:10px 12px;color:#fff;font-size:14px;outline:none;
+  font-family:'Barlow',sans-serif;transition:border-color .18s;min-width:0}
+.plr-add-input:focus{border-color:var(--gold)}
+.plr-add-input::placeholder{color:var(--muted)}
+.plr-add-btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;
+  background:var(--gold);color:#111;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:.5px;white-space:nowrap;
+  transition:all .18s;touch-action:manipulation}
+.plr-add-btn:hover{background:#ffe833}
+
+/* sync button */
+.plr-sync-btn{width:100%;padding:9px;border-radius:9px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;
+  letter-spacing:.5px;text-transform:uppercase;transition:all .18s;margin-bottom:14px;
+  touch-action:manipulation}
+.plr-sync-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* stats row */
+.plr-stats-row{display:flex;gap:8px;margin-bottom:14px}
+.plr-stat-chip{flex:1;background:#1a1a2e;border:1px solid #2a2a44;border-radius:9px;
+  padding:9px 8px;text-align:center}
+.plr-stat-chip-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+.plr-stat-chip-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+
+/* player list */
+.plr-list{display:flex;flex-direction:column;gap:6px}
+.plr-empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px}
+.plr-empty-icon{font-size:36px;margin-bottom:8px}
+
+.plr-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--card);border:1px solid #2a2a40;border-radius:11px;
+  transition:border-color .18s;cursor:pointer}
+.plr-item:hover{border-color:#3a3a5e}
+.plr-item-rank{flex-shrink:0;width:26px;text-align:center;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--muted)}
+.plr-item-rank.gold{color:#FFD700}.plr-item-rank.silver{color:#b0b8c8}.plr-item-rank.bronze{color:#cd7f32}
+.plr-item-info{flex:1;min-width:0}
+.plr-item-name{font-weight:700;font-size:14px;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plr-item-meta{display:flex;align-items:center;gap:8px;font-size:10px;
+  color:var(--muted);margin-top:2px;flex-wrap:wrap}
+.plr-item-pts{flex-shrink:0;text-align:right}
+.plr-item-pts-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);line-height:1}
+.plr-item-pts-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.plr-del-btn{flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1px solid #3a2a2a;
+  background:rgba(233,69,96,.08);color:rgba(233,69,96,.5);cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;transition:all .18s;touch-action:manipulation}
+.plr-del-btn:hover{background:rgba(233,69,96,.2);color:var(--red);border-color:var(--red)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1373,6 +1453,73 @@ let activeTabId = 0;  // current tab id (number = court index, or string)
 
 // ── HOME DASHBOARD STATE ────────────────────────────────────
 let homeActiveTab = 'schedule';
+
+// ── PLAYER DATABASE STATE ───────────────────────────────────
+let playersGender = 'M';
+let playersSearch = '';
+
+function loadPlayerDB() {
+  try { return JSON.parse(localStorage.getItem('kotc3_playerdb') || '[]'); } catch(e){ return []; }
+}
+function savePlayerDB(db) {
+  localStorage.setItem('kotc3_playerdb', JSON.stringify(db));
+}
+function addPlayerToDB(name, gender) {
+  name = name.trim();
+  if (!name) return false;
+  const db = loadPlayerDB();
+  if (db.find(p => p.name.toLowerCase() === name.toLowerCase() && p.gender === gender)) return false;
+  db.push({ id: Date.now() + Math.random(), name, gender,
+            addedAt: new Date().toISOString().split('T')[0],
+            tournaments: 0, totalPts: 0, lastSeen: '' });
+  savePlayerDB(db);
+  return true;
+}
+function removePlayerFromDB(id) {
+  const db = loadPlayerDB().filter(p => p.id !== id);
+  savePlayerDB(db);
+}
+// Called on finishTournament — upserts all players with their results
+function syncPlayersFromTournament(players, date) {
+  const db = loadPlayerDB();
+  players.forEach(p => {
+    const existing = db.find(d => d.name.toLowerCase() === p.name.toLowerCase() && d.gender === p.gender);
+    if (existing) {
+      existing.tournaments = (existing.tournaments || 0) + 1;
+      existing.totalPts    = (existing.totalPts    || 0) + (p.totalPts || 0);
+      existing.lastSeen    = date;
+    } else {
+      db.push({ id: Date.now() + Math.random(), name: p.name, gender: p.gender,
+                addedAt: date, tournaments: 1, totalPts: p.totalPts || 0, lastSeen: date });
+    }
+  });
+  savePlayerDB(db);
+}
+// Import names currently in the roster inputs (without score data)
+function syncPlayersFromRoster() {
+  const date = new Date().toISOString().split('T')[0];
+  let added = 0;
+  for (let ci = 0; ci < nc; ci++) {
+    ALL_COURTS[ci].men.forEach(n => { if (n.trim() && addPlayerToDB(n.trim(), 'M')) added++; });
+    ALL_COURTS[ci].women.forEach(n => { if (n.trim() && addPlayerToDB(n.trim(), 'W')) added++; });
+  }
+  return added;
+}
+function setPlayersGender(g) {
+  playersGender = g;
+  playersSearch = '';
+  const inp = document.getElementById('plr-search-inp');
+  if (inp) inp.value = '';
+  refreshPlayersScreen();
+}
+function setPlayersSearch(val) {
+  playersSearch = val;
+  refreshPlayersScreen();
+}
+function refreshPlayersScreen() {
+  const s = document.getElementById('screen-players');
+  if (s && s.classList.contains('active')) s.innerHTML = renderPlayers();
+}
 
 const HOME_TOURNAMENTS = [
   { id:1, level:'hard',   division:'Мужской',   format:'King of the Court',
@@ -1678,6 +1825,8 @@ async function finishTournament() {
   localStorage.setItem('kotc3_history', JSON.stringify(history));
 
   showToast('🏆 Турнир сохранён в архиве!');
+  // Sync players to database
+  syncPlayersFromTournament(players, date);
   // Auto-export to Google Sheets if connected
   if (gshIsConnected()) {
     gshExportTournament(snapshot, null).catch(()=>{});
@@ -1780,10 +1929,11 @@ function buildNav() {
   top.appendChild(spacer);
 
   [
-    { label:'🏠',   tab:'home'   },
-    { label:'СВОД', tab:'svod'   },
-    { label:'СТАТ', tab:'stats'  },
-    { label:'⚙️',   tab:'roster' },
+    { label:'🏠',   tab:'home'    },
+    { label:'👤',   tab:'players' },
+    { label:'СВОД', tab:'svod'    },
+    { label:'СТАТ', tab:'stats'   },
+    { label:'⚙️',   tab:'roster'  },
   ].forEach(({label,tab}) => {
     const b = document.createElement('button');
     b.className = 'nb'; b.dataset.tab = tab;
@@ -1858,7 +2008,7 @@ function buildScreens() {
   }
 
   // Named screens
-  const named = ['home','svod','hard','advance','medium','lite','stats','roster'];
+  const named = ['home','players','svod','hard','advance','medium','lite','stats','roster'];
   named.forEach(id => {
     const s = document.createElement('div');
     s.className = 'screen'; s.id = `screen-${id}`;
@@ -1907,8 +2057,9 @@ async function switchTab(id) {
   if (!screen) return;
 
   // Re-render content on demand
-  if (id === 'home')   screen.innerHTML = renderHome();
-  if (id === 'svod')   screen.innerHTML = renderSvod();
+  if (id === 'home')    screen.innerHTML = renderHome();
+  if (id === 'players') { playersSearch=''; screen.innerHTML = renderPlayers(); }
+  if (id === 'svod')    screen.innerHTML = renderSvod();
   if (id === 'roster') {
     if (!rosterUnlocked) {
       screen.classList.add('active');
@@ -3075,6 +3226,116 @@ function renderStats() {
   </div>
 
   ${renderHistory()}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// PLAYER DATABASE SCREEN
+// ════════════════════════════════════════════════════════════
+function renderPlayers() {
+  const db  = loadPlayerDB();
+  const all = db.filter(p => p.gender === playersGender);
+  const q   = playersSearch.trim().toLowerCase();
+  const list = (q ? all.filter(p => p.name.toLowerCase().includes(q)) : all)
+    .sort((a,b) => (b.totalPts||0) - (a.totalPts||0));
+
+  const totalM   = db.filter(p=>p.gender==='M').length;
+  const totalW   = db.filter(p=>p.gender==='W').length;
+  const allTrn   = db.reduce((s,p)=>s+(p.tournaments||0),0);
+
+  function rankClass(i){ return i===0?'gold':i===1?'silver':i===2?'bronze':''; }
+  function medal(i){ return i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1; }
+
+  const itemsHtml = list.length === 0 ? `
+    <div class="plr-empty">
+      <div class="plr-empty-icon">${q ? '🔍' : playersGender==='M'?'🏋️':'👩'}</div>
+      ${q ? `Нет совпадений для «${esc(q)}»` : 'Нет игроков. Добавьте вручную или синхронизируйте с ростером.'}
+    </div>` : list.map((p, i) => `
+    <div class="plr-item" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">
+      <div class="plr-item-rank ${rankClass(i)}">${medal(i)}</div>
+      <div class="plr-item-info">
+        <div class="plr-item-name">${esc(p.name)}</div>
+        <div class="plr-item-meta">
+          <span>🏆 ${p.tournaments||0} турн.</span>
+          ${p.lastSeen ? `<span>📅 ${p.lastSeen}</span>` : ''}
+          ${p.addedAt  ? `<span>➕ ${p.addedAt}</span>`  : ''}
+        </div>
+      </div>
+      <div class="plr-item-pts">
+        <div class="plr-item-pts-val">${p.totalPts||0}</div>
+        <div class="plr-item-pts-lbl">очков</div>
+      </div>
+      <button class="plr-del-btn" title="Удалить"
+        onclick="event.stopPropagation();removePlayerFromDB(${p.id});refreshPlayersScreen()">✕</button>
+    </div>`).join('');
+
+  return `
+<div class="plr-wrap">
+  <div class="plr-header">
+    <div class="plr-title">👤 БАЗА ИГРОКОВ</div>
+    <div class="plr-sub">Управление составом, история участий, статистика</div>
+  </div>
+
+  <!-- Stats chips -->
+  <div class="plr-stats-row">
+    <div class="plr-stat-chip">
+      <div class="plr-stat-chip-val">${totalM}</div>
+      <div class="plr-stat-chip-lbl">🏋️ Мужчин</div>
+    </div>
+    <div class="plr-stat-chip">
+      <div class="plr-stat-chip-val">${totalW}</div>
+      <div class="plr-stat-chip-lbl">👩 Женщин</div>
+    </div>
+    <div class="plr-stat-chip">
+      <div class="plr-stat-chip-val">${db.length}</div>
+      <div class="plr-stat-chip-lbl">Всего</div>
+    </div>
+    <div class="plr-stat-chip">
+      <div class="plr-stat-chip-val">${allTrn}</div>
+      <div class="plr-stat-chip-lbl">Участий</div>
+    </div>
+  </div>
+
+  <!-- Gender tabs -->
+  <div class="plr-tabs">
+    <button class="plr-tab ${playersGender==='M'?'active':''}" onclick="setPlayersGender('M')">🏋️ Мужчины (${totalM})</button>
+    <button class="plr-tab ${playersGender==='W'?'active':''}" onclick="setPlayersGender('W')">👩 Женщины (${totalW})</button>
+  </div>
+
+  <!-- Add player -->
+  <div class="plr-add-form">
+    <input class="plr-add-input" id="plr-add-inp" type="text"
+      placeholder="${playersGender==='M'?'Фамилия игрока (мужской)':'Фамилия игрока (женский)'}"
+      onkeydown="if(event.key==='Enter'){
+        const v=this.value.trim();
+        if(v&&addPlayerToDB(v,'${playersGender}')){this.value='';refreshPlayersScreen();showToast('✅ '+v+' добавлен')}
+        else if(v) showToast('⚠️ Уже в базе')
+      }">
+    <button class="plr-add-btn" onclick="
+      const inp=document.getElementById('plr-add-inp');
+      const v=inp.value.trim();
+      if(v&&addPlayerToDB(v,'${playersGender}')){inp.value='';refreshPlayersScreen();showToast('✅ '+v+' добавлен')}
+      else if(v) showToast('⚠️ Уже в базе')
+    ">+ Добавить</button>
+  </div>
+
+  <!-- Sync from roster -->
+  <button class="plr-sync-btn" onclick="
+    const n=syncPlayersFromRoster();
+    refreshPlayersScreen();
+    showToast(n>0?'✅ Синхронизировано: +'+n+' игроков':'ℹ️ Новых игроков не найдено')
+  ">🔄 Импортировать из текущего ростера</button>
+
+  <!-- Search -->
+  <div class="plr-search-wrap">
+    <span class="plr-search-icon">🔍</span>
+    <input class="plr-search" id="plr-search-inp" type="search"
+      placeholder="Поиск по имени…" value="${esc(playersSearch)}"
+      oninput="setPlayersSearch(this.value)">
+  </div>
+
+  <!-- List -->
+  <div class="plr-list">${itemsHtml}</div>
+</div>`;
 }
 
 // ════════════════════════════════════════════════════════════
