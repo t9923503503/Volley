@@ -4191,13 +4191,13 @@ function _rosterTrnHtml() {
       </div>
       <span class="trn-mgr-badge ${t.level || 'medium'}">${levelLbl}</span>
       <div class="trn-mgr-actions">
-        <button class="trn-mgr-edit"  onclick="openTrnEdit(${JSON.stringify(t.id)})"  title="Редактировать">✏️</button>
-        <button class="trn-mgr-clone" onclick="cloneTrn(${JSON.stringify(t.id)})"     title="Дублировать">📋</button>
+        <button class="trn-mgr-edit"  onclick="openTrnEdit('${t.id}')"  title="Редактировать">✏️</button>
+        <button class="trn-mgr-clone" onclick="cloneTrn('${t.id}')"     title="Дублировать">📋</button>
         ${isActive
-          ? `<button class="trn-mgr-finish" onclick="finishTrn(${JSON.stringify(t.id)})" title="Завершить">✅</button>`
-          : `<button class="trn-mgr-finish" onclick="openResultsForm(${JSON.stringify(t.id)})" title="Редактировать результаты" style="font-size:11px">📊</button>`}
-        <button class="trn-mgr-plr" onclick="openParticipantsModal(${JSON.stringify(t.id)})" title="Участники">👥</button>
-        <button class="trn-mgr-del"   onclick="deleteTrn(${JSON.stringify(t.id)})"   title="Удалить">✕</button>
+          ? `<button class="trn-mgr-finish" onclick="finishTrn('${t.id}')" title="Завершить">✅</button>`
+          : `<button class="trn-mgr-finish" onclick="openResultsForm('${t.id}')" title="Редактировать результаты" style="font-size:11px">📊</button>`}
+        <button class="trn-mgr-plr" onclick="openParticipantsModal('${t.id}')" title="Участники">👥</button>
+        <button class="trn-mgr-del"   onclick="deleteTrn('${t.id}')"   title="Удалить">✕</button>
       </div>
     </div>`;
   }).join('')
@@ -6284,7 +6284,7 @@ function renderHome() {
     const ac = t.status==='open' ? 'var(--gold)' : '#2a2a44';
     const div = t.division==='Мужской'?'♂':'♀';
     return `
-<div class="trn-card" onclick="openTrnDetails(${JSON.stringify(t.id)})" style="cursor:pointer">
+<div class="trn-card" onclick="openTrnDetails('${t.id}')" style="cursor:pointer">
   <div class="trn-card-accent" style="background:${ac}"></div>
   <div class="trn-card-body">
     <div class="trn-card-head">
@@ -6313,7 +6313,7 @@ function renderHome() {
       </div>
     </div>
     <button class="trn-btn ${t.status}"
-      onclick="event.stopPropagation();openTrnDetails(${JSON.stringify(t.id)})">
+      onclick="event.stopPropagation();openTrnDetails('${t.id}')">
       ${t.status==='open'?'⚡ Записаться':'📋 В лист ожидания'}
     </button>
   </div>
