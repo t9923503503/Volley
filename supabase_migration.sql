@@ -385,7 +385,411 @@ END $$;
 
 
 -- ══════════════════════════════════════════════════════════════
--- ГОТОВО. Таблицы: players, tournaments, tournament_participants,
--- player_requests. RPC: safe_register_player, search_players,
--- approve_player_request.
+-- PHASE 2: Идеи ИИ — только то, что реально нужно
+-- ══════════════════════════════════════════════════════════════
+
+
+-- ── 9. Gender Constraints ────────────────────────────────────
+-- min_male / min_female — минимум участников каждого пола.
+-- Для Микст-турниров: нельзя записать 20 мужчин и 0 женщин.
+-- ──────────────────────────────────────────────────────────────
+ALTER TABLE tournaments
+  ADD COLUMN IF NOT EXISTS min_male   INT DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS min_female INT DEFAULT 0;
+
+COMMENT ON COLUMN tournaments.min_male   IS 'Мин. мужчин для начала турнира. 0 = без ограничений.';
+COMMENT ON COLUMN tournaments.min_female IS 'Мин. женщин для начала турнира. 0 = без ограничений.';
+
+
+-- ── 10. Обновлённый safe_register_player с gender check ──────
+-- Проверяем: не превышен ли лимит одного пола.
+-- Если capacity=24 и min_male=8, min_female=8, то:
+--   max_male = 24 - 8 = 16,  max_female = 24 - 8 = 16
+-- Т.е. min_female резервирует места для женщин, ограничивая мужчин.
+-- ──────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION safe_register_player(
+  p_tournament_id UUID,
+  p_player_id     UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_trn          tournaments%ROWTYPE;
+  v_current      INT;
+  v_gender_count INT;
+  v_max_gender   INT;
+  v_is_waitlist  BOOLEAN;
+  v_position     INT;
+  v_player       players%ROWTYPE;
+BEGIN
+  -- ① Блокируем строку турнира
+  SELECT * INTO v_trn
+    FROM tournaments
+   WHERE id = p_tournament_id
+     FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'TOURNAMENT_NOT_FOUND',
+      'message', 'Турнир не найден');
+  END IF;
+
+  -- ② Турнир закрыт?
+  IF v_trn.status IN ('finished', 'cancelled') THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'TOURNAMENT_CLOSED',
+      'message', 'Турнир завершён или отменён');
+  END IF;
+
+  -- ③ Игрок существует?
+  SELECT * INTO v_player FROM players WHERE id = p_player_id;
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'PLAYER_NOT_FOUND',
+      'message', 'Игрок не найден в базе');
+  END IF;
+
+  -- ④ Уже зарегистрирован?
+  IF EXISTS (
+    SELECT 1 FROM tournament_participants
+     WHERE tournament_id = p_tournament_id
+       AND player_id     = p_player_id
+  ) THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'ALREADY_REGISTERED',
+      'message', v_player.name || ' уже зарегистрирован(а)');
+  END IF;
+
+  -- ⑤ Считаем текущих (не waitlist)
+  SELECT COUNT(*) INTO v_current
+    FROM tournament_participants
+   WHERE tournament_id = p_tournament_id
+     AND is_waitlist = false;
+
+  -- ⑥ Gender constraint check
+  -- min_female резервирует места для Ж, ограничивая М (и наоборот)
+  IF COALESCE(v_trn.min_male, 0) > 0 OR COALESCE(v_trn.min_female, 0) > 0 THEN
+    SELECT COUNT(*) INTO v_gender_count
+      FROM tournament_participants tp
+      JOIN players pl ON pl.id = tp.player_id
+     WHERE tp.tournament_id = p_tournament_id
+       AND tp.is_waitlist = false
+       AND pl.gender = v_player.gender;
+
+    -- max для данного пола = capacity - min_противоположного
+    IF v_player.gender = 'M' THEN
+      v_max_gender := v_trn.capacity - COALESCE(v_trn.min_female, 0);
+    ELSE
+      v_max_gender := v_trn.capacity - COALESCE(v_trn.min_male, 0);
+    END IF;
+
+    IF v_max_gender > 0 AND v_gender_count >= v_max_gender THEN
+      RETURN jsonb_build_object(
+        'ok', false, 'error', 'GENDER_LIMIT',
+        'message', 'Лимит ' || CASE v_player.gender WHEN 'M' THEN 'мужчин' ELSE 'женщин' END
+          || ' исчерпан (' || v_gender_count || '/' || v_max_gender || ').'
+          || ' Места зарезервированы для '
+          || CASE v_player.gender WHEN 'M' THEN 'женщин' ELSE 'мужчин' END || '.');
+    END IF;
+  END IF;
+
+  -- ⑦ Место есть или waitlist?
+  v_is_waitlist := v_current >= v_trn.capacity;
+
+  -- ⑧ Позиция
+  SELECT COALESCE(MAX(position), 0) + 1 INTO v_position
+    FROM tournament_participants
+   WHERE tournament_id = p_tournament_id
+     AND is_waitlist = v_is_waitlist;
+
+  -- ⑨ Вставляем
+  INSERT INTO tournament_participants
+    (tournament_id, player_id, is_waitlist, position)
+  VALUES
+    (p_tournament_id, p_player_id, v_is_waitlist, v_position);
+
+  -- ⑩ Обновляем статус
+  IF NOT v_is_waitlist AND (v_current + 1) >= v_trn.capacity THEN
+    UPDATE tournaments SET status = 'full' WHERE id = p_tournament_id;
+  END IF;
+
+  -- ⑪ Статистика
+  IF NOT v_is_waitlist THEN
+    UPDATE players SET tournaments_played = tournaments_played + 1
+     WHERE id = p_player_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok',        true,
+    'waitlist',  v_is_waitlist,
+    'position',  v_position,
+    'total',     v_current + CASE WHEN v_is_waitlist THEN 0 ELSE 1 END,
+    'capacity',  v_trn.capacity,
+    'player',    v_player.name,
+    'message',   CASE
+      WHEN v_is_waitlist THEN v_player.name || ' → лист ожидания (#' || v_position || ')'
+      ELSE v_player.name || ' зарегистрирован(а) (' || (v_current+1) || '/' || v_trn.capacity || ')'
+    END
+  );
+END;
+$$;
+
+
+-- ── 11. RPC: safe_cancel_registration ────────────────────────
+-- Атомарная отмена регистрации + авто-продвижение из waitlist.
+--
+-- Логика:
+--   1. Блокируем турнир (FOR UPDATE)
+--   2. Удаляем участника
+--   3. Если был в основном составе → берём первого из waitlist
+--   4. Перемещаем его в основной состав
+--   5. Пересчитываем позиции (заполняем дырку)
+--   6. Обновляем статус турнира (full → open)
+-- ──────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION safe_cancel_registration(
+  p_tournament_id UUID,
+  p_player_id     UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_trn          tournaments%ROWTYPE;
+  v_was_waitlist BOOLEAN;
+  v_promoted_id  UUID;
+  v_promoted_nm  TEXT;
+  v_current      INT;
+BEGIN
+  -- ① Блокируем турнир
+  SELECT * INTO v_trn
+    FROM tournaments
+   WHERE id = p_tournament_id
+     FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'TOURNAMENT_NOT_FOUND',
+      'message', 'Турнир не найден');
+  END IF;
+
+  -- ② Участник зарегистрирован?
+  SELECT is_waitlist INTO v_was_waitlist
+    FROM tournament_participants
+   WHERE tournament_id = p_tournament_id
+     AND player_id     = p_player_id;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'NOT_REGISTERED',
+      'message', 'Игрок не найден в списке участников');
+  END IF;
+
+  -- ③ Удаляем
+  DELETE FROM tournament_participants
+   WHERE tournament_id = p_tournament_id
+     AND player_id     = p_player_id;
+
+  -- ④ Если был в основном составе — откатываем статистику
+  IF NOT v_was_waitlist THEN
+    UPDATE players
+       SET tournaments_played = GREATEST(tournaments_played - 1, 0)
+     WHERE id = p_player_id;
+  END IF;
+
+  -- ⑤ Если был в основном составе и есть waitlist → продвигаем
+  v_promoted_id := NULL;
+  IF NOT v_was_waitlist THEN
+    -- Берём первого из waitlist (минимальная позиция)
+    SELECT tp.player_id INTO v_promoted_id
+      FROM tournament_participants tp
+     WHERE tp.tournament_id = p_tournament_id
+       AND tp.is_waitlist = true
+     ORDER BY tp.position ASC
+     LIMIT 1
+       FOR UPDATE SKIP LOCKED;  -- предотвращаем гонку
+
+    IF v_promoted_id IS NOT NULL THEN
+      -- Переводим в основной состав
+      UPDATE tournament_participants
+         SET is_waitlist = false,
+             position = (
+               SELECT COALESCE(MAX(position), 0) + 1
+                 FROM tournament_participants
+                WHERE tournament_id = p_tournament_id
+                  AND is_waitlist = false
+             )
+       WHERE tournament_id = p_tournament_id
+         AND player_id = v_promoted_id;
+
+      -- Статистика для продвинутого
+      UPDATE players
+         SET tournaments_played = tournaments_played + 1
+       WHERE id = v_promoted_id;
+
+      SELECT name INTO v_promoted_nm FROM players WHERE id = v_promoted_id;
+    END IF;
+  END IF;
+
+  -- ⑥ Пересчёт статуса турнира
+  SELECT COUNT(*) INTO v_current
+    FROM tournament_participants
+   WHERE tournament_id = p_tournament_id
+     AND is_waitlist = false;
+
+  IF v_current < v_trn.capacity AND v_trn.status = 'full' THEN
+    UPDATE tournaments SET status = 'open' WHERE id = p_tournament_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok',       true,
+    'promoted', v_promoted_id IS NOT NULL,
+    'promoted_player', COALESCE(v_promoted_nm, ''),
+    'current',  v_current,
+    'capacity', v_trn.capacity,
+    'message',  'Регистрация отменена'
+      || CASE WHEN v_promoted_nm IS NOT NULL
+           THEN '. ' || v_promoted_nm || ' переведён(а) из листа ожидания'
+           ELSE '' END
+  );
+END;
+$$;
+
+
+-- ── 12. MERGE AUDIT TABLE ────────────────────────────────────
+-- Лог склеек профилей для отката и отчётности.
+-- ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS merge_audit (
+  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  temp_player_id  UUID NOT NULL,
+  real_player_id  UUID NOT NULL,
+  temp_name       TEXT NOT NULL,
+  real_name       TEXT NOT NULL,
+  records_moved   INT  DEFAULT 0,     -- кол-во перенесённых записей
+  merged_at       TIMESTAMPTZ DEFAULT now()
+);
+
+
+-- ── 13. RPC: merge_players ───────────────────────────────────
+-- Идемпотентная склейка временного профиля в настоящий.
+--
+-- Порядок:
+--   1. Проверяем что temp существует и status = 'temporary'
+--   2. Проверяем что real существует и status = 'active'
+--   3. Переносим все tournament_participants от temp к real
+--      (если real уже в турнире — удаляем дубль temp)
+--   4. Суммируем статистику
+--   5. Записываем аудит
+--   6. Удаляем temp профиль
+-- ──────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION merge_players(
+  p_temp_id UUID,
+  p_real_id UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_temp     players%ROWTYPE;
+  v_real     players%ROWTYPE;
+  v_moved    INT := 0;
+  v_deleted  INT := 0;
+  v_tp       RECORD;
+BEGIN
+  -- ① Блокируем оба профиля
+  SELECT * INTO v_temp FROM players WHERE id = p_temp_id FOR UPDATE;
+  SELECT * INTO v_real FROM players WHERE id = p_real_id FOR UPDATE;
+
+  IF NOT FOUND OR v_temp.id IS NULL THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'PLAYER_NOT_FOUND',
+      'message', 'Один из игроков не найден');
+  END IF;
+
+  -- ② Проверки
+  IF v_temp.id = v_real.id THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'SAME_PLAYER',
+      'message', 'Нельзя склеить игрока с самим собой');
+  END IF;
+
+  IF v_temp.status <> 'temporary' THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'error', 'NOT_TEMPORARY',
+      'message', v_temp.name || ' не является временным игроком');
+  END IF;
+
+  -- ③ Переносим tournament_participants
+  FOR v_tp IN
+    SELECT * FROM tournament_participants
+     WHERE player_id = p_temp_id
+  LOOP
+    -- Если real уже в этом турнире — удаляем запись temp (дубль)
+    IF EXISTS (
+      SELECT 1 FROM tournament_participants
+       WHERE tournament_id = v_tp.tournament_id
+         AND player_id     = p_real_id
+    ) THEN
+      DELETE FROM tournament_participants
+       WHERE id = v_tp.id;
+      v_deleted := v_deleted + 1;
+    ELSE
+      -- Переносим запись
+      UPDATE tournament_participants
+         SET player_id = p_real_id
+       WHERE id = v_tp.id;
+      v_moved := v_moved + 1;
+    END IF;
+  END LOOP;
+
+  -- ④ Переносим player_requests
+  UPDATE player_requests
+     SET approved_player_id = p_real_id
+   WHERE approved_player_id = p_temp_id;
+
+  -- ⑤ Суммируем статистику
+  UPDATE players
+     SET tournaments_played = tournaments_played + v_temp.tournaments_played,
+         total_pts          = total_pts + v_temp.total_pts
+   WHERE id = p_real_id;
+
+  -- ⑥ Аудит
+  INSERT INTO merge_audit (temp_player_id, real_player_id, temp_name, real_name, records_moved)
+  VALUES (p_temp_id, p_real_id, v_temp.name, v_real.name, v_moved);
+
+  -- ⑦ Удаляем temp
+  DELETE FROM players WHERE id = p_temp_id;
+
+  RETURN jsonb_build_object(
+    'ok',      true,
+    'moved',   v_moved,
+    'deleted', v_deleted,
+    'message', 'Профиль «' || v_temp.name || '» склеен с «' || v_real.name
+               || '». Перенесено записей: ' || v_moved
+               || CASE WHEN v_deleted > 0 THEN ', дубликатов удалено: ' || v_deleted ELSE '' END
+  );
+END;
+$$;
+
+
+-- RLS для новых таблиц
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'ma_select') THEN
+    CREATE POLICY ma_select ON merge_audit FOR SELECT USING (true);
+  END IF;
+END $$;
+ALTER TABLE merge_audit ENABLE ROW LEVEL SECURITY;
+
+
+-- ══════════════════════════════════════════════════════════════
+-- ИТОГО:
+--   Таблицы:  players, tournaments, tournament_participants,
+--             player_requests, merge_audit
+--   RPC:      safe_register_player (+ gender constraints)
+--             safe_cancel_registration (+ auto-promote waitlist)
+--             merge_players (+ audit trail)
+--             search_players, approve_player_request
 -- ══════════════════════════════════════════════════════════════

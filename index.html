@@ -22,6 +22,43 @@
   --nav-base-h:96px;
   --nav-h:calc(var(--nav-base-h) + env(safe-area-inset-top,0px));
 }
+
+/* ── SOLAR THEME — для пляжа при ярком солнце ─────────── */
+/* Активируется классом .solar на <body>                   */
+/* Принцип: max контраст, чёрный фон, жёлтый акцент,      */
+/* крупные тач-зоны, без полупрозрачностей                 */
+body.solar{
+  --gold:#FFFF00;--gold2:#FFD700;
+  --red:#FF4444;--blue:#44BBFF;--green:#44FF44;--purple:#DD88FF;
+  --dark:#000000;--dark2:#0a0a0a;--dark3:#111111;--dark4:#181818;
+  --card:#1a1a1a;--text:#FFFFFF;--muted:#999999;
+  --plus:#44FF44;--minus:#FF4444;
+  background:#000!important;color:#fff!important;
+}
+/* Навигация */
+body.solar #nav{background:#000;border-bottom:2px solid #FFFF00}
+body.solar .nav-pill{background:#111;border-color:#333}
+body.solar .nav-pill.active{border-color:#FFFF00;box-shadow:0 0 12px rgba(255,255,0,.3)}
+body.solar .nav-pill .pill-main{color:#ccc}
+body.solar .nav-pill.active .pill-main{color:#fff}
+body.solar .nav-pill.active .pill-sub{color:#FFFF00}
+body.solar .brand-main{color:#FFFF00}
+/* Карточки */
+body.solar .settings-card,body.solar .sb-card,
+body.solar .gsh-card,body.solar .trn-meta-card{
+  background:#111;border-color:#333}
+/* Кнопки ввода счёта — КРУПНЫЕ для песочных рук */
+body.solar button.player-tap{
+  min-height:100px!important;font-size:20px!important;
+  border:2px solid #FFFF00!important;
+  background:#111!important;color:#fff!important}
+body.solar button.player-tap:active{
+  background:#FFFF00!important;color:#000!important}
+/* Индикатор темы */
+.solar-indicator{display:none;font-size:9px;color:#FFFF00;margin-left:4px}
+body.solar .solar-indicator{display:inline}
+/* Кнопка переключения */
+.nb.solar-toggle{font-size:18px;min-width:32px;padding:0 4px}
 html{
   font-size:16px;
   -webkit-text-size-adjust:100%;
@@ -4551,6 +4588,19 @@ function buildNav() {
   spacer.className = 'nav-spacer';
   top.appendChild(spacer);
 
+  // ── Solar toggle button ──
+  const solarBtn = document.createElement('button');
+  solarBtn.className = 'nb solar-toggle';
+  solarBtn.title = 'Тема: Пляж / Ночь';
+  solarBtn.textContent = localStorage.getItem('kotc3_solar') === '1' ? '🌙' : '☀️';
+  solarBtn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('solar');
+    localStorage.setItem('kotc3_solar', on ? '1' : '0');
+    solarBtn.textContent = on ? '🌙' : '☀️';
+    document.querySelector('meta[name=theme-color]')?.setAttribute('content', on ? '#000000' : '#0d0d1a');
+  });
+  top.appendChild(solarBtn);
+
   [
     { label:'🏠',   tab:'home'    },
     { label:'👤',   tab:'players' },
@@ -8049,6 +8099,11 @@ function renderTimerBlock(ci, roundNavHtml='') {
 loadState();
 loadTimerState();  // восстанавливаем таймеры после перезагрузки
 sbLoadConfig();    // загружаем настройки Supabase
+// Solar-тема: восстанавливаем из localStorage
+if (localStorage.getItem('kotc3_solar') === '1') {
+  document.body.classList.add('solar');
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#000000');
+}
 gshLoadConfig();   // загружаем настройки Google Sheets
 // Дата по умолчанию — сегодня
 if (!tournamentMeta.date) tournamentMeta.date = new Date().toISOString().split('T')[0];
