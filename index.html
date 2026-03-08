@@ -2447,7 +2447,7 @@ function _rdbBodyHtml() {
   const rows = db.length ? db.map((p,i) => `
     <div class="rdb-row">
       <span class="rdb-rank ${rankCls(i)}">${medal(i)}</span>
-      <span class="rdb-name" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})"
+      <span class="rdb-name" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')"
         title="Открыть карточку">${esc(p.name)}</span>
       <span title="Турниров" style="color:var(--muted);font-size:9px;flex-shrink:0">🏆</span>
       <input class="rdb-trn-inp" type="number" min="0" value="${p.tournaments||0}"
@@ -2625,10 +2625,21 @@ function migrateProjectData() {
 /** Non-finished tournaments with computed `registered` for old home render */
 function loadUpcomingTournaments() {
   const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const MON_NAMES_SHORT = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                           'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   return getTournaments()
     .filter(t => t.status !== 'finished' && t.status !== 'cancelled')
     .filter(t => !t.date || t.date >= today) // скрываем прошедшие с главной
-    .map(t => ({ ...t, registered: t.participants.length }));
+    .map(t => {
+      const d = t.date ? new Date(t.date + 'T12:00:00') : null;
+      return {
+        ...t,
+        registered: t.participants.length,
+        dayNum: d ? d.getDate() : '',
+        dayStr: d ? _TRN_DAY_NAMES[d.getDay()] : '',
+        month:  d ? MON_NAMES_SHORT[d.getMonth()] + ' ' + d.getFullYear() : '',
+      };
+    });
 }
 /** Finished tournaments in the legacy manual-archive shape */
 function loadManualTournaments() {
@@ -2875,7 +2886,7 @@ function openResultsForm(trnId) {
         <div id="res-new-player-wrap"></div>
       </div>
       <div class="res-modal-footer">
-        ${!isEdit ? `<button class="res-btn-skip" onclick="finishTrnNoResults(${JSON.stringify(trnId)})">
+        ${!isEdit ? `<button class="res-btn-skip" onclick="finishTrnNoResults('${escAttr(trnId)}')">
           Без результатов
         </button>` : ''}
         <button class="res-btn-save" id="res-btn-save" disabled onclick="saveResults()">
@@ -2962,7 +2973,7 @@ function _slotHtml(slot, idx, playerPool, allDb, allSelectedIds) {
   const badges = slot.playerIds.map(id => {
     const p = allMap.get(id);
     return `<span class="res-badge">
-      <button class="player-tap" onclick="showPlayerCard(${JSON.stringify(p?.name||'')},${JSON.stringify(p?.gender||'M')})"
+      <button class="player-tap" onclick="showPlayerCard('${escAttr(p?.name||'')}','${escAttr(p?.gender||'M')}')"
         style="color:inherit;font-size:inherit">${esc(p?.name || '?')}</button>
       <button class="res-badge-rm" onclick="resRemovePlayer(${idx},'${id}')" aria-label="Убрать">×</button>
     </span>`;
@@ -3485,7 +3496,7 @@ function openTrnDetails(trnId) {
     </div>
     <div class="td-footer">
       ${!isFinished
-        ? `<button class="td-btn-reg ${isFull?'wait':''}" onclick="document.getElementById('td-modal')?.remove();openRegistrationModal('${esc(trn.id)}', ${JSON.stringify({id:trn.id, name:trn.name, capacity:trn.capacity, participants:trn.participants, waitlist:trn.waitlist})})">
+        ? `<button class="td-btn-reg ${isFull?'wait':''}" onclick="document.getElementById('td-modal')?.remove();openRegistrationModal('${escAttr(trn.id)}')">
             ${isFull ? '📋 В лист ожидания' : '⚡ Записаться'}
           </button>`
         : ''}
@@ -3537,7 +3548,7 @@ function _regIsOnline() { return !!_regSb(); }
 function openRegistrationModal(trnId, localTrn) {
   document.getElementById('reg-modal')?.remove();
   _regTrnId      = trnId;
-  _regTrnLocal   = localTrn || null;
+  _regTrnLocal   = localTrn || getTournaments().find(t => t.id === trnId) || null;
   _regFormMode   = null;
   _regFormGender = 'M';
   _regResults    = [];
@@ -4191,13 +4202,13 @@ function _rosterTrnHtml() {
       </div>
       <span class="trn-mgr-badge ${t.level || 'medium'}">${levelLbl}</span>
       <div class="trn-mgr-actions">
-        <button class="trn-mgr-edit"  onclick="openTrnEdit(${JSON.stringify(t.id)})"  title="Редактировать">✏️</button>
-        <button class="trn-mgr-clone" onclick="cloneTrn(${JSON.stringify(t.id)})"     title="Дублировать">📋</button>
+        <button class="trn-mgr-edit"  onclick="openTrnEdit('${t.id}')"  title="Редактировать">✏️</button>
+        <button class="trn-mgr-clone" onclick="cloneTrn('${t.id}')"     title="Дублировать">📋</button>
         ${isActive
-          ? `<button class="trn-mgr-finish" onclick="finishTrn(${JSON.stringify(t.id)})" title="Завершить">✅</button>`
-          : `<button class="trn-mgr-finish" onclick="openResultsForm(${JSON.stringify(t.id)})" title="Редактировать результаты" style="font-size:11px">📊</button>`}
-        <button class="trn-mgr-plr" onclick="openParticipantsModal(${JSON.stringify(t.id)})" title="Участники">👥</button>
-        <button class="trn-mgr-del"   onclick="deleteTrn(${JSON.stringify(t.id)})"   title="Удалить">✕</button>
+          ? `<button class="trn-mgr-finish" onclick="finishTrn('${t.id}')" title="Завершить">✅</button>`
+          : `<button class="trn-mgr-finish" onclick="openResultsForm('${t.id}')" title="Редактировать результаты" style="font-size:11px">📊</button>`}
+        <button class="trn-mgr-plr" onclick="openParticipantsModal('${t.id}')" title="Участники">👥</button>
+        <button class="trn-mgr-del"   onclick="deleteTrn('${t.id}')"   title="Удалить">✕</button>
       </div>
     </div>`;
   }).join('')
@@ -5914,7 +5925,7 @@ function renderStats() {
         return `<div class="bar-row">
           <div class="bar-lbl">
             <span class="pb ${pb}" style="font-size:11px;padding:2px 5px">${p.globalRank}</span>
-            <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
+            <button class="bar-name player-tap" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${p.genderIcon} ${esc(p.name)}</button>
             <span class="bar-court">${p.courtName}</span>
             <span class="bar-avg">avg ${avg}</span>
             <span class="bar-pts">${p.totalPts}</span>
@@ -5930,7 +5941,7 @@ function renderStats() {
       ${consist.map((p,i)=>`
         <div class="consist-row">
           <span class="consist-rank">${i+1}</span>
-          <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
+          <button class="bar-name player-tap" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${p.genderIcon} ${esc(p.name)}</button>
           <span class="bar-court">${p.courtName}</span>
           <div class="consist-bar"><div class="consist-fill" style="width:${Math.max(5,100-p.vari*5)}%"></div></div>
           <span class="bar-pts">${p.totalPts??p.pts}</span>
@@ -5957,7 +5968,7 @@ function renderStats() {
             <span class="avg-rank">${medals[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
-                <button class="bar-name player-tap" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">${p.genderIcon} ${esc(p.name)}</button>
+                <button class="bar-name player-tap" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${p.genderIcon} ${esc(p.name)}</button>
                 <span class="bar-court">${p.courtName}</span>
                 <span class="avg-num">${p.avgVal.toFixed(1)}</span>
               </div>
@@ -6019,7 +6030,7 @@ function renderStats() {
             <span class="avg-rank">${medals[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
-                <span class="bar-name" style="font-size:13px"><button class="player-tap" onclick="showPlayerCard(${JSON.stringify(man)},'M')">🏋️ ${esc(man)}</button> <span style="color:#9b5de5">+</span> <button class="player-tap" onclick="showPlayerCard(${JSON.stringify(woman)},'W')">👩 ${esc(woman)}</button></span>
+                <span class="bar-name" style="font-size:13px"><button class="player-tap" onclick="showPlayerCard('${escAttr(man)}','M')">🏋️ ${esc(man)}</button> <span style="color:#9b5de5">+</span> <button class="player-tap" onclick="showPlayerCard('${escAttr(woman)}','W')">👩 ${esc(woman)}</button></span>
                 <span class="avg-num">${pts}</span>
               </div>
               <div class="avg-track"><div class="avg-fill" style="width:${pct}%;background:linear-gradient(90deg,#5a1e8a,#c77dff)"></div></div>
@@ -6095,7 +6106,7 @@ function renderPlayers() {
       <div class="plr-empty-icon">${q ? '🔍' : playersGender==='M'?'🏋️':'👩'}</div>
       ${q ? `Нет совпадений для «${esc(q)}»` : 'Нет игроков. Добавляйте и редактируйте через ⚙️ Ростер.'}
     </div>` : list.map((p, i) => `
-    <div class="plr-item" onclick="showPlayerCard(${JSON.stringify(p.name)},${JSON.stringify(p.gender)})">
+    <div class="plr-item" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">
       <div class="plr-item-rank ${rankClass(i)}">${medal(i)}</div>
       <div class="plr-item-info">
         <div class="plr-item-name">${esc(p.name)}</div>
@@ -6284,7 +6295,7 @@ function renderHome() {
     const ac = t.status==='open' ? 'var(--gold)' : '#2a2a44';
     const div = t.division==='Мужской'?'♂':'♀';
     return `
-<div class="trn-card" onclick="openTrnDetails(${JSON.stringify(t.id)})" style="cursor:pointer">
+<div class="trn-card" onclick="openTrnDetails('${t.id}')" style="cursor:pointer">
   <div class="trn-card-accent" style="background:${ac}"></div>
   <div class="trn-card-body">
     <div class="trn-card-head">
@@ -6313,7 +6324,7 @@ function renderHome() {
       </div>
     </div>
     <button class="trn-btn ${t.status}"
-      onclick="event.stopPropagation();openTrnDetails(${JSON.stringify(t.id)})">
+      onclick="event.stopPropagation();openTrnDetails('${t.id}')">
       ${t.status==='open'?'⚡ Записаться':'📋 В лист ожидания'}
     </button>
   </div>
@@ -7649,6 +7660,8 @@ function attachSwipe() {
 // ════════════════════════════════════════════════════════════
 function pbCls(p){ return p===1?'pb1':p===2?'pb2':p===3?'pb3':'pbn'; }
 function esc(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+/** Escape a string for safe use inside onclick="fn('...')" HTML attributes */
+function escAttr(s){ return esc(String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")); }
 
 let _toastTimer=null;
 function showToast(msg) {
