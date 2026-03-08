@@ -4641,6 +4641,7 @@ function buildNav() {
     { label:'👤',   tab:'players' },
     { label:'СВОД', tab:'svod'    },
     { label:'СТАТ', tab:'stats'   },
+    { label:'👥',   tab:'rating'  },
     { label:'⚙️',   tab:'roster'  },
   ].forEach(({label,tab}) => {
     const b = document.createElement('button');
@@ -4733,7 +4734,7 @@ function buildScreens() {
   }
 
   // Named screens
-  const named = ['home','players','svod','hard','advance','medium','lite','stats','roster'];
+  const named = ['home','players','svod','hard','advance','medium','lite','stats','rating','roster'];
   named.forEach(id => {
     const s = document.createElement('div');
     s.className = 'screen'; s.id = `screen-${id}`;
@@ -4796,6 +4797,7 @@ async function switchTab(id) {
     screen.innerHTML = renderRoster();
   }
   if (id === 'stats')  screen.innerHTML = renderStats();
+  if (id === 'rating') screen.innerHTML = renderRating();
   if (id === 'hard' || id === 'advance' || id === 'medium' || id === 'lite') {
     if (!hasRound5Score()) {
       showToast(`🔒 Добавьте очки в раунде ${ppc} на кортах 1–${nc}`);
@@ -6097,6 +6099,66 @@ function renderStats() {
   </div>
 
   ${renderHistory()}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// PLAYER RATING SCREEN
+// ════════════════════════════════════════════════════════════
+function renderRating() {
+  const allRanked = getAllRanked();
+  const allP = [...allRanked.M, ...allRanked.W];
+
+  if (allP.length === 0) {
+    return `<div class="stats-empty">
+      <div style="font-size:48px">👥</div>
+      <div class="page-h" style="margin-top:12px">Нет игроков</div>
+      <div class="page-sub">Добавьте игроков в базу</div>
+    </div>`;
+  }
+
+  // Enrich with total points
+  const enriched = allP.map(p => {
+    const allRounds = getAllRoundsForPlayer(p);
+    const totalPts = allRounds.reduce((a,b)=>a+b, 0);
+    return { ...p, totalPts };
+  });
+
+  // Sort by total points descending
+  const sorted = [...enriched].sort((a,b) => b.totalPts - a.totalPts);
+
+  const rows = sorted.map((p, idx) => {
+    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '  ';
+    const gender = p.gender === 'M' ? '♂️' : '♀️';
+    return `
+      <tr>
+        <td style="text-align:center;padding:8px 4px">${medal}</td>
+        <td style="text-align:center;padding:8px 4px">${idx + 1}</td>
+        <td style="padding:8px 4px">${p.name}</td>
+        <td style="text-align:center;padding:8px 4px">${gender}</td>
+        <td style="text-align:right;padding:8px 4px;font-weight:700;color:var(--gold)">${p.totalPts}</td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <div style="padding:12px;max-width:600px;margin:0 auto">
+      <div style="padding:12px;background:#0d1015;border-radius:8px;border:1px solid #1e1e34;margin-bottom:16px">
+        <div style="font-size:1.2rem;font-weight:700;color:var(--gold);margin-bottom:8px">👥 РЕЙТИНГ ИГРОКОВ</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:1px solid #1e1e34">
+              <th style="text-align:center;padding:8px 4px"></th>
+              <th style="text-align:center;padding:8px 4px">#</th>
+              <th style="text-align:left;padding:8px 4px">Игрок</th>
+              <th style="text-align:center;padding:8px 4px">Пол</th>
+              <th style="text-align:right;padding:8px 4px">Очки</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 // ════════════════════════════════════════════════════════════
