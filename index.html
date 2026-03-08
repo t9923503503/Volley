@@ -1863,6 +1863,107 @@ button.player-tap:active{opacity:.6}
   letter-spacing:.5px;text-transform:uppercase;touch-action:manipulation;transition:all .18s}
 .td-btn-close:hover{border-color:#5a5a8e;color:#fff}
 
+/* ══ Registration Modal ═══════════════════════════════════════ */
+.reg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1060;
+  display:flex;align-items:flex-end;justify-content:center;animation:fadeInPt .18s ease}
+.reg-modal{background:#13132a;border:1px solid #2a2a44;border-radius:18px 18px 0 0;
+  width:100%;max-width:520px;max-height:90dvh;display:flex;flex-direction:column;
+  animation:slideUpPt .22s ease;overflow:hidden}
+.reg-accent{height:3px;background:linear-gradient(90deg,var(--green),rgba(106,191,105,.3),transparent)}
+.reg-header{padding:16px 16px 0;flex-shrink:0}
+.reg-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;
+  color:#fff;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.reg-subtitle{font-size:12px;color:var(--muted);margin-bottom:14px}
+.reg-search-wrap{position:relative;margin-bottom:4px}
+.reg-search-inp{width:100%;padding:12px 14px 12px 38px;border-radius:12px;
+  border:1.5px solid #2a2a44;background:rgba(255,255,255,.05);
+  color:#fff;font-size:15px;font-family:'Barlow',sans-serif;outline:none;
+  box-sizing:border-box;transition:border-color .18s}
+.reg-search-inp:focus{border-color:var(--green)}
+.reg-search-inp::placeholder{color:var(--muted)}
+.reg-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:16px;color:var(--muted);pointer-events:none}
+.reg-search-spin{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;border:2px solid #2a2a44;border-top-color:var(--green);
+  border-radius:50%;animation:spin .6s linear infinite;display:none}
+.reg-search-spin.active{display:block}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+
+.reg-body{flex:1;overflow-y:auto;padding:0 16px 16px}
+
+/* Результаты поиска */
+.reg-results{margin-top:8px}
+.reg-result-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid #2a2a44;border-radius:10px;margin-bottom:6px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation}
+.reg-result-item:hover,.reg-result-item:active{background:rgba(106,191,105,.08);border-color:rgba(106,191,105,.35)}
+.reg-result-item.registering{opacity:.6;pointer-events:none}
+.reg-result-item.registered{border-color:var(--green);background:rgba(106,191,105,.1)}
+.reg-result-avatar{width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.reg-result-avatar.M{background:rgba(77,168,218,.15);border:1px solid rgba(77,168,218,.3)}
+.reg-result-avatar.W{background:rgba(199,125,255,.15);border:1px solid rgba(199,125,255,.3)}
+.reg-result-info{flex:1;min-width:0}
+.reg-result-name{font-size:14px;font-weight:600;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reg-result-meta{font-size:10px;color:var(--muted);margin-top:1px;
+  display:flex;gap:8px;align-items:center}
+.reg-result-meta .temp{color:orange;font-weight:700}
+.reg-result-action{flex-shrink:0;font-size:18px}
+
+/* Пустое состояние / "не нашли себя" */
+.reg-empty{text-align:center;padding:20px 0}
+.reg-empty-text{font-size:13px;color:var(--muted);margin-bottom:14px}
+.reg-new-options{display:flex;flex-direction:column;gap:8px}
+.reg-new-btn{padding:12px 14px;border-radius:10px;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.3px;transition:all .15s;touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  text-transform:uppercase;border:none}
+.reg-new-btn.request{background:rgba(77,168,218,.12);border:1.5px solid rgba(77,168,218,.3);color:#4DA8DA}
+.reg-new-btn.request:hover,.reg-new-btn.request:active{background:rgba(77,168,218,.22)}
+.reg-new-btn.temp{background:rgba(255,165,0,.1);border:1.5px solid rgba(255,165,0,.3);color:orange}
+.reg-new-btn.temp:hover,.reg-new-btn.temp:active{background:rgba(255,165,0,.2)}
+
+/* Форма нового игрока */
+.reg-form{margin-top:10px;padding:14px;background:#0e0e20;border:1px solid #2a2a44;border-radius:12px}
+.reg-form-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.reg-form-row{display:flex;gap:8px;margin-bottom:8px}
+.reg-form-inp{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-family:'Barlow',sans-serif;
+  outline:none;box-sizing:border-box;transition:border-color .15s}
+.reg-form-inp:focus{border-color:var(--gold)}
+.reg-form-inp::placeholder{color:var(--muted)}
+.reg-gender-btns{display:flex;gap:4px}
+.reg-gender-btn{padding:10px 14px;border-radius:8px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  transition:all .15s;touch-action:manipulation}
+.reg-gender-btn.sel-M{background:rgba(77,168,218,.2);border-color:rgba(77,168,218,.5);color:#4DA8DA}
+.reg-gender-btn.sel-W{background:rgba(199,125,255,.2);border-color:rgba(199,125,255,.5);color:var(--purple)}
+.reg-form-submit{width:100%;padding:11px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.3px;transition:all .15s;touch-action:manipulation}
+.reg-form-submit.request{background:#4DA8DA;color:#fff}
+.reg-form-submit.temp{background:orange;color:#111}
+.reg-form-submit:disabled{opacity:.4;cursor:not-allowed}
+
+/* Статусные плашки */
+.reg-status{padding:10px 14px;border-radius:10px;margin-top:10px;font-size:13px;
+  font-weight:600;display:flex;align-items:center;gap:8px}
+.reg-status.success{background:rgba(106,191,105,.1);border:1px solid rgba(106,191,105,.3);color:var(--green)}
+.reg-status.waitlist{background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.3);color:orange}
+.reg-status.error{background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.3);color:var(--red)}
+
+/* Footer */
+.reg-footer{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #2a2a44;flex-shrink:0}
+.reg-btn-close{flex:1;padding:11px;border-radius:10px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.5px;text-transform:uppercase;touch-action:manipulation;transition:all .18s}
+.reg-btn-close:hover,.reg-btn-close:active{border-color:#5a5a8e;color:#fff}
+
 /* ══ Players screen — podium & sort ═════════════════════════ */
 .plr-podium{display:flex;align-items:flex-end;justify-content:center;
   gap:8px;padding:16px 0 10px;margin-bottom:10px}
@@ -3347,9 +3448,7 @@ function openTrnDetails(trnId) {
     </div>
     <div class="td-footer">
       ${!isFinished
-        ? `<button class="td-btn-reg ${isFull?'wait':''}" onclick="showToast('${
-            isFull ? '📋 Добавлены в лист ожидания' : '✅ Запрос на участие отправлен!'
-          }');document.getElementById('td-modal')?.remove()">
+        ? `<button class="td-btn-reg ${isFull?'wait':''}" onclick="document.getElementById('td-modal')?.remove();openRegistrationModal('${esc(trn.id)}', ${JSON.stringify({id:trn.id, name:trn.name, capacity:trn.capacity, participants:trn.participants, waitlist:trn.waitlist})})">
             ${isFull ? '📋 В лист ожидания' : '⚡ Записаться'}
           </button>`
         : ''}
@@ -3359,6 +3458,506 @@ function openTrnDetails(trnId) {
 
   document.body.appendChild(overlay);
 }
+
+// ══════════════════════════════════════════════════════════════
+// REGISTRATION MODULE — Supabase-backed tournament sign-up
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Архитектура:
+ *   Supabase = primary source для регистрации
+ *   localStorage = кеш + fallback офлайн
+ *
+ * Потоки:
+ *   1. Найден в базе   → safe_register_player (RPC)
+ *   2. Не найден        → "Отправить заявку" (insert player_requests)
+ *                    ИЛИ → "Быстрая запись"  (insert players[temporary] + RPC)
+ */
+
+// ── State ────────────────────────────────────────────────────
+let _regTrnId       = null;   // текущий турнир UUID
+let _regTrnLocal    = null;   // локальный объект турнира (fallback)
+let _regDebounce    = null;
+let _regFormMode    = null;   // null | 'request' | 'temp'
+let _regFormGender  = 'M';
+let _regResults     = [];
+let _regStatusMsg   = null;   // {type, text}
+
+// ── Helpers ──────────────────────────────────────────────────
+function _regSb() {
+  if (sbClient) return sbClient;
+  // Попытка создать клиент если не подключен
+  if (typeof supabase !== 'undefined' && sbConfig.url && sbConfig.anonKey) {
+    sbClient = supabase.createClient(sbConfig.url, sbConfig.anonKey);
+    return sbClient;
+  }
+  return null;
+}
+
+function _regIsOnline() { return !!_regSb(); }
+
+// ── Open Modal ───────────────────────────────────────────────
+function openRegistrationModal(trnId, localTrn) {
+  document.getElementById('reg-modal')?.remove();
+  _regTrnId      = trnId;
+  _regTrnLocal   = localTrn || null;
+  _regFormMode   = null;
+  _regFormGender = 'M';
+  _regResults    = [];
+  _regStatusMsg  = null;
+
+  const overlay       = document.createElement('div');
+  overlay.id          = 'reg-modal';
+  overlay.className   = 'reg-overlay';
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeRegistrationModal();
+  });
+
+  overlay.innerHTML = _regModalHtml();
+  document.body.appendChild(overlay);
+
+  // Авто-фокус на поиске
+  setTimeout(() => document.getElementById('reg-search')?.focus(), 120);
+}
+
+function closeRegistrationModal() {
+  document.getElementById('reg-modal')?.remove();
+  _regTrnId = null;
+  _regFormMode = null;
+  _regResults = [];
+}
+
+// ── Render ────────────────────────────────────────────────────
+function _regModalHtml() {
+  const trnName = _regTrnLocal?.name || 'Турнир';
+  const cap     = _regTrnLocal?.capacity || '?';
+  const online  = _regIsOnline();
+
+  const resultsHtml = _regResults.length > 0
+    ? _regResults.map(p => `
+        <div class="reg-result-item" id="reg-p-${p.id}"
+          onclick="regSelectPlayer('${p.id}', '${esc(p.name)}')">
+          <div class="reg-result-avatar ${p.gender}">
+            ${p.gender === 'M' ? '🏋️' : '👩'}
+          </div>
+          <div class="reg-result-info">
+            <div class="reg-result-name">${esc(p.name)}</div>
+            <div class="reg-result-meta">
+              ${p.status === 'temporary' ? '<span class="temp">ВРЕМЕННЫЙ</span>' : ''}
+              <span>🏆 ${p.tournaments_played || 0} турн.</span>
+              <span>⭐ ${p.total_pts || 0} очков</span>
+            </div>
+          </div>
+          <div class="reg-result-action">→</div>
+        </div>`).join('')
+    : '';
+
+  const emptyHtml = !_regFormMode ? `
+    <div class="reg-empty">
+      <div class="reg-empty-text">
+        ${_regResults.length === 0 && document.getElementById('reg-search')?.value?.length > 1
+          ? '😕 Игрок не найден в базе. Выберите действие:'
+          : '🔍 Начните вводить фамилию для поиска'}
+      </div>
+      ${_regResults.length === 0 && document.getElementById('reg-search')?.value?.length > 1 ? `
+      <div class="reg-new-options">
+        <button class="reg-new-btn request" onclick="regShowForm('request')">
+          📝 Отправить заявку в базу
+        </button>
+        <button class="reg-new-btn temp" onclick="regShowForm('temp')">
+          ⚡ Создать временного и записать сразу
+        </button>
+      </div>` : ''}
+    </div>` : '';
+
+  const formHtml = _regFormMode ? _regFormHtml() : '';
+
+  const statusHtml = _regStatusMsg
+    ? `<div class="reg-status ${_regStatusMsg.type}">${_regStatusMsg.text}</div>` : '';
+
+  return `
+  <div class="reg-modal">
+    <div class="reg-accent"></div>
+    <div class="reg-header">
+      <div class="reg-title">⚡ Запись на турнир</div>
+      <div class="reg-subtitle">${esc(trnName)} · мест: ${cap}
+        ${online
+          ? '<span style="color:var(--green)">● онлайн</span>'
+          : '<span style="color:var(--red)">● офлайн</span>'}
+      </div>
+      <div class="reg-search-wrap">
+        <span class="reg-search-icon">🔍</span>
+        <input class="reg-search-inp" id="reg-search"
+          type="text" placeholder="Поиск по фамилии…"
+          autocomplete="off"
+          oninput="regOnSearch(this.value)">
+        <div class="reg-search-spin" id="reg-spin"></div>
+      </div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-results" id="reg-results">${resultsHtml}</div>
+      ${emptyHtml}
+      ${formHtml}
+      ${statusHtml}
+    </div>
+    <div class="reg-footer">
+      <button class="reg-btn-close" onclick="closeRegistrationModal()">Закрыть</button>
+    </div>
+  </div>`;
+}
+
+function _regRefresh() {
+  const overlay = document.getElementById('reg-modal');
+  if (overlay) overlay.innerHTML = _regModalHtml();
+  // Восстановить фокус и значение поиска
+  const inp = document.getElementById('reg-search');
+  if (inp && _regLastQuery) {
+    inp.value = _regLastQuery;
+    inp.focus();
+    // Курсор в конец
+    inp.setSelectionRange(inp.value.length, inp.value.length);
+  }
+}
+
+let _regLastQuery = '';
+
+// ── Debounced Search ─────────────────────────────────────────
+function regOnSearch(query) {
+  _regLastQuery = query;
+  _regFormMode  = null;
+  _regStatusMsg = null;
+
+  if (_regDebounce) clearTimeout(_regDebounce);
+
+  const q = query.trim();
+  if (q.length < 2) {
+    _regResults = [];
+    _regRefresh();
+    return;
+  }
+
+  // Показать спиннер
+  const spin = document.getElementById('reg-spin');
+  if (spin) spin.classList.add('active');
+
+  _regDebounce = setTimeout(async () => {
+    try {
+      if (_regIsOnline()) {
+        // ── Supabase search (RPC) ──
+        const { data, error } = await _regSb().rpc('search_players', {
+          p_query: q, p_gender: null, p_limit: 10
+        });
+        if (error) throw error;
+        _regResults = data || [];
+      } else {
+        // ── Fallback: localStorage search ──
+        const db = loadPlayerDB();
+        const lq = q.toLowerCase();
+        _regResults = db
+          .filter(p => p.name.toLowerCase().includes(lq))
+          .sort((a, b) => {
+            const aStart = a.name.toLowerCase().startsWith(lq) ? 1 : 0;
+            const bStart = b.name.toLowerCase().startsWith(lq) ? 1 : 0;
+            return bStart - aStart || (b.tournaments || 0) - (a.tournaments || 0);
+          })
+          .slice(0, 10)
+          .map(p => ({
+            id:    p.id,
+            name:  p.name,
+            gender: p.gender,
+            status: 'active',
+            tournaments_played: p.tournaments || 0,
+            total_pts: p.totalPts || 0
+          }));
+      }
+    } catch (err) {
+      console.error('[REG] Search error:', err);
+      _regResults = [];
+    }
+    // Убрать спиннер и обновить
+    const sp = document.getElementById('reg-spin');
+    if (sp) sp.classList.remove('active');
+    _regRefresh();
+  }, 300); // 300ms debounce
+}
+
+// ── Register Existing Player ─────────────────────────────────
+async function regSelectPlayer(playerId, playerName) {
+  // ① Optimistic UI — пометить элемент
+  const el = document.getElementById('reg-p-' + playerId);
+  if (el) {
+    el.classList.add('registering');
+    el.querySelector('.reg-result-action').textContent = '⏳';
+  }
+
+  try {
+    if (_regIsOnline()) {
+      // ── Supabase RPC ──
+      const { data, error } = await _regSb().rpc('safe_register_player', {
+        p_tournament_id: _regTrnId,
+        p_player_id:     playerId
+      });
+      if (error) throw error;
+
+      if (data.ok) {
+        // Успех
+        _regStatusMsg = {
+          type: data.waitlist ? 'waitlist' : 'success',
+          text: data.message
+        };
+        if (el) {
+          el.classList.remove('registering');
+          el.classList.add('registered');
+          el.querySelector('.reg-result-action').textContent = '✅';
+          el.onclick = null;
+        }
+        // Синхронизируем с localStorage
+        _regSyncLocalParticipant(playerId, data.waitlist);
+      } else {
+        // RPC вернул ошибку
+        throw new Error(data.message || data.error);
+      }
+    } else {
+      // ── Offline fallback: localStorage ──
+      const arr = getTournaments();
+      const trn = arr.find(t => t.id === _regTrnLocal?.id);
+      if (!trn) throw new Error('Турнир не найден в localStorage');
+
+      if (trn.participants.includes(playerId) || (trn.waitlist||[]).includes(playerId)) {
+        throw new Error(playerName + ' уже зарегистрирован(а)');
+      }
+
+      const isWaitlist = trn.participants.length >= trn.capacity;
+      if (isWaitlist) {
+        trn.waitlist = trn.waitlist || [];
+        trn.waitlist.push(playerId);
+      } else {
+        trn.participants.push(playerId);
+        if (trn.participants.length >= trn.capacity) trn.status = 'full';
+      }
+      saveTournaments(arr);
+
+      _regStatusMsg = {
+        type: isWaitlist ? 'waitlist' : 'success',
+        text: isWaitlist
+          ? playerName + ' → лист ожидания'
+          : playerName + ' зарегистрирован(а) (' + trn.participants.length + '/' + trn.capacity + ')'
+      };
+      if (el) {
+        el.classList.remove('registering');
+        el.classList.add('registered');
+        el.querySelector('.reg-result-action').textContent = '✅';
+        el.onclick = null;
+      }
+    }
+  } catch (err) {
+    console.error('[REG] Register error:', err);
+    _regStatusMsg = { type: 'error', text: '❌ ' + (err.message || 'Ошибка регистрации') };
+    // Revert optimistic UI
+    if (el) {
+      el.classList.remove('registering');
+      el.querySelector('.reg-result-action').textContent = '→';
+    }
+  }
+
+  _regRefresh();
+}
+
+// ── "Not Found" Form ─────────────────────────────────────────
+function regShowForm(mode) {
+  _regFormMode = mode; // 'request' | 'temp'
+  _regStatusMsg = null;
+  _regRefresh();
+  setTimeout(() => document.getElementById('reg-new-name')?.focus(), 80);
+}
+
+function regSetGender(g) {
+  _regFormGender = g;
+  ['M','W'].forEach(x => {
+    const b = document.getElementById('reg-g-' + x);
+    if (b) b.className = 'reg-gender-btn' + (x === g ? ' sel-' + g : '');
+  });
+}
+
+function _regFormHtml() {
+  const isReq = _regFormMode === 'request';
+  // Pre-fill name from search input
+  const prefillName = _regLastQuery || '';
+
+  return `
+  <div class="reg-form">
+    <div class="reg-form-title">${isReq ? '📝 Заявка в базу' : '⚡ Быстрая запись'}</div>
+    <div class="reg-form-row">
+      <input class="reg-form-inp" id="reg-new-name" type="text"
+        placeholder="Фамилия Имя" value="${esc(prefillName)}">
+      <div class="reg-gender-btns">
+        <button class="reg-gender-btn ${_regFormGender==='M'?'sel-M':''}"
+          id="reg-g-M" onclick="regSetGender('M')">М</button>
+        <button class="reg-gender-btn ${_regFormGender==='W'?'sel-W':''}"
+          id="reg-g-W" onclick="regSetGender('W')">Ж</button>
+      </div>
+    </div>
+    ${isReq ? `
+    <div class="reg-form-row">
+      <input class="reg-form-inp" id="reg-new-phone" type="tel"
+        placeholder="Телефон (необязательно)">
+    </div>` : ''}
+    <button class="reg-form-submit ${isReq ? 'request' : 'temp'}"
+      id="reg-submit-btn"
+      onclick="${isReq ? 'regSubmitRequest()' : 'regSubmitTemp()'}">
+      ${isReq ? '📝 Отправить заявку' : '⚡ Создать и записать'}
+    </button>
+  </div>`;
+}
+
+// ── Submit: Player Request ───────────────────────────────────
+async function regSubmitRequest() {
+  const name  = (document.getElementById('reg-new-name')?.value || '').trim();
+  const phone = (document.getElementById('reg-new-phone')?.value || '').trim();
+  if (!name) { showToast('Введите фамилию', 'error'); return; }
+
+  const btn = document.getElementById('reg-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Отправляю…'; }
+
+  try {
+    if (_regIsOnline()) {
+      const { error } = await _regSb()
+        .from('player_requests')
+        .insert({
+          name,
+          gender:        _regFormGender,
+          phone:         phone || null,
+          tournament_id: _regTrnId,
+          status:        'pending'
+        });
+      if (error) throw error;
+
+      _regStatusMsg = {
+        type: 'success',
+        text: '📝 Заявка отправлена! ' + name + ' будет добавлен(а) после проверки.'
+      };
+      _regFormMode = null;
+    } else {
+      // Offline — сохраняем в localStorage очередь
+      const queue = JSON.parse(localStorage.getItem('kotc3_player_requests') || '[]');
+      queue.push({ name, gender: _regFormGender, phone, trnId: _regTrnId, ts: Date.now() });
+      localStorage.setItem('kotc3_player_requests', JSON.stringify(queue));
+
+      _regStatusMsg = {
+        type: 'success',
+        text: '📝 Заявка сохранена локально. Отправится при подключении к Supabase.'
+      };
+      _regFormMode = null;
+    }
+  } catch (err) {
+    console.error('[REG] Request error:', err);
+    _regStatusMsg = { type: 'error', text: '❌ ' + (err.message || 'Ошибка отправки') };
+    if (btn) { btn.disabled = false; btn.textContent = '📝 Отправить заявку'; }
+  }
+
+  _regRefresh();
+}
+
+// ── Submit: Temporary Player + Instant Register ──────────────
+async function regSubmitTemp() {
+  const name = (document.getElementById('reg-new-name')?.value || '').trim();
+  if (!name) { showToast('Введите фамилию', 'error'); return; }
+
+  const btn = document.getElementById('reg-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Создаю…'; }
+
+  try {
+    if (_regIsOnline()) {
+      // ① Создаём temporary игрока в Supabase
+      const { data: player, error: pErr } = await _regSb()
+        .from('players')
+        .insert({
+          name,
+          gender: _regFormGender,
+          status: 'temporary',
+          phone:  null
+        })
+        .select('id, name')
+        .single();
+      if (pErr) throw pErr;
+
+      // ② Сразу регистрируем через RPC
+      const { data: reg, error: rErr } = await _regSb().rpc('safe_register_player', {
+        p_tournament_id: _regTrnId,
+        p_player_id:     player.id
+      });
+      if (rErr) throw rErr;
+
+      if (reg.ok) {
+        _regStatusMsg = {
+          type: reg.waitlist ? 'waitlist' : 'success',
+          text: reg.message + ' (временный игрок)'
+        };
+        // Синхронизируем в localStorage
+        addPlayerToDB(name, _regFormGender);
+        _regSyncLocalParticipant(player.id, reg.waitlist);
+      } else {
+        throw new Error(reg.message || reg.error);
+      }
+      _regFormMode = null;
+
+    } else {
+      // ── Offline fallback ──
+      // Создаём в localStorage playerDB
+      addPlayerToDB(name, _regFormGender);
+      const db = loadPlayerDB();
+      const newP = db.find(p => p.name === name && p.gender === _regFormGender);
+
+      if (newP && _regTrnLocal) {
+        // Регистрируем локально
+        const arr = getTournaments();
+        const trn = arr.find(t => t.id === _regTrnLocal.id);
+        if (trn) {
+          const isWaitlist = trn.participants.length >= trn.capacity;
+          if (isWaitlist) {
+            trn.waitlist = trn.waitlist || [];
+            trn.waitlist.push(newP.id);
+          } else {
+            trn.participants.push(newP.id);
+            if (trn.participants.length >= trn.capacity) trn.status = 'full';
+          }
+          saveTournaments(arr);
+
+          _regStatusMsg = {
+            type: isWaitlist ? 'waitlist' : 'success',
+            text: name + (isWaitlist ? ' → лист ожидания' : ' записан(а)') + ' (временный)'
+          };
+        }
+      }
+      _regFormMode = null;
+    }
+  } catch (err) {
+    console.error('[REG] Temp player error:', err);
+    _regStatusMsg = { type: 'error', text: '❌ ' + (err.message || 'Ошибка создания') };
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Создать и записать'; }
+  }
+
+  _regRefresh();
+}
+
+// ── Sync helper: update localStorage after Supabase registration ──
+function _regSyncLocalParticipant(playerId, isWaitlist) {
+  if (!_regTrnLocal?.id) return;
+  try {
+    const arr = getTournaments();
+    const trn = arr.find(t => t.id === _regTrnLocal.id);
+    if (!trn) return;
+    if (isWaitlist) {
+      trn.waitlist = trn.waitlist || [];
+      if (!trn.waitlist.includes(playerId)) trn.waitlist.push(playerId);
+    } else {
+      if (!trn.participants.includes(playerId)) trn.participants.push(playerId);
+      if (trn.participants.length >= trn.capacity) trn.status = 'full';
+    }
+    saveTournaments(arr);
+  } catch(e) { /* silent */ }
+}
+
 
 // ── Export / Import ───────────────────────────────────────────
 // ══ Backup / Restore ══════════════════════════════════════════
