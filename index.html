@@ -4167,11 +4167,6 @@ function _rosterTrnHtml() {
           </select>
         </div>
         <div>
-          <label class="trn-form-label">Призовой фонд</label>
-          <input class="trn-form-inp" id="trnf-prize" type="text" placeholder="₽50 000"
-            value="${esc(editTrn?.prize || '')}">
-        </div>
-        <div>
           <label class="trn-form-label">Мест (ёмкость)</label>
           <input class="trn-form-inp" id="trnf-cap" type="number" min="4" max="200"
             value="${editTrn?.capacity || 24}">
@@ -6313,7 +6308,7 @@ function renderHome() {
     <div class="trn-name">${t.name}</div>
     <div class="trn-meta">🕐 <span>${t.date}, ${t.time}</span></div>
     <div class="trn-meta">📍 <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${t.location}</span></div>
-    <div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>
+    ${t.prize ? `<div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>` : ''}
     <div class="trn-prog">
       <div class="trn-prog-hdr">
         <span class="trn-prog-lbl">Регистрация</span>
