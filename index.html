@@ -1346,6 +1346,79 @@ button.player-tap:active{opacity:.6}
 .rdb-del:hover{color:var(--red)}
 .rdb-empty{text-align:center;padding:20px;color:var(--muted);font-size:12px}
 
+/* ── Roster Tournament Manager section ── */
+.trn-mgr-wrap{margin-top:18px;background:var(--card);
+  border:1px solid #2a2a44;border-radius:14px;overflow:hidden}
+.trn-mgr-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 10px;border-bottom:1px solid #2a2a40}
+.trn-mgr-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  font-size:15px;letter-spacing:.5px;color:#fff}
+.trn-mgr-title span{color:var(--gold)}
+.trn-mgr-add-btn{padding:5px 12px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--gold);color:#111;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:12px;letter-spacing:.3px;text-transform:uppercase;
+  transition:all .15s;touch-action:manipulation;white-space:nowrap}
+.trn-mgr-add-btn:hover{background:#ffe833}
+
+.trn-mgr-form{padding:14px;border-bottom:1px solid #2a2a40;
+  background:#131320;animation:fadeSlideIn .2s ease}
+.trn-mgr-form-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;
+  margin-bottom:10px}
+.trn-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.trn-form-full{grid-column:1/-1}
+.trn-form-inp,.trn-form-sel{
+  background:#0f0f1e;border:1px solid #2a2a44;border-radius:8px;
+  padding:8px 10px;color:#fff;font-size:13px;font-family:'Barlow',sans-serif;
+  width:100%;box-sizing:border-box;outline:none;transition:border-color .15s}
+.trn-form-inp:focus,.trn-form-sel:focus{border-color:var(--gold)}
+.trn-form-inp::placeholder{color:var(--muted)}
+.trn-form-sel option{background:#1a1a2e}
+.trn-form-label{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:3px;display:block}
+.trn-form-btns{display:flex;gap:7px}
+.trn-form-save{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--gold);color:#111;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:13px;letter-spacing:.3px;transition:all .15s;
+  touch-action:manipulation}
+.trn-form-save:hover{background:#ffe833}
+.trn-form-cancel{padding:9px 14px;border-radius:8px;border:1px solid #2a2a44;cursor:pointer;
+  background:transparent;color:var(--muted);font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:13px;transition:all .15s;touch-action:manipulation}
+.trn-form-cancel:hover{border-color:#999;color:#fff}
+
+.trn-mgr-list{max-height:360px;overflow-y:auto}
+.trn-mgr-row{display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-bottom:1px solid #1e1e30;transition:background .12s}
+.trn-mgr-row:last-child{border-bottom:none}
+.trn-mgr-row:hover{background:rgba(255,255,255,.02)}
+.trn-mgr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.trn-mgr-dot.open{background:#4caf50}
+.trn-mgr-dot.full{background:var(--red)}
+.trn-mgr-info{flex:1;min-width:0}
+.trn-mgr-name{font-size:13px;font-weight:600;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trn-mgr-sub{font-size:10px;color:var(--muted);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trn-mgr-badge{font-size:10px;padding:2px 6px;border-radius:5px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.3px;
+  flex-shrink:0;text-transform:uppercase}
+.trn-mgr-badge.hard{background:rgba(233,69,96,.15);color:var(--red)}
+.trn-mgr-badge.medium{background:rgba(255,215,0,.12);color:var(--gold)}
+.trn-mgr-badge.easy{background:rgba(77,168,218,.12);color:#4DA8DA}
+.trn-mgr-actions{display:flex;gap:4px;flex-shrink:0}
+.trn-mgr-edit{width:26px;height:26px;border-radius:6px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+  touch-action:manipulation}
+.trn-mgr-edit:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
+.trn-mgr-del{width:26px;height:26px;border-radius:6px;border:none;
+  background:transparent;color:rgba(233,69,96,.4);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+  touch-action:manipulation}
+.trn-mgr-del:hover{background:rgba(233,69,96,.12);color:var(--red)}
+.trn-mgr-empty{text-align:center;padding:22px;color:var(--muted);font-size:12px}
+
 /* ── Archive tab (past tournaments) ── */
 .arch-add-toggle{width:100%;padding:10px 14px;border-radius:10px;
   border:1px dashed #3a3a5e;background:rgba(255,255,255,.03);
@@ -1901,38 +1974,259 @@ function _rdbBodyHtml() {
     <div class="rdb-list">${rows}</div>`;
 }
 
-const HOME_TOURNAMENTS = [
-  { id:1, level:'hard',   division:'Мужской',   format:'King of the Court',
+// ── Upcoming Tournaments (editable, persisted to localStorage) ──────────────
+const _TRN_DAY_NAMES  = ['ВС','ПН','ВТ','СР','ЧТ','ПТ','СБ'];
+const _TRN_MONTH_NAMES= ['января','февраля','марта','апреля','мая','июня',
+                          'июля','августа','сентября','октября','ноября','декабря'];
+
+function enrichTrn(t) {
+  // Compute display fields from isoDate (YYYY-MM-DD) if not already set
+  if (t.isoDate && !t.date) {
+    const d   = new Date(t.isoDate + 'T12:00:00');
+    const dn  = _TRN_DAY_NAMES[d.getDay()];
+    const mn  = _TRN_MONTH_NAMES[d.getMonth()];
+    t.dayNum  = String(d.getDate());
+    t.dayStr  = dn;
+    t.month   = mn + ' ' + d.getFullYear();
+    t.date    = dn.charAt(0) + dn.slice(1).toLowerCase() + ', ' + d.getDate() + ' ' + mn + ' ' + d.getFullYear();
+  }
+  if (!t.status) {
+    t.status = (t.registered >= t.capacity) ? 'full' : 'open';
+  }
+  return t;
+}
+
+const HOME_TOURNAMENTS_DEFAULT = [
+  { id:'t1', level:'hard',   division:'Мужской',   format:'King of the Court',
     name:'Открытый чемпионат — Мужской',
-    date:'Вс, 15 марта 2026',  dayNum:'15', dayStr:'ВС', month:'марта 2026',
-    time:'09:00', location:'Пляж «Золотые Пески»',
-    registered:28, capacity:30, status:'open',  prize:'₽50 000' },
-  { id:2, level:'medium', division:'Женский',   format:'Round Robin',
+    isoDate:'2026-03-15', time:'09:00', location:'Пляж «Золотые Пески»',
+    registered:28, capacity:30, prize:'₽50 000' },
+  { id:'t2', level:'medium', division:'Женский',   format:'Round Robin',
     name:'Весенний кубок — Женский',
-    date:'Сб, 21 марта 2026',  dayNum:'21', dayStr:'СБ', month:'марта 2026',
-    time:'10:00', location:'Центральный пляж',
-    registered:30, capacity:30, status:'full',  prize:'₽30 000' },
-  { id:3, level:'easy',   division:'Смешанный', format:'King of the Court',
+    isoDate:'2026-03-21', time:'10:00', location:'Центральный пляж',
+    registered:30, capacity:30, prize:'₽30 000' },
+  { id:'t3', level:'easy',   division:'Смешанный', format:'King of the Court',
     name:'Любительский турнир — Микст',
-    date:'Вс, 22 марта 2026',  dayNum:'22', dayStr:'ВС', month:'марта 2026',
-    time:'11:00', location:'Южный пляж',
-    registered:16, capacity:24, status:'open',  prize:'₽20 000' },
-  { id:4, level:'hard',   division:'Мужской',   format:'Олимпийская система',
+    isoDate:'2026-03-22', time:'11:00', location:'Южный пляж',
+    registered:16, capacity:24, prize:'₽20 000' },
+  { id:'t4', level:'hard',   division:'Мужской',   format:'Олимпийская система',
     name:'Grand Prix — Мужской',
-    date:'Сб, 28 марта 2026',  dayNum:'28', dayStr:'СБ', month:'марта 2026',
-    time:'08:00', location:'Пляж «Авангард»',
-    registered:22, capacity:30, status:'open',  prize:'₽75 000' },
-  { id:5, level:'medium', division:'Смешанный', format:'Round Robin',
+    isoDate:'2026-03-28', time:'08:00', location:'Пляж «Авангард»',
+    registered:22, capacity:30, prize:'₽75 000' },
+  { id:'t5', level:'medium', division:'Смешанный', format:'Round Robin',
     name:'Апрельский кубок — Микст',
-    date:'Вс, 5 апреля 2026',  dayNum:'5',  dayStr:'ВС', month:'апреля 2026',
-    time:'10:00', location:'Городской пляж',
-    registered:30, capacity:30, status:'full',  prize:'₽25 000' },
-  { id:6, level:'easy',   division:'Женский',   format:'King of the Court',
+    isoDate:'2026-04-05', time:'10:00', location:'Городской пляж',
+    registered:30, capacity:30, prize:'₽25 000' },
+  { id:'t6', level:'easy',   division:'Женский',   format:'King of the Court',
     name:'Открытый кубок — Женский',
-    date:'Сб, 12 апреля 2026', dayNum:'12', dayStr:'СБ', month:'апреля 2026',
-    time:'09:30', location:'Пляж «Ривьера»',
-    registered:18, capacity:30, status:'open',  prize:'₽15 000' },
-];
+    isoDate:'2026-04-12', time:'09:30', location:'Пляж «Ривьера»',
+    registered:18, capacity:30, prize:'₽15 000' },
+].map(enrichTrn);
+
+function loadUpcomingTournaments() {
+  try {
+    const raw = localStorage.getItem('kotc3_upcoming');
+    if (raw) return JSON.parse(raw).map(enrichTrn);
+  } catch(e) {}
+  return HOME_TOURNAMENTS_DEFAULT.map(t => Object.assign({}, t));
+}
+function saveUpcomingTournaments(arr) {
+  localStorage.setItem('kotc3_upcoming', JSON.stringify(arr));
+}
+// Initialise storage with defaults if empty
+(function() {
+  if (!localStorage.getItem('kotc3_upcoming')) {
+    saveUpcomingTournaments(HOME_TOURNAMENTS_DEFAULT.map(t => Object.assign({}, t)));
+  }
+})();
+
+// ── Roster Tournament CRUD ────────────────────────────────────
+let rosterTrnFormOpen = false;
+let rosterTrnEditId   = null;
+
+function openTrnAdd() {
+  rosterTrnFormOpen = true;
+  rosterTrnEditId   = null;
+  _refreshRosterTrn();
+  setTimeout(() => {
+    const el = document.getElementById('trnf-name');
+    if (el) el.focus();
+  }, 80);
+}
+
+function openTrnEdit(id) {
+  rosterTrnFormOpen = true;
+  rosterTrnEditId   = id;
+  _refreshRosterTrn();
+  setTimeout(() => {
+    const el = document.getElementById('trnf-name');
+    if (el) el.focus();
+  }, 80);
+}
+
+function closeTrnForm() {
+  rosterTrnFormOpen = false;
+  rosterTrnEditId   = null;
+  _refreshRosterTrn();
+}
+
+function submitTrnForm() {
+  const name     = (document.getElementById('trnf-name')    ?.value || '').trim();
+  const isoDate  = (document.getElementById('trnf-date')    ?.value || '').trim();
+  const time     = (document.getElementById('trnf-time')    ?.value || '09:00').trim();
+  const location = (document.getElementById('trnf-loc')     ?.value || '').trim();
+  const format   = (document.getElementById('trnf-format')  ?.value || 'King of the Court').trim();
+  const division = (document.getElementById('trnf-div')     ?.value || 'Мужской').trim();
+  const level    = (document.getElementById('trnf-level')   ?.value || 'medium').trim();
+  const prize    = (document.getElementById('trnf-prize')   ?.value || '').trim();
+  const capacity = parseInt(document.getElementById('trnf-cap')  ?.value || '30', 10) || 30;
+  const registered = parseInt(document.getElementById('trnf-reg')?.value || '0',  10) || 0;
+
+  if (!name)    { showToast('⚠️ Введите название турнира'); return; }
+  if (!isoDate) { showToast('⚠️ Укажите дату турнира');     return; }
+
+  const arr = loadUpcomingTournaments();
+
+  if (rosterTrnEditId !== null) {
+    const idx = arr.findIndex(t => t.id === rosterTrnEditId);
+    if (idx !== -1) {
+      const t = arr[idx];
+      t.name = name; t.isoDate = isoDate; t.time = time; t.location = location;
+      t.format = format; t.division = division; t.level = level;
+      t.prize = prize; t.capacity = capacity; t.registered = registered;
+      // Re-compute display fields
+      delete t.date; delete t.dayNum; delete t.dayStr; delete t.month; delete t.status;
+      enrichTrn(t);
+      arr[idx] = t;
+    }
+    showToast('✅ Турнир обновлён');
+  } else {
+    const newT = enrichTrn({
+      id: 'u' + Date.now(), name, isoDate, time, location,
+      format, division, level, prize, capacity, registered
+    });
+    arr.push(newT);
+    showToast('✅ Турнир добавлен');
+  }
+
+  saveUpcomingTournaments(arr);
+  rosterTrnFormOpen = false;
+  rosterTrnEditId   = null;
+  _refreshRosterTrn();
+}
+
+function deleteTrn(id) {
+  if (!confirm('Удалить этот турнир из списка?')) return;
+  const arr = loadUpcomingTournaments().filter(t => t.id !== id);
+  saveUpcomingTournaments(arr);
+  _refreshRosterTrn();
+  showToast('🗑 Турнир удалён');
+}
+
+function _refreshRosterTrn() {
+  const el = document.getElementById('roster-trn-section');
+  if (el) el.innerHTML = _rosterTrnHtml();
+}
+
+function _rosterTrnHtml() {
+  const arr = loadUpcomingTournaments();
+  const editTrn = rosterTrnEditId !== null ? arr.find(t => t.id === rosterTrnEditId) : null;
+
+  const formHtml = rosterTrnFormOpen ? `
+    <div class="trn-mgr-form">
+      <div class="trn-mgr-form-title">${editTrn ? '✏️ Редактировать турнир' : '➕ Новый турнир'}</div>
+      <div class="trn-form-grid">
+        <div class="trn-form-full">
+          <label class="trn-form-label">Название</label>
+          <input class="trn-form-inp" id="trnf-name" type="text" placeholder="Название турнира"
+            value="${esc(editTrn?.name||'')}">
+        </div>
+        <div>
+          <label class="trn-form-label">Дата</label>
+          <input class="trn-form-inp" id="trnf-date" type="date"
+            value="${editTrn?.isoDate||''}">
+        </div>
+        <div>
+          <label class="trn-form-label">Время</label>
+          <input class="trn-form-inp" id="trnf-time" type="time"
+            value="${editTrn?.time||'09:00'}">
+        </div>
+        <div class="trn-form-full">
+          <label class="trn-form-label">Место проведения</label>
+          <input class="trn-form-inp" id="trnf-loc" type="text" placeholder="Пляж / адрес"
+            value="${esc(editTrn?.location||'')}">
+        </div>
+        <div>
+          <label class="trn-form-label">Формат</label>
+          <select class="trn-form-sel" id="trnf-format">
+            ${['King of the Court','Round Robin','Олимпийская система','Другой'].map(f =>
+              `<option value="${f}" ${(editTrn?.format||'King of the Court')===f?'selected':''}>${f}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="trn-form-label">Дивизион</label>
+          <select class="trn-form-sel" id="trnf-div">
+            ${['Мужской','Женский','Смешанный'].map(d =>
+              `<option value="${d}" ${(editTrn?.division||'Мужской')===d?'selected':''}>${d}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="trn-form-label">Уровень</label>
+          <select class="trn-form-sel" id="trnf-level">
+            ${[['hard','Хард (Pro)'],['medium','Средний'],['easy','Лайт']].map(([v,l]) =>
+              `<option value="${v}" ${(editTrn?.level||'medium')===v?'selected':''}>${l}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="trn-form-label">Призовой фонд</label>
+          <input class="trn-form-inp" id="trnf-prize" type="text" placeholder="₽50 000"
+            value="${esc(editTrn?.prize||'')}">
+        </div>
+        <div>
+          <label class="trn-form-label">Мест (ёмкость)</label>
+          <input class="trn-form-inp" id="trnf-cap" type="number" min="1" max="200"
+            value="${editTrn?.capacity||30}">
+        </div>
+        <div>
+          <label class="trn-form-label">Зарегистрировано</label>
+          <input class="trn-form-inp" id="trnf-reg" type="number" min="0" max="200"
+            value="${editTrn?.registered||0}">
+        </div>
+      </div>
+      <div class="trn-form-btns">
+        <button class="trn-form-save" onclick="submitTrnForm()">
+          ${editTrn ? '💾 Сохранить' : '➕ Добавить'}
+        </button>
+        <button class="trn-form-cancel" onclick="closeTrnForm()">Отмена</button>
+      </div>
+    </div>` : '';
+
+  const rows = arr.length ? arr.map(t => `
+    <div class="trn-mgr-row">
+      <div class="trn-mgr-dot ${t.status||'open'}"></div>
+      <div class="trn-mgr-info">
+        <div class="trn-mgr-name">${esc(t.name)}</div>
+        <div class="trn-mgr-sub">${t.date||''} · ${t.time||''} · ${esc(t.location||'')}</div>
+      </div>
+      <span class="trn-mgr-badge ${t.level||'medium'}">${t.level||'medium'}</span>
+      <div class="trn-mgr-actions">
+        <button class="trn-mgr-edit" onclick="openTrnEdit(${JSON.stringify(t.id)})" title="Редактировать">✏️</button>
+        <button class="trn-mgr-del"  onclick="deleteTrn(${JSON.stringify(t.id)})"   title="Удалить">✕</button>
+      </div>
+    </div>`).join('')
+    : `<div class="trn-mgr-empty">Нет турниров. Добавьте первый.</div>`;
+
+  return `
+    <div class="trn-mgr-hdr">
+      <span class="trn-mgr-title">📅 ТУРНИРЫ <span>РАСПИСАНИЕ</span></span>
+      ${rosterTrnFormOpen ? '' : `<button class="trn-mgr-add-btn" onclick="openTrnAdd()">+ Добавить</button>`}
+    </div>
+    ${formHtml}
+    <div class="trn-mgr-list">${rows}</div>`;
+}
 
 // ════════════════════════════════════════════════════════════
 // 2. CORE MATH
@@ -2722,6 +3016,9 @@ function renderRoster() {
     if (incomplete) html += `<div class="rc-warn">⚠️ Внимание: неполный состав</div>`;
     html += `</div>`;
   }
+
+  <!-- Tournament Manager section -->
+  html += `<div class="trn-mgr-wrap" id="roster-trn-section">${_rosterTrnHtml()}</div>`;
 
   <!-- Player DB section -->
   html += `<div class="rdb-wrap" id="roster-db-section">${_rdbBodyHtml()}</div>`;
@@ -3807,8 +4104,8 @@ function _archPlrListHtml() {
 }
 
 function renderHome() {
-  const T = HOME_TOURNAMENTS;
-  const totalReg  = T.reduce((s,t) => s + t.registered, 0);
+  const T = loadUpcomingTournaments();
+  const totalReg  = T.reduce((s,t) => s + (t.registered||0), 0);
   const openCount = T.filter(t => t.status === 'open').length;
 
   // helpers
