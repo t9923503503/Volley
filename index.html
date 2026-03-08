@@ -1133,6 +1133,139 @@ button.player-tap:active{opacity:.6}
   transition:width .5s linear, background .3s;
 }
 .timer-progress-fill.danger{background:#e94560}
+
+/* ════════════════════════════════════════════════════════════
+   HOME DASHBOARD
+   ════════════════════════════════════════════════════════════ */
+.home-wrap{padding:16px 12px 40px;max-width:960px;margin:0 auto}
+
+/* ── Hero ── */
+.home-hero{text-align:center;padding:22px 0 26px}
+.home-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;
+  border-radius:99px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);
+  color:var(--gold);font-size:12px;font-weight:600;margin-bottom:14px}
+.home-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,11vw,76px);
+  line-height:.95;letter-spacing:2px;color:#fff;margin-bottom:10px}
+.home-title span{color:var(--gold)}
+.home-subtitle{color:var(--muted);font-size:13px;line-height:1.55;
+  max-width:300px;margin:0 auto 20px}
+.home-stats{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.home-stat-val{font-family:'Bebas Neue',sans-serif;font-size:30px;
+  color:var(--gold);line-height:1}
+.home-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.8px;margin-top:1px}
+
+/* ── Tabs ── */
+.home-tabs{display:flex;gap:5px;background:rgba(255,255,255,.04);
+  padding:5px;border-radius:14px;border:1px solid #2a2a40;margin-bottom:18px}
+.home-tab-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:9px 6px;border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:12px;text-transform:uppercase;letter-spacing:.5px;
+  border:none;cursor:pointer;transition:all .2s;
+  color:var(--muted);background:transparent;touch-action:manipulation}
+.home-tab-btn.active{background:var(--gold);color:#111;
+  box-shadow:0 4px 16px rgba(255,215,0,.3)}
+
+/* ── Tournament cards grid ── */
+.home-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:500px){.home-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:820px){.home-grid{grid-template-columns:1fr 1fr 1fr}}
+
+.trn-card{background:var(--card);border:1px solid #2a2a44;border-radius:14px;
+  overflow:hidden;position:relative;display:flex;flex-direction:column;
+  transition:border-color .25s,box-shadow .25s}
+.trn-card:hover{border-color:rgba(255,215,0,.35);
+  box-shadow:0 6px 24px rgba(255,215,0,.1)}
+.trn-card-accent{height:2px;width:100%}
+.trn-card-body{padding:13px;flex:1;display:flex;flex-direction:column;gap:0}
+
+/* level badge */
+.trn-lv{display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;
+  font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;
+  letter-spacing:.5px;border:1px solid}
+.trn-lv.easy  {color:#6abf69;border-color:rgba(106,191,105,.3);background:rgba(106,191,105,.1)}
+.trn-lv.medium{color:var(--gold);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.1)}
+.trn-lv.hard  {color:var(--red);border-color:rgba(233,69,96,.3);background:rgba(233,69,96,.1)}
+
+/* status badge */
+.trn-st{display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700;
+  letter-spacing:.3px;border:1px solid}
+.trn-st.open{color:#6abf69;border-color:rgba(106,191,105,.3);background:rgba(106,191,105,.1)}
+.trn-st.full{color:var(--muted);border-color:#2a2a44;background:rgba(255,255,255,.04)}
+.trn-st-dot{width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
+.trn-st.open .trn-st-dot{background:#6abf69;animation:pulse 2s infinite}
+.trn-st.full .trn-st-dot{background:var(--muted)}
+
+.trn-card-head{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:6px;margin-bottom:9px}
+.trn-fmt{font-size:9px;color:rgba(255,215,0,.7);font-weight:700;
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.trn-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;
+  color:#fff;line-height:1.2;margin-bottom:8px}
+.trn-meta{display:flex;align-items:center;gap:5px;font-size:11px;
+  color:var(--muted);margin-bottom:3px}
+.trn-prize{display:flex;align-items:center;gap:5px;font-size:11px;
+  color:var(--gold2);font-weight:700;margin-bottom:12px;margin-top:2px}
+
+/* progress */
+.trn-prog{margin-top:auto}
+.trn-prog-hdr{display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;margin-bottom:4px}
+.trn-prog-lbl{color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.trn-prog-val{font-weight:700;font-size:12px}
+.trn-prog-val.g{color:#6abf69}.trn-prog-val.y{color:var(--gold)}.trn-prog-val.r{color:var(--red)}
+.trn-prog-bar{height:5px;background:#1e1e34;border-radius:3px;overflow:hidden}
+.trn-prog-fill{height:100%;border-radius:3px;transition:width .5s}
+.trn-prog-fill.g{background:linear-gradient(90deg,#16a34a,#6abf69)}
+.trn-prog-fill.y{background:linear-gradient(90deg,#b45309,#fbbf24)}
+.trn-prog-fill.r{background:linear-gradient(90deg,#9f1239,#e94560)}
+
+.trn-btn{width:100%;margin-top:10px;padding:10px;border-radius:9px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  text-transform:uppercase;letter-spacing:.8px;cursor:pointer;
+  transition:all .18s;border:none;touch-action:manipulation}
+.trn-btn.open{background:var(--gold);color:#111;
+  box-shadow:0 3px 10px rgba(255,215,0,.25)}
+.trn-btn.open:hover{background:#ffe833;transform:scale(1.02)}
+.trn-btn.full{background:rgba(255,255,255,.05);color:var(--muted);
+  border:1px solid #2a2a44}
+.trn-btn.full:hover{background:rgba(255,255,255,.09)}
+
+/* ── Calendar list ── */
+.cal-month{margin-bottom:22px}
+.cal-month-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cal-month-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:11px;text-transform:uppercase;letter-spacing:2px;
+  color:rgba(255,215,0,.75);white-space:nowrap}
+.cal-month-line{flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(255,215,0,.25),transparent)}
+.cal-month-count{font-size:11px;color:var(--muted);white-space:nowrap}
+.cal-row{display:flex;align-items:center;gap:10px;padding:9px;
+  background:var(--card);border:1px solid #2a2a40;border-radius:11px;
+  margin-bottom:5px;transition:all .18s;cursor:pointer}
+.cal-row:hover{border-color:rgba(255,215,0,.28);background:#1e1e30}
+.cal-date-box{flex-shrink:0;width:44px;height:44px;border-radius:9px;
+  background:rgba(255,255,255,.05);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;border:1px solid #2a2a44}
+.cal-dn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;line-height:1}
+.cal-ds{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.5px}
+.cal-info{flex:1;min-width:0}
+.cal-info-name{font-size:13px;font-weight:600;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-info-meta{display:flex;align-items:center;gap:8px;font-size:10px;
+  color:var(--muted);margin-top:2px;flex-wrap:wrap}
+.cal-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.cal-slots{font-size:10px;font-weight:700}
+.cal-slots.g{color:#6abf69}.cal-slots.r{color:var(--red)}
+
+/* section sub-header */
+.home-sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.home-sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px}
+.home-sec-title span{color:var(--gold)}
+.home-sec-count{font-size:11px;color:var(--muted)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1237,6 +1370,42 @@ function makeBlankDivRoster(){
 }
 
 let activeTabId = 0;  // current tab id (number = court index, or string)
+
+// ── HOME DASHBOARD STATE ────────────────────────────────────
+let homeActiveTab = 'schedule';
+
+const HOME_TOURNAMENTS = [
+  { id:1, level:'hard',   division:'Мужской',   format:'King of the Court',
+    name:'Открытый чемпионат — Мужской',
+    date:'Вс, 15 марта 2026',  dayNum:'15', dayStr:'ВС', month:'марта 2026',
+    time:'09:00', location:'Пляж «Золотые Пески»',
+    registered:28, capacity:30, status:'open',  prize:'₽50 000' },
+  { id:2, level:'medium', division:'Женский',   format:'Round Robin',
+    name:'Весенний кубок — Женский',
+    date:'Сб, 21 марта 2026',  dayNum:'21', dayStr:'СБ', month:'марта 2026',
+    time:'10:00', location:'Центральный пляж',
+    registered:30, capacity:30, status:'full',  prize:'₽30 000' },
+  { id:3, level:'easy',   division:'Смешанный', format:'King of the Court',
+    name:'Любительский турнир — Микст',
+    date:'Вс, 22 марта 2026',  dayNum:'22', dayStr:'ВС', month:'марта 2026',
+    time:'11:00', location:'Южный пляж',
+    registered:16, capacity:24, status:'open',  prize:'₽20 000' },
+  { id:4, level:'hard',   division:'Мужской',   format:'Олимпийская система',
+    name:'Grand Prix — Мужской',
+    date:'Сб, 28 марта 2026',  dayNum:'28', dayStr:'СБ', month:'марта 2026',
+    time:'08:00', location:'Пляж «Авангард»',
+    registered:22, capacity:30, status:'open',  prize:'₽75 000' },
+  { id:5, level:'medium', division:'Смешанный', format:'Round Robin',
+    name:'Апрельский кубок — Микст',
+    date:'Вс, 5 апреля 2026',  dayNum:'5',  dayStr:'ВС', month:'апреля 2026',
+    time:'10:00', location:'Городской пляж',
+    registered:30, capacity:30, status:'full',  prize:'₽25 000' },
+  { id:6, level:'easy',   division:'Женский',   format:'King of the Court',
+    name:'Открытый кубок — Женский',
+    date:'Сб, 12 апреля 2026', dayNum:'12', dayStr:'СБ', month:'апреля 2026',
+    time:'09:30', location:'Пляж «Ривьера»',
+    registered:18, capacity:30, status:'open',  prize:'₽15 000' },
+];
 
 // ════════════════════════════════════════════════════════════
 // 2. CORE MATH
@@ -1611,6 +1780,7 @@ function buildNav() {
   top.appendChild(spacer);
 
   [
+    { label:'🏠',   tab:'home'   },
     { label:'СВОД', tab:'svod'   },
     { label:'СТАТ', tab:'stats'  },
     { label:'⚙️',   tab:'roster' },
@@ -1688,7 +1858,7 @@ function buildScreens() {
   }
 
   // Named screens
-  const named = ['svod','hard','advance','medium','lite','stats','roster'];
+  const named = ['home','svod','hard','advance','medium','lite','stats','roster'];
   named.forEach(id => {
     const s = document.createElement('div');
     s.className = 'screen'; s.id = `screen-${id}`;
@@ -1737,6 +1907,7 @@ async function switchTab(id) {
   if (!screen) return;
 
   // Re-render content on demand
+  if (id === 'home')   screen.innerHTML = renderHome();
   if (id === 'svod')   screen.innerHTML = renderSvod();
   if (id === 'roster') {
     if (!rosterUnlocked) {
@@ -2904,6 +3075,149 @@ function renderStats() {
   </div>
 
   ${renderHistory()}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// HOME DASHBOARD
+// ════════════════════════════════════════════════════════════
+function setHomeTab(tab) {
+  homeActiveTab = tab;
+  const s = document.getElementById('screen-home');
+  if (s) s.innerHTML = renderHome();
+}
+
+function renderHome() {
+  const T = HOME_TOURNAMENTS;
+  const totalReg  = T.reduce((s,t) => s + t.registered, 0);
+  const openCount = T.filter(t => t.status === 'open').length;
+
+  // helpers
+  const pct  = (r,c) => Math.min(r/c*100, 100);
+  const pcls = (r,c) => { const p=r/c; return p>=1?'r':p>=.8?'y':'g'; };
+
+  function cardHtml(t) {
+    const c  = pcls(t.registered, t.capacity);
+    const ac = t.status==='open' ? 'var(--gold)' : '#2a2a44';
+    const div = t.division==='Мужской'?'♂':'♀';
+    return `
+<div class="trn-card">
+  <div class="trn-card-accent" style="background:${ac}"></div>
+  <div class="trn-card-body">
+    <div class="trn-card-head">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+        <span class="trn-lv ${t.level}">${t.level.toUpperCase()}</span>
+        <span style="font-size:10px;color:var(--muted);background:rgba(255,255,255,.06);
+          padding:2px 7px;border-radius:6px">${t.division}</span>
+      </div>
+      <span class="trn-st ${t.status}">
+        <span class="trn-st-dot"></span>
+        ${t.status==='open'?'ОТКРЫТ':'ЗАПОЛНЕНО'}
+      </span>
+    </div>
+    <div class="trn-fmt">👑 ${t.format}</div>
+    <div class="trn-name">${t.name}</div>
+    <div class="trn-meta">🕐 <span>${t.date}, ${t.time}</span></div>
+    <div class="trn-meta">📍 <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${t.location}</span></div>
+    <div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>
+    <div class="trn-prog">
+      <div class="trn-prog-hdr">
+        <span class="trn-prog-lbl">Регистрация</span>
+        <span class="trn-prog-val ${c}">${t.registered}/${t.capacity}</span>
+      </div>
+      <div class="trn-prog-bar">
+        <div class="trn-prog-fill ${c}" style="width:${pct(t.registered,t.capacity)}%"></div>
+      </div>
+    </div>
+    <button class="trn-btn ${t.status}"
+      onclick="showToast('${t.status==='open'?'✅ Запрос на участие отправлен!':'📋 Добавлены в лист ожидания'}')">
+      ${t.status==='open'?'⚡ Записаться':'📋 В лист ожидания'}
+    </button>
+  </div>
+</div>`;
+  }
+
+  function calRow(t) {
+    const c = t.status==='open' ? 'g' : 'r';
+    return `
+<div class="cal-row">
+  <div class="cal-date-box">
+    <div class="cal-dn">${t.dayNum}</div>
+    <div class="cal-ds">${t.dayStr}</div>
+  </div>
+  <div class="cal-info">
+    <div class="cal-info-name">${t.name}</div>
+    <div class="cal-info-meta">
+      <span>🕐 ${t.time}</span>
+      <span class="trn-lv ${t.level}" style="font-size:9px;padding:1px 5px">${t.level.toUpperCase()}</span>
+      <span>${t.division}</span>
+    </div>
+  </div>
+  <div class="cal-right">
+    <span class="trn-st ${t.status}" style="font-size:9px;padding:2px 6px">
+      <span class="trn-st-dot"></span>${t.status==='open'?'ОТКРЫТ':'ЗАПОЛНЕНО'}
+    </span>
+    <span class="cal-slots ${c}">${t.registered}/${t.capacity}</span>
+  </div>
+</div>`;
+  }
+
+  // group by month for calendar
+  const byMonth = {};
+  T.forEach(t => { (byMonth[t.month] = byMonth[t.month]||[]).push(t); });
+  const calHtml = Object.entries(byMonth).map(([m, ts]) => `
+<div class="cal-month">
+  <div class="cal-month-hdr">
+    <span class="cal-month-title">${m}</span>
+    <div class="cal-month-line"></div>
+    <span class="cal-month-count">${ts.length} турн.</span>
+  </div>
+  ${ts.map(calRow).join('')}
+</div>`).join('');
+
+  const isS = homeActiveTab === 'schedule';
+
+  return `
+<div class="home-wrap">
+  <!-- Hero -->
+  <div class="home-hero">
+    <div class="home-badge">🔥 Сезон 2026 — уже открыт!</div>
+    <div class="home-title">ДОМИНИРУЙ НА<br><span>КОРТЕ</span></div>
+    <div class="home-subtitle">Записывайся на турниры, следи за рейтингом<br>и становись королём пляжного волейбола</div>
+    <div class="home-stats">
+      <div class="home-stat"><div class="home-stat-val">${T.length}</div><div class="home-stat-lbl">Турниров</div></div>
+      <div class="home-stat"><div class="home-stat-val">${totalReg}+</div><div class="home-stat-lbl">Участников</div></div>
+      <div class="home-stat"><div class="home-stat-val">${openCount}</div><div class="home-stat-lbl">Открыто</div></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="home-tabs">
+    <button class="home-tab-btn ${isS?'active':''}" onclick="setHomeTab('schedule')">
+      ⚔️ РАСПИСАНИЕ ТУРНИРОВ ⚔️
+    </button>
+    <button class="home-tab-btn ${!isS?'active':''}" onclick="setHomeTab('calendar')">
+      📅 КАЛЕНДАРЬ
+    </button>
+  </div>
+
+  <!-- Schedule -->
+  <div style="display:${isS?'block':'none'}">
+    <div class="home-sec-hdr">
+      <span class="home-sec-title">БЛИЖАЙШИЕ <span>ЧЕМПИОНАТЫ</span></span>
+      <span class="home-sec-count">${T.length} событий</span>
+    </div>
+    <div class="home-grid">${T.map(cardHtml).join('')}</div>
+  </div>
+
+  <!-- Calendar -->
+  <div style="display:${!isS?'block':'none'}">
+    <div class="home-sec-hdr">
+      <span class="home-sec-title">КАЛЕНДАРЬ <span>СОБЫТИЙ</span></span>
+      <span class="home-sec-count">Март — Апрель 2026</span>
+    </div>
+    ${calHtml}
+  </div>
+</div>`;
 }
 
 function renderHistory() {
@@ -4437,7 +4751,7 @@ gshLoadConfig();   // загружаем настройки Google Sheets
 if (!tournamentMeta.date) tournamentMeta.date = new Date().toISOString().split('T')[0];
 // DOM строим до сетевых запросов, чтобы не было пустого экрана
 buildAll();
-switchTab(activeTabId || 0);
+switchTab(activeTabId || 'home');
 // После первичной отрисовки — подключаемся к Supabase
 if (sbConfig.roomCode) sbConnect();
 timerTick(); // start global animation loop
