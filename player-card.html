@@ -3,679 +3,1071 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0a0f">
-<title>Карточка Лютого Пляжника</title>
+<meta name="theme-color" content="#080808">
+<title>Ultimate Fighter Card — Лютые Пляжники Сургут</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-/* ── RESET & VARIABLES ──────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════
+   ULTIMATE FIGHTER CARD — КИБЕРПАНК × СЕВЕР
+   Огонь и Лед Сургута | Гексагональная геометрия
+   ════════════════════════════════════════════════════════════════ */
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0f;
-  --card:#111118;
-  --card2:#16161f;
-  --glass:rgba(255,255,255,.04);
-  --glass-border:rgba(255,255,255,.08);
-  --text:#f0f0f5;
-  --muted:#6a6a80;
-  --accent:#ff6a1a;
-  --accent2:#ff9500;
-  --accent-glow:rgba(255,106,26,.35);
-  --neon:#ff6a1a;
-  --gold:#FFD700;
-  --silver:#C0C0C0;
-  --bronze:#CD7F32;
-  --green:#22c55e;
-  --red:#ef4444;
-  --blue:#3b82f6;
-  --purple:#a855f7;
+  /* ЦВЕТОВАЯ ПАЛИТРА: Огонь & Лед */
+  --bg-dark:#080808;        /* Глубокий уголь */
+  --bg-card:#1a1a1a;        /* Графит */
+  --text-primary:#ffffff;   /* Белый */
+  --text-secondary:#9a9a9a; /* Серый */
+  --accent-fire:#FF4500;    /* Огненный оранжевый (раскаленный металл) */
+  --accent-ice:#00BFFF;     /* Ледяной синий (северное сияние) */
+  --accent-dark:#cc3300;    /* Темный оранжевый для контраста */
+  --accent-light:#00ffff;   /* Голубой неон */
+  --glow-fire:rgba(255,69,0,.5);
+  --glow-ice:rgba(0,191,255,.3);
+  --neon-glow:rgba(0,255,255,.4);
 }
-html{font-size:16px;-webkit-text-size-adjust:100%}
+html{
+  font-size:16px;
+  -webkit-text-size-adjust:100%;
+}
 body{
-  font-family:'Barlow',sans-serif;
-  background:var(--bg);color:var(--text);
+  font-family:'Oswald','Barlow Condensed',sans-serif;
+  background:var(--bg-dark);
+  color:var(--text-primary);
   min-height:100vh;min-height:100dvh;
-  display:flex;align-items:center;justify-content:center;
-  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
   overflow-x:hidden;
+  /* Микротекстура: потертая поверхность */
+  background-image:
+    radial-gradient(at 20% 30%, rgba(255,69,0,.04) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(0,191,255,.04) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,.01) 2px, rgba(255,255,255,.01) 4px);
 }
 
-/* ── CARD CONTAINER ─────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   КОНТЕЙНЕР КАРТОЧЕК & СЕТКА
+   ════════════════════════════════════════════════════ */
+.fighter-cards-container{
+  width:100%;
+  max-width:1200px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  gap:32px;
+  animation:sceneEntry 1.2s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes sceneEntry{
+  from{opacity:0;transform:translateY(60px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ════════════════════════════════════════════════════
+   БОЕВАЯ КАРТОЧКА — ГЛАВНЫЙ КОНТЕЙНЕР
+   ════════════════════════════════════════════════════ */
 .fighter-card{
-  width:100%;max-width:420px;
-  background:var(--card);
-  border-radius:24px;
-  border:2px solid rgba(255,106,26,.25);
   position:relative;
+  background:var(--bg-card);
+  border-radius:12px;
   overflow:hidden;
+  /* ГРАНИЦА: Огонь ↔ Лед */
+  border:2px solid transparent;
+  background-clip:padding-box;
   box-shadow:
-    0 0 60px rgba(255,106,26,.08),
-    0 25px 80px rgba(0,0,0,.6);
+    0 0 60px var(--glow-fire),
+    0 0 40px var(--glow-ice),
+    inset 0 0 30px rgba(255,69,0,.05),
+    0 20px 60px rgba(0,0,0,.8);
+  animation:cardHover 3s ease-in-out infinite;
 }
-/* Ambient gradient glow */
 .fighter-card::before{
-  content:'';position:absolute;top:-50%;left:-50%;
-  width:200%;height:200%;
-  background:conic-gradient(from 180deg at 50% 50%,
-    transparent 0deg,
-    rgba(255,106,26,.06) 60deg,
-    transparent 120deg,
-    rgba(255,149,0,.04) 200deg,
-    transparent 300deg);
-  animation:cardRotate 12s linear infinite;
-  pointer-events:none;z-index:0;
+  content:'';position:absolute;
+  top:-2px;right:-2px;bottom:-2px;left:-2px;
+  background:linear-gradient(180deg,
+    var(--accent-fire) 0%,
+    rgba(255,69,0,.4) 25%,
+    rgba(0,191,255,.3) 50%,
+    var(--accent-ice) 100%);
+  border-radius:12px;
+  z-index:-1;
+  animation:borderRotate 6s linear infinite;
 }
-@keyframes cardRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-/* Glass overlay on top of rotating gradient */
-.fighter-card::after{
-  content:'';position:absolute;inset:0;
-  background:var(--card);
-  border-radius:22px;
-  z-index:1;
+@keyframes borderRotate{
+  0%{background-position:0% 0%}
+  100%{background-position:100% 100%}
 }
-.fighter-card>*{position:relative;z-index:2}
+@keyframes cardHover{
+  0%,100%{transform:translateY(0) scale(1);opacity:1}
+  50%{transform:translateY(-3px) scale(1.001)}
+}
+.fighter-card:hover{
+  transform:translateY(-8px);
+  box-shadow:
+    0 0 80px var(--glow-fire),
+    0 0 60px var(--glow-ice),
+    inset 0 0 40px rgba(255,69,0,.1),
+    0 30px 80px rgba(0,0,0,.9);
+}
 
-/* ── HEADER ─────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   HEADER: ГЕКСАГОНАЛЬНЫЙ АВАТАР + НИКНЕЙМ + РАНГ
+   ════════════════════════════════════════════════════ */
 .fc-header{
-  padding:28px 24px 20px;
-  display:flex;align-items:center;gap:18px;
-  background:linear-gradient(135deg,rgba(255,106,26,.08) 0%,transparent 60%);
-  border-bottom:1px solid rgba(255,255,255,.06);
+  padding:24px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.08) 0%,
+    rgba(0,0,0,.2) 50%,
+    rgba(0,191,255,.04) 100%);
+  border-bottom:1px solid rgba(0,191,255,.15);
+  position:relative;
 }
+.fc-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,var(--accent-fire),var(--accent-ice),var(--accent-fire));
+  opacity:.4;
+}
+
+/* ГЕКСАГОНАЛЬНЫЙ АВАТАР */
 .fc-avatar{
-  width:88px;height:88px;
-  border-radius:50%;
-  border:3px solid var(--accent);
-  box-shadow:0 0 24px var(--accent-glow),inset 0 0 20px rgba(0,0,0,.4);
-  overflow:hidden;
+  width:92px;
+  height:92px;
   flex-shrink:0;
   position:relative;
-  background:linear-gradient(135deg,#1a1a2e,#0d0d1a);
-  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.15),
+    rgba(0,191,255,.1));
+  border:2px solid transparent;
+  background-clip:padding-box;
+  /* Гексагон через clip-path */
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
 }
-.fc-avatar img{width:100%;height:100%;object-fit:cover}
+.fc-avatar::before{
+  content:'';position:absolute;
+  inset:-2px;
+  background:conic-gradient(from 0deg,var(--accent-fire),var(--accent-ice),var(--accent-fire));
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  z-index:-1;
+  animation:hexRotate 4s linear infinite;
+}
+@keyframes hexRotate{
+  0%{background-position:0% 0%}
+  100%{background-position:360deg 0%}
+}
+.fc-avatar img{
+  width:100%;height:100%;
+  object-fit:cover;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
 .fc-avatar-initials{
   font-family:'Bebas Neue',sans-serif;
-  font-size:36px;letter-spacing:2px;
-  color:var(--accent);
-  text-shadow:0 0 20px var(--accent-glow);
+  font-size:40px;
+  letter-spacing:2px;
+  font-weight:bold;
+  background:linear-gradient(135deg,var(--accent-fire),var(--accent-ice));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:0 0 30px rgba(255,69,0,.4);
+  filter:drop-shadow(0 0 20px rgba(0,191,255,.3));
 }
+
 .fc-info{flex:1;min-width:0}
+
 .fc-nickname{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:32px;letter-spacing:3px;line-height:1;
-  color:var(--text);
-  text-shadow:0 2px 10px rgba(0,0,0,.5);
-  margin-bottom:4px;
-}
-.fc-rank{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 12px;border-radius:6px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#000;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px;font-weight:900;letter-spacing:1.5px;
+  font-family:'Bebas Neue','Oswald',sans-serif;
+  font-size:36px;
+  letter-spacing:4px;
+  line-height:1;
+  color:var(--text-primary);
   text-transform:uppercase;
-  box-shadow:0 0 16px var(--accent-glow);
+  text-shadow:
+    0 0 20px rgba(255,69,0,.5),
+    0 0 40px rgba(255,69,0,.2),
+    0 2px 8px rgba(0,0,0,.8);
+  margin-bottom:6px;
+  animation:nickEntry .8s cubic-bezier(.16,1,.3,1) backwards;
 }
-.fc-rank i{font-size:10px}
+@keyframes nickEntry{
+  from{opacity:0;transform:translateX(-20px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+.fc-rank{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border-radius:6px;
+  border:1px solid var(--accent-fire);
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.15),
+    rgba(255,69,0,.05));
+  color:var(--accent-fire);
+  font-family:'Oswald',sans-serif;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  box-shadow:0 0 20px rgba(255,69,0,.25);
+  animation:rankPulse 2s ease-in-out infinite;
+}
+@keyframes rankPulse{
+  0%,100%{box-shadow:0 0 20px rgba(255,69,0,.25)}
+  50%{box-shadow:0 0 40px rgba(255,69,0,.5),inset 0 0 20px rgba(255,69,0,.15)}
+}
+.fc-rank i{font-size:11px}
+
 .fc-community{
   margin-top:8px;
-  font-size:11px;color:var(--muted);
-  letter-spacing:.5px;
-  display:flex;align-items:center;gap:5px;
+  font-size:10px;
+  color:var(--accent-ice);
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  text-transform:uppercase;
 }
-.fc-community i{color:var(--accent);font-size:10px}
+.fc-community i{font-size:9px}
 
-/* ── MAIN STATS ─────────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   ГЛАВНЫЕ СТАТИСТИКИ: НЕОНОВЫЙ РЕЙТИНГ + ПРОЦЕНТ + ИГРЫ
+   ════════════════════════════════════════════════════ */
 .fc-stats{
-  display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:2px;
-  padding:2px;
-  margin:20px 20px 0;
-  background:rgba(255,255,255,.03);
-  border-radius:16px;
-  border:1px solid var(--glass-border);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  padding:1px;
+  margin:24px 20px;
+  background:linear-gradient(135deg,var(--accent-fire),var(--accent-ice));
+  border-radius:10px;
   overflow:hidden;
+  box-shadow:
+    inset 0 0 30px rgba(255,69,0,.1),
+    0 0 30px rgba(255,69,0,.2),
+    0 0 20px rgba(0,191,255,.1);
 }
 .fc-stat{
-  padding:18px 12px;
+  padding:20px 14px;
   text-align:center;
-  background:var(--glass);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  background:var(--bg-card);
   position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,69,0,.1);
+  transition:all .3s ease;
 }
-.fc-stat:first-child{border-radius:14px 0 0 14px}
-.fc-stat:last-child{border-radius:0 14px 14px 0}
-.fc-stat-val{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:36px;line-height:1;
-  letter-spacing:1px;
-  background:linear-gradient(180deg,var(--text) 30%,var(--muted));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
+.fc-stat::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(255,69,0,.1),transparent 70%);
+  pointer-events:none;
 }
-.fc-stat-val.accent{
-  background:linear-gradient(180deg,var(--accent) 30%,var(--accent2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.fc-stat-lbl{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--muted);margin-top:4px;
+.fc-stat:hover{
+  background:linear-gradient(135deg,rgba(255,69,0,.08),rgba(0,191,255,.04));
+  border-color:rgba(0,191,255,.2);
 }
 
-/* ── ACHIEVEMENTS ───────────────────────────────────── */
+.fc-stat-val{
+  font-family:'Bebas Neue','Oswald',sans-serif;
+  font-size:44px;
+  line-height:1;
+  letter-spacing:2px;
+  font-weight:900;
+  color:var(--text-primary);
+  margin-bottom:2px;
+  position:relative;
+  z-index:2;
+}
+/* НЕОНОВЫЙ РЕЙТИНГ — пульсирующее свечение */
+.fc-stat:first-child .fc-stat-val{
+  color:var(--accent-fire);
+  text-shadow:
+    0 0 10px rgba(255,69,0,.8),
+    0 0 20px rgba(255,69,0,.6),
+    0 0 40px rgba(255,69,0,.4),
+    0 0 60px rgba(255,69,0,.2);
+  animation:neonPulse 1.5s ease-in-out infinite;
+}
+@keyframes neonPulse{
+  0%,100%{
+    text-shadow:
+      0 0 10px rgba(255,69,0,.8),
+      0 0 20px rgba(255,69,0,.6),
+      0 0 40px rgba(255,69,0,.4),
+      0 0 60px rgba(255,69,0,.2);
+  }
+  50%{
+    text-shadow:
+      0 0 20px rgba(255,69,0,1),
+      0 0 30px rgba(255,69,0,.8),
+      0 0 60px rgba(255,69,0,.6),
+      0 0 100px rgba(255,69,0,.3);
+  }
+}
+
+.fc-stat-lbl{
+  font-family:'Oswald',sans-serif;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  position:relative;
+  z-index:2;
+}
+
+/* ════════════════════════════════════════════════════
+   ДОСТИЖЕНИЯ & МЕДАЛИ — Гексагональные бейджи
+   ════════════════════════════════════════════════════ */
 .fc-section{padding:20px 24px 0}
 .fc-section-title{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  color:var(--muted);margin-bottom:12px;
-  display:flex;align-items:center;gap:8px;
+  font-family:'Oswald',sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--accent-ice);
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.fc-section-title::before{
+  content:'';width:4px;height:4px;
+  border-radius:50%;
+  background:var(--accent-fire);
+  box-shadow:0 0 10px var(--accent-fire);
 }
 .fc-section-title::after{
   content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,rgba(255,255,255,.1),transparent);
+  background:linear-gradient(90deg,rgba(0,191,255,.3),transparent);
 }
-.fc-badges{display:flex;gap:10px;flex-wrap:wrap}
+
+.fc-badges{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(56px,1fr));
+  gap:12px;
+  animation:badgesEntry 1s cubic-bezier(.16,1,.3,1) backwards;
+}
+@keyframes badgesEntry{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
 .fc-badge{
-  width:52px;height:52px;
-  border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;
-  background:var(--glass);
-  border:1.5px solid var(--glass-border);
+  width:56px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
   position:relative;
-  cursor:default;
-  transition:all .25s ease;
+  cursor:pointer;
+  /* Гексагон */
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  background:var(--bg-card);
+  border:2px solid transparent;
+  background-clip:padding-box;
+  overflow:visible;
+  transition:all .3s ease;
+}
+.fc-badge::before{
+  content:'';position:absolute;
+  inset:-2px;
+  background:linear-gradient(135deg,var(--accent-fire),var(--accent-ice));
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  z-index:-1;
+}
+.fc-badge:hover{
+  transform:scale(1.15) rotate(5deg);
+  filter:drop-shadow(0 0 20px rgba(255,69,0,.5)) drop-shadow(0 0 10px rgba(0,191,255,.3));
 }
 .fc-badge::after{
   content:attr(data-count);
-  position:absolute;top:-4px;right:-4px;
-  min-width:18px;height:18px;
-  border-radius:9px;
-  background:var(--card);
-  border:1.5px solid var(--glass-border);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:900;
-  color:var(--text);
-  display:flex;align-items:center;justify-content:center;
-  padding:0 4px;
+  position:absolute;
+  top:-8px;right:-8px;
+  min-width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--accent-fire);
+  border:2px solid var(--bg-dark);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:11px;
+  font-weight:900;
+  color:var(--bg-dark);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 15px var(--accent-fire);
 }
 .fc-badge[data-count="0"]::after{display:none}
-.fc-badge.gold{
-  border-color:rgba(255,215,0,.3);
-  background:linear-gradient(135deg,rgba(255,215,0,.1),transparent);
-}
-.fc-badge.gold:hover{
-  border-color:rgba(255,215,0,.6);
-  box-shadow:0 0 20px rgba(255,215,0,.25);
-  transform:translateY(-2px);
-}
-.fc-badge.silver{
-  border-color:rgba(192,192,192,.25);
-  background:linear-gradient(135deg,rgba(192,192,192,.08),transparent);
-}
-.fc-badge.silver:hover{
-  border-color:rgba(192,192,192,.5);
-  box-shadow:0 0 20px rgba(192,192,192,.2);
-  transform:translateY(-2px);
-}
-.fc-badge.bronze{
-  border-color:rgba(205,127,50,.25);
-  background:linear-gradient(135deg,rgba(205,127,50,.08),transparent);
-}
-.fc-badge.bronze:hover{
-  border-color:rgba(205,127,50,.5);
-  box-shadow:0 0 20px rgba(205,127,50,.2);
-  transform:translateY(-2px);
-}
-.fc-badge.special{
-  border-color:rgba(168,85,247,.3);
-  background:linear-gradient(135deg,rgba(168,85,247,.1),transparent);
-}
-.fc-badge.special:hover{
-  border-color:rgba(168,85,247,.6);
-  box-shadow:0 0 20px rgba(168,85,247,.25);
-  transform:translateY(-2px);
-}
+
 .fc-badge-tooltip{
-  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;
+  display:none;
+  position:absolute;
+  bottom:calc(100% + 14px);
+  left:50%;
   transform:translateX(-50%);
-  padding:5px 10px;border-radius:8px;
-  background:rgba(0,0,0,.9);border:1px solid rgba(255,255,255,.1);
-  font-size:10px;font-weight:700;white-space:nowrap;
-  color:var(--text);z-index:10;
+  padding:6px 12px;
+  border-radius:6px;
+  border:1px solid var(--accent-fire);
+  background:linear-gradient(135deg,rgba(255,69,0,.2),rgba(0,191,255,.1));
+  backdrop-filter:blur(10px);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  color:var(--text-primary);
+  z-index:100;
   pointer-events:none;
+  animation:tooltipEntry .3s ease;
+}
+@keyframes tooltipEntry{
+  from{opacity:0;transform:translateX(-50%) translateY(10px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}
 }
 .fc-badge:hover .fc-badge-tooltip{display:block}
 
-/* ── PERSONAL INFO ──────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   ЛИЧНАЯ ИНФОРМАЦИЯ: НОМЕР + СОЦСЕТИ
+   ════════════════════════════════════════════════════ */
 .fc-personal{
-  display:flex;align-items:center;gap:16px;
-  padding:16px 20px;
-  margin:20px 20px 0;
-  background:var(--glass);
-  border:1px solid var(--glass-border);
-  border-radius:14px;
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-}
-.fc-jersey{
-  display:flex;align-items:center;gap:8px;
-  font-family:'Bebas Neue',sans-serif;
-  font-size:28px;letter-spacing:2px;
-  color:var(--accent);
-}
-.fc-jersey i{font-size:18px;opacity:.7}
-.fc-personal-sep{
-  width:1px;height:32px;
-  background:rgba(255,255,255,.1);
-}
-.fc-socials{display:flex;gap:10px;align-items:center}
-.fc-social{
-  width:36px;height:36px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 24px;
+  margin:24px 20px;
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.06),
+    rgba(0,191,255,.03));
+  border:1px solid rgba(0,191,255,.2);
   border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  color:var(--muted);
-  font-size:16px;
-  text-decoration:none;
-  transition:all .2s;
+  position:relative;
+  overflow:hidden;
 }
-.fc-social:hover{
-  color:var(--text);
-  border-color:rgba(255,255,255,.2);
-  background:rgba(255,255,255,.08);
-  transform:translateY(-1px);
+.fc-personal::before{
+  content:'';position:absolute;
+  inset:0;
+  background:conic-gradient(from 0deg at 50% 50%,transparent,rgba(255,69,0,.05),transparent);
+  pointer-events:none;
 }
 
-/* ── HISTORY TABLE ──────────────────────────────────── */
+.fc-jersey{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:'Bebas Neue','Oswald',sans-serif;
+  font-size:32px;
+  letter-spacing:2px;
+  font-weight:900;
+  color:var(--accent-fire);
+  text-shadow:0 0 15px rgba(255,69,0,.5);
+  position:relative;
+  z-index:2;
+}
+.fc-jersey i{
+  font-size:16px;
+  opacity:.6;
+}
+
+.fc-personal-sep{
+  width:1px;
+  height:32px;
+  background:linear-gradient(180deg,rgba(255,69,0,.2),rgba(0,191,255,.2),rgba(255,69,0,.1));
+  position:relative;
+  z-index:2;
+}
+
+.fc-socials{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  position:relative;
+  z-index:2;
+}
+
+.fc-social{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,rgba(255,69,0,.1),rgba(0,191,255,.05));
+  border:1px solid rgba(0,191,255,.25);
+  color:var(--accent-ice);
+  font-size:16px;
+  text-decoration:none;
+  transition:all .25s ease;
+}
+.fc-social:hover{
+  color:var(--accent-fire);
+  border-color:rgba(255,69,0,.5);
+  background:linear-gradient(135deg,rgba(255,69,0,.2),rgba(0,191,255,.1));
+  transform:translateY(-3px);
+  box-shadow:0 0 20px rgba(255,69,0,.3);
+}
+
+/* ════════════════════════════════════════════════════
+   ТАБЛИЦА ПОСЛЕДНИХ ИГР — Огненные победы, холодные поражения
+   ════════════════════════════════════════════════════ */
 .fc-history{
-  margin:20px 20px 0;
-  background:var(--glass);
-  border:1px solid var(--glass-border);
-  border-radius:14px;
+  margin:24px 20px;
+  background:linear-gradient(135deg,rgba(255,69,0,.04),rgba(0,191,255,.02));
+  border:1px solid rgba(0,191,255,.15);
+  border-radius:10px;
   overflow:hidden;
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
+  box-shadow:inset 0 0 20px rgba(255,69,0,.03);
 }
-.fc-history table{width:100%;border-collapse:collapse}
+
+.fc-history table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+
 .fc-history th{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--muted);
-  padding:12px 14px;
+  font-family:'Oswald',sans-serif;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--accent-ice);
+  padding:14px 16px;
   text-align:left;
-  background:rgba(255,255,255,.02);
-  border-bottom:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(135deg,rgba(255,69,0,.05),rgba(0,191,255,.04));
+  border-bottom:2px solid rgba(0,191,255,.15);
+  position:relative;
 }
+.fc-history th::after{
+  content:'';position:absolute;
+  bottom:-2px;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--accent-fire),var(--accent-ice),var(--accent-fire));
+}
+
 .fc-history td{
-  padding:10px 14px;
-  font-size:13px;font-weight:500;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  color:var(--text);
+  padding:12px 16px;
+  font-size:12px;
+  font-weight:500;
+  color:var(--text-primary);
+  border-bottom:1px solid rgba(0,191,255,.08);
 }
-.fc-history tr:last-child td{border-bottom:none}
-.fc-history tr{transition:background .15s}
-.fc-history tbody tr:hover{background:rgba(255,255,255,.03)}
+
+/* ИНДИКАЦИЯ ПОБЕД/ПОРАЖЕНИЙ */
+.fc-history tbody tr{
+  transition:all .2s ease;
+  position:relative;
+  overflow:hidden;
+}
+.fc-history tbody tr::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:3px;
+  background:transparent;
+  transition:all .2s ease;
+}
+.fc-history tbody tr.win::before{
+  background:linear-gradient(180deg,var(--accent-fire),rgba(255,69,0,.2));
+  box-shadow:inset 3px 0 10px rgba(255,69,0,.4);
+}
+.fc-history tbody tr.loss::before{
+  background:linear-gradient(180deg,rgba(100,100,120,.4),transparent);
+  box-shadow:inset 3px 0 10px rgba(100,100,120,.2);
+}
+.fc-history tbody tr:hover{
+  background:rgba(0,191,255,.08);
+}
+.fc-history tbody tr.win:hover{
+  background:rgba(255,69,0,.1);
+}
+.fc-history tbody tr:last-child td{border-bottom:none}
+
 .fc-place{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;border-radius:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  border-radius:6px;
   font-family:'Bebas Neue',sans-serif;
-  font-size:16px;font-weight:700;
+  font-size:16px;
+  font-weight:900;
+  transition:all .2s ease;
 }
-.fc-place.p1{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
-.fc-place.p2{background:rgba(192,192,192,.12);color:var(--silver);border:1px solid rgba(192,192,192,.25)}
-.fc-place.p3{background:rgba(205,127,50,.12);color:var(--bronze);border:1px solid rgba(205,127,50,.25)}
-.fc-place.other{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(255,255,255,.08)}
+.fc-place.p1{
+  background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,69,0,.15));
+  color:var(--accent-fire);
+  border:1.5px solid rgba(255,215,0,.4);
+  box-shadow:0 0 12px rgba(255,215,0,.2);
+}
+.fc-place.p1:hover{
+  box-shadow:0 0 20px rgba(255,215,0,.4),0 0 10px rgba(255,69,0,.3);
+}
+.fc-place.p2{
+  background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(200,200,200,.05));
+  color:#c0c0c0;
+  border:1.5px solid rgba(192,192,192,.3);
+}
+.fc-place.p3{
+  background:linear-gradient(135deg,rgba(205,127,50,.15),rgba(255,140,0,.05));
+  color:#cd7f32;
+  border:1.5px solid rgba(205,127,50,.3);
+}
+.fc-place.other{
+  background:rgba(0,191,255,.08);
+  color:var(--accent-ice);
+  border:1.5px solid rgba(0,191,255,.2);
+}
+
 .fc-trn-name{
   font-weight:600;
-  max-width:160px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:180px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-.fc-trn-date{font-size:12px;color:var(--muted)}
 
-/* ── SHARE BUTTON ───────────────────────────────────── */
+.fc-trn-date{
+  font-size:11px;
+  color:var(--text-secondary);
+  font-weight:500;
+}
+
+/* ════════════════════════════════════════════════════
+   FOOTER & SHARE BUTTON — Киберпанк кнопка
+   ════════════════════════════════════════════════════ */
 .fc-footer{
   padding:20px 24px 24px;
 }
+
 .fc-share-btn{
   width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:2px solid var(--accent);
-  background:linear-gradient(135deg,rgba(255,106,26,.12),rgba(255,149,0,.05));
-  color:var(--accent);
-  font-family:'Bebas Neue',sans-serif;
-  font-size:20px;letter-spacing:3px;
+  padding:16px;
+  border-radius:10px;
+  border:2px solid var(--accent-fire);
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.15),
+    rgba(255,69,0,.05));
+  color:var(--accent-fire);
+  font-family:'Bebas Neue','Oswald',sans-serif;
+  font-size:18px;
+  letter-spacing:3px;
   cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .25s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-transform:uppercase;
+  font-weight:900;
+  transition:all .3s ease;
   touch-action:manipulation;
+  position:relative;
+  overflow:hidden;
+}
+.fc-share-btn::before{
+  content:'';position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,transparent,rgba(0,191,255,.3),transparent);
+  transform:translateX(-100%);
+  transition:transform .5s ease;
 }
 .fc-share-btn:hover{
-  background:linear-gradient(135deg,rgba(255,106,26,.2),rgba(255,149,0,.1));
-  box-shadow:0 0 30px var(--accent-glow);
+  background:linear-gradient(135deg,
+    rgba(255,69,0,.25),
+    rgba(0,191,255,.1));
+  border-color:var(--accent-ice);
+  box-shadow:
+    0 0 30px rgba(255,69,0,.4),
+    0 0 20px rgba(0,191,255,.2),
+    inset 0 0 20px rgba(255,69,0,.1);
+  color:var(--accent-ice);
 }
-.fc-share-btn:active{transform:scale(.97)}
-.fc-share-btn i{font-size:16px}
-
-/* ── SHARE FLASH EFFECT ─────────────────────────────── */
-.fighter-card.flash{
-  animation:shareFlash .8s ease-out;
+.fc-share-btn:hover::before{
+  transform:translateX(100%);
 }
-@keyframes shareFlash{
-  0%{box-shadow:0 0 0 0 rgba(255,106,26,.6),0 0 60px rgba(255,106,26,.08),0 25px 80px rgba(0,0,0,.6)}
-  30%{box-shadow:0 0 0 12px rgba(255,106,26,.3),0 0 100px rgba(255,106,26,.3),0 25px 80px rgba(0,0,0,.6)}
-  60%{box-shadow:0 0 0 20px rgba(255,106,26,0),0 0 80px rgba(255,106,26,.15),0 25px 80px rgba(0,0,0,.6)}
-  100%{box-shadow:0 0 60px rgba(255,106,26,.08),0 25px 80px rgba(0,0,0,.6)}
+.fc-share-btn:active{
+  transform:scale(.96);
 }
-.fighter-card.flash::before{
-  animation:cardRotate 12s linear infinite, flashBurst .8s ease-out;
-}
-@keyframes flashBurst{
-  0%{opacity:1;filter:brightness(3)}
-  100%{opacity:1;filter:brightness(1)}
+.fc-share-btn i{
+  font-size:14px;
 }
 
-/* ── WATERMARK ──────────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   FOOTWATERMARK
+   ════════════════════════════════════════════════════ */
 .fc-watermark{
   text-align:center;
-  padding:0 24px 20px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.12);
+  padding:16px 24px 20px;
+  font-family:'Oswald',sans-serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:rgba(0,191,255,.3);
 }
-.fc-watermark span{color:rgba(255,106,26,.35)}
+.fc-watermark::before{
+  content:'⚡ ';
+  color:var(--accent-fire);
+}
+.fc-watermark::after{
+  content:' ⚡';
+  color:var(--accent-ice);
+}
 
-/* ── RESPONSIVE ─────────────────────────────────────── */
-@media(max-width:380px){
-  .fc-header{padding:20px 16px 16px;gap:14px}
-  .fc-avatar{width:72px;height:72px}
-  .fc-avatar-initials{font-size:28px}
-  .fc-nickname{font-size:26px;letter-spacing:2px}
-  .fc-stats{margin:16px 14px 0}
-  .fc-stat{padding:14px 8px}
-  .fc-stat-val{font-size:28px}
-  .fc-section{padding:16px 16px 0}
-  .fc-personal{margin:16px 14px 0;padding:12px 14px;gap:12px}
+/* ════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ════════════════════════════════════════════════════ */
+@media(max-width:480px){
+  .fighter-cards-container{
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+  .fc-header{padding:20px 18px}
+  .fc-avatar{width:80px;height:80px}
+  .fc-avatar-initials{font-size:32px}
+  .fc-nickname{font-size:28px;letter-spacing:2px}
+  .fc-rank{font-size:10px;padding:5px 12px}
+  .fc-stats{margin:18px 14px;grid-template-columns:1fr 1fr 1fr;gap:1px}
+  .fc-stat{padding:14px 10px}
+  .fc-stat-val{font-size:32px}
+  .fc-stat-lbl{font-size:8px}
+  .fc-section{padding:16px 18px 0}
+  .fc-badges{grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:10px}
+  .fc-badge{width:48px;height:48px;font-size:20px}
+  .fc-personal{margin:16px 14px;padding:14px 16px;gap:12px}
   .fc-jersey{font-size:24px}
-  .fc-history{margin:16px 14px 0}
-  .fc-footer{padding:16px 16px 20px}
-  .fc-trn-name{max-width:120px}
+  .fc-history{margin:16px 14px}
+  .fc-footer{padding:14px 18px}
+  .fc-trn-name{max-width:140px}
 }
 
-/* ── BACKGROUND PARTICLES ───────────────────────────── */
-.bg-particles{
-  position:fixed;inset:0;z-index:0;
-  pointer-events:none;overflow:hidden;
-}
-.bg-particle{
-  position:absolute;
-  width:2px;height:2px;
-  border-radius:50%;
-  background:var(--accent);
-  opacity:0;
-  animation:particleFloat linear infinite;
-}
-@keyframes particleFloat{
-  0%{opacity:0;transform:translateY(100vh) scale(0)}
-  10%{opacity:.4}
-  90%{opacity:.1}
-  100%{opacity:0;transform:translateY(-10vh) scale(1)}
-}
-
-/* ── ENTRY ANIMATION ────────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   ENTRY ANIMATIONS
+   ════════════════════════════════════════════════════ */
 .fighter-card{
-  animation:cardEntry .6s cubic-bezier(.16,1,.3,1) both;
+  animation:cardEnter .7s cubic-bezier(.34,.1,.68,1) backwards;
 }
-@keyframes cardEntry{
-  from{opacity:0;transform:translateY(30px) scale(.95)}
-  to{opacity:1;transform:translateY(0) scale(1)}
+@keyframes cardEnter{
+  from{
+    opacity:0;
+    transform:translateY(40px) scale(.92);
+    filter:blur(4px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
 }
+
+/* Stagger animation for multiple cards */
+.fighter-card:nth-child(1){animation-delay:.1s}
+.fighter-card:nth-child(2){animation-delay:.2s}
+.fighter-card:nth-child(3){animation-delay:.3s}
 </style>
 </head>
 <body>
 
-<!-- Background particles -->
-<div class="bg-particles" id="particles"></div>
-
-<!-- ═══════════════════════════════════════════════════
-     FIGHTER CARD — КАРТОЧКА ЛЮТОГО ПЛЯЖНИКА
-     ═══════════════════════════════════════════════════ -->
-<div class="fighter-card" id="fighter-card">
-
-  <!-- HEADER: Avatar + Nickname + Rank -->
-  <div class="fc-header">
-    <div class="fc-avatar" id="fc-avatar">
-      <span class="fc-avatar-initials" id="fc-initials"></span>
-    </div>
-    <div class="fc-info">
-      <div class="fc-nickname" id="fc-nickname"></div>
-      <div class="fc-rank" id="fc-rank"></div>
-      <div class="fc-community">
-        <i class="fa-solid fa-volleyball-ball"></i>
-        Лютые пляжники
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN STATS: Rating, Win%, Tournaments -->
-  <div class="fc-stats">
-    <div class="fc-stat">
-      <div class="fc-stat-val accent" id="fc-rating"></div>
-      <div class="fc-stat-lbl">Рейтинг</div>
-    </div>
-    <div class="fc-stat">
-      <div class="fc-stat-val" id="fc-winrate"></div>
-      <div class="fc-stat-lbl">Побед %</div>
-    </div>
-    <div class="fc-stat">
-      <div class="fc-stat-val" id="fc-tournaments"></div>
-      <div class="fc-stat-lbl">Турниры</div>
-    </div>
-  </div>
-
-  <!-- ACHIEVEMENTS: Medal Badges -->
-  <div class="fc-section">
-    <div class="fc-section-title">Витрина</div>
-    <div class="fc-badges" id="fc-badges"></div>
-  </div>
-
-  <!-- PERSONAL INFO: Jersey + Socials -->
-  <div class="fc-personal">
-    <div class="fc-jersey">
-      <i class="fa-solid fa-shirt"></i>
-      <span id="fc-jersey"></span>
-    </div>
-    <div class="fc-personal-sep"></div>
-    <div class="fc-socials" id="fc-socials"></div>
-  </div>
-
-  <!-- HISTORY TABLE: Last 5 Tournaments -->
-  <div class="fc-section">
-    <div class="fc-section-title">Последние турниры</div>
-  </div>
-  <div class="fc-history">
-    <table>
-      <thead>
-        <tr><th>Турнир</th><th>Дата</th><th>Место</th></tr>
-      </thead>
-      <tbody id="fc-history-body"></tbody>
-    </table>
-  </div>
-
-  <!-- WATERMARK -->
-  <div class="fc-watermark">
-    <span>Лютые пляжники</span> &middot; King of the Court
-  </div>
-
-  <!-- SHARE BUTTON -->
-  <div class="fc-footer">
-    <button class="fc-share-btn" id="fc-share" onclick="shareCard()">
-      <i class="fa-solid fa-camera"></i>
-      Поделиться
-    </button>
-  </div>
-
-</div>
+<div class="fighter-cards-container" id="cards-container"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   DEMO DATA — Захардкоженные данные игрока
-   (готово под замену на Supabase fetch)
-   ═══════════════════════════════════════════════════════ */
-const PLAYER = {
-  nickname: 'ДМИТРИЙ ВОЛК',
-  initials: 'ДВ',
-  avatar: null, // URL или null → покажет инициалы
-  rank: 'TOP-10',
-  rankIcon: 'fa-fire',
-  jersey: 13,
-  rating: 1847,
-  winrate: 72,
-  tournaments: 28,
-  medals: {
-    gold: 8,
-    silver: 5,
-    bronze: 3
+/* ════════════════════════════════════════════════════════════════
+   ULTIMATE FIGHTER CARDS — КИБЕРПАНК UI
+   Динамический рендер из JSON с поддержкой нескольких карточек
+   ════════════════════════════════════════════════════════════════ */
+
+/**
+ * JSON-структура игрока:
+ * {
+ *   nickname: "MAMEDOV",
+ *   initials: "MM",
+ *   avatar: null,
+ *   rank: "LYUTYI",         // LYUTYI | PRO | NEXT
+ *   rankIcon: "fa-fire",
+ *   jersey: 7,
+ *   rating: 3900,
+ *   winrate: 78,
+ *   tournaments: 42,
+ *   status: "LYUTYI",       // Статус для ранга
+ *   medals: { gold, silver, bronze },
+ *   achievements: [ { icon, name, type: "crown|fire|snow|special" } ],
+ *   socials: [ { type, url, icon } ],
+ *   recent_games: [ { name, date, result: "win|loss", place } ]
+ * }
+ */
+
+// ════════════════════════════════════════════════════════════════
+// ДЕМО-ДАННЫЕ: 3 ЛЮТЫХ БОЙЦА
+// ════════════════════════════════════════════════════════════════
+const PLAYERS_DATABASE = [
+  {
+    nickname: 'MAMEDOV',
+    initials: 'MM',
+    avatar: null,
+    rank: 'LYUTYI',
+    rankIcon: 'fa-fire',
+    jersey: 7,
+    rating: 3900,
+    winrate: 78,
+    tournaments: 42,
+    status: 'LYUTYI',
+    medals: { gold: 15, silver: 8, bronze: 4 },
+    achievements: [
+      { icon: '🔥', name: 'Огненный поток', type: 'fire' },
+      { icon: '👑', name: 'Король сургута', type: 'crown' },
+      { icon: '❄️', name: 'Ледяной удар', type: 'snow' }
+    ],
+    socials: [
+      { type: 'telegram', url: '#', icon: 'fa-brands fa-telegram' },
+      { type: 'instagram', url: '#', icon: 'fa-brands fa-instagram' }
+    ],
+    recent_games: [
+      { name: 'King of the Court #30', date: '05.03.2026', result: 'win', place: 1 },
+      { name: 'Сургут Мастер Лига', date: '02.03.2026', result: 'win', place: 1 },
+      { name: 'Зимний Кубок Северян', date: '28.02.2026', result: 'loss', place: 4 },
+      { name: 'King of the Court #29', date: '24.02.2026', result: 'win', place: 1 },
+      { name: 'Лютая Серия 4x4', date: '18.02.2026', result: 'win', place: 2 }
+    ]
   },
-  achievements: [
-    { icon: '🔥', name: 'Серия 5 побед', type: 'special' },
-    { icon: '👑', name: 'Легенда пляжа', type: 'special' }
-  ],
-  socials: [
-    { type: 'telegram', url: '#', icon: 'fa-brands fa-telegram' },
-    { type: 'vk', url: '#', icon: 'fa-brands fa-vk' }
-  ],
-  history: [
-    { name: 'King of the Court #28', date: '02.03.2026', place: 1 },
-    { name: 'Зимний кубок пляжников', date: '15.02.2026', place: 2 },
-    { name: 'King of the Court #27', date: '08.02.2026', place: 1 },
-    { name: 'Лютый турнир 4×4', date: '25.01.2026', place: 3 },
-    { name: 'King of the Court #26', date: '18.01.2026', place: 1 }
-  ]
-};
+  {
+    nickname: 'SHPERLING',
+    initials: 'SH',
+    avatar: null,
+    rank: 'PRO',
+    rankIcon: 'fa-star',
+    jersey: 1,
+    rating: 3750,
+    winrate: 74,
+    tournaments: 38,
+    status: 'PRO',
+    medals: { gold: 12, silver: 10, bronze: 6 },
+    achievements: [
+      { icon: '⚡', name: 'Молниеносный', type: 'special' },
+      { icon: '🎯', name: 'Точный расчет', type: 'crown' }
+    ],
+    socials: [
+      { type: 'vk', url: '#', icon: 'fa-brands fa-vk' },
+      { type: 'telegram', url: '#', icon: 'fa-brands fa-telegram' }
+    ],
+    recent_games: [
+      { name: 'King of the Court #30', date: '05.03.2026', result: 'loss', place: 3 },
+      { name: 'Сургут Мастер Лига', date: '02.03.2026', result: 'win', place: 2 },
+      { name: 'Зимний Кубок Северян', date: '28.02.2026', result: 'win', place: 1 },
+      { name: 'King of the Court #29', date: '24.02.2026', result: 'loss', place: 5 },
+      { name: 'Лютая Серия 4x4', date: '18.02.2026', result: 'win', place: 1 }
+    ]
+  },
+  {
+    nickname: 'DMITRIY VOLK',
+    initials: 'DV',
+    avatar: null,
+    rank: 'NEXT',
+    rankIcon: 'fa-rocket',
+    jersey: 13,
+    rating: 3600,
+    winrate: 71,
+    tournaments: 28,
+    status: 'NEXT',
+    medals: { gold: 8, silver: 5, bronze: 3 },
+    achievements: [
+      { icon: '🚀', name: 'Восходящая звезда', type: 'special' },
+      { icon: '🔥', name: 'Горячая голова', type: 'fire' }
+    ],
+    socials: [
+      { type: 'telegram', url: '#', icon: 'fa-brands fa-telegram' },
+      { type: 'vk', url: '#', icon: 'fa-brands fa-vk' }
+    ],
+    recent_games: [
+      { name: 'King of the Court #30', date: '05.03.2026', result: 'win', place: 2 },
+      { name: 'Сургут Мастер Лига', date: '02.03.2026', result: 'loss', place: 5 },
+      { name: 'Зимний Кубок Северян', date: '28.02.2026', result: 'win', place: 2 },
+      { name: 'King of the Court #29', date: '24.02.2026', result: 'win', place: 2 },
+      { name: 'Лютая Серия 4x4', date: '18.02.2026', result: 'loss', place: 3 }
+    ]
+  }
+];
 
-/* ═══════════════════════════════════════════════════════
-   RENDER — Заполняем карточку данными
-   ═══════════════════════════════════════════════════════ */
-function renderCard(p) {
-  // Avatar
-  const avatarEl = document.getElementById('fc-avatar');
-  const initialsEl = document.getElementById('fc-initials');
-  if (p.avatar) {
-    initialsEl.style.display = 'none';
-    const img = document.createElement('img');
-    img.src = p.avatar;
-    img.alt = p.nickname;
-    avatarEl.appendChild(img);
-  } else {
-    initialsEl.textContent = p.initials;
+// ════════════════════════════════════════════════════════════════
+// РЕНДЕР КАРТОЧЕК
+// ════════════════════════════════════════════════════════════════
+
+function createFighterCard(player) {
+  const badgesHTML = createBadgesHTML(player);
+  const socialsHTML = createSocialsHTML(player);
+  const historyHTML = createHistoryTableHTML(player);
+
+  const ratingDisplayed = Math.round(player.rating / 100);
+
+  return `
+    <div class="fighter-card">
+      <!-- HEADER -->
+      <div class="fc-header">
+        <div class="fc-avatar">
+          <span class="fc-avatar-initials">${player.initials}</span>
+        </div>
+        <div class="fc-info">
+          <div class="fc-nickname">${player.nickname}</div>
+          <div class="fc-rank">
+            <i class="fa-solid ${player.rankIcon}"></i> ${player.status}
+          </div>
+          <div class="fc-community">
+            <i class="fa-solid fa-volleyball-ball"></i>
+            ЛЮТЫЕ ПЛЯЖНИКИ
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN STATS -->
+      <div class="fc-stats">
+        <div class="fc-stat">
+          <div class="fc-stat-val">${ratingDisplayed}</div>
+          <div class="fc-stat-lbl">Рейтинг</div>
+        </div>
+        <div class="fc-stat">
+          <div class="fc-stat-val">${player.winrate}%</div>
+          <div class="fc-stat-lbl">Побед</div>
+        </div>
+        <div class="fc-stat">
+          <div class="fc-stat-val">${player.tournaments}</div>
+          <div class="fc-stat-lbl">Турниры</div>
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div class="fc-section">
+        <div class="fc-section-title">ВИТРИНА</div>
+        <div class="fc-badges">
+          ${badgesHTML}
+        </div>
+      </div>
+
+      <!-- PERSONAL INFO -->
+      <div class="fc-personal">
+        <div class="fc-jersey">
+          <i class="fa-solid fa-shirt"></i>
+          <span>#${player.jersey}</span>
+        </div>
+        <div class="fc-personal-sep"></div>
+        <div class="fc-socials">
+          ${socialsHTML}
+        </div>
+      </div>
+
+      <!-- HISTORY TABLE -->
+      <div class="fc-section">
+        <div class="fc-section-title">БОЕВОЙ ЖУРНАЛ</div>
+      </div>
+      <div class="fc-history">
+        <table>
+          <thead>
+            <tr><th>ТУРНИР</th><th>ДАТА</th><th>МЕСТО</th></tr>
+          </thead>
+          <tbody>
+            ${historyHTML}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WATERMARK -->
+      <div class="fc-watermark">ЛЮТЫЕ ПЛЯЖНИКИ • KING OF THE COURT</div>
+
+      <!-- SHARE BUTTON -->
+      <div class="fc-footer">
+        <button class="fc-share-btn" onclick="shareCard('${player.nickname}')">
+          <i class="fa-solid fa-camera"></i> ПОДЕЛИТЬСЯ
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function createBadgesHTML(player) {
+  let html = '';
+
+  // Медали
+  if (player.medals.gold > 0) {
+    html += `<div class="fc-badge" data-count="${player.medals.gold}">🥇<span class="fc-badge-tooltip">Золото ${player.medals.gold}</span></div>`;
+  }
+  if (player.medals.silver > 0) {
+    html += `<div class="fc-badge" data-count="${player.medals.silver}">🥈<span class="fc-badge-tooltip">Серебро ${player.medals.silver}</span></div>`;
+  }
+  if (player.medals.bronze > 0) {
+    html += `<div class="fc-badge" data-count="${player.medals.bronze}">🥉<span class="fc-badge-tooltip">Бронза ${player.medals.bronze}</span></div>`;
   }
 
-  // Nickname & rank
-  document.getElementById('fc-nickname').textContent = p.nickname;
-  const rankEl = document.getElementById('fc-rank');
-  rankEl.innerHTML = `<i class="fa-solid ${p.rankIcon}"></i> ${p.rank}`;
+  // Достижения
+  player.achievements.forEach(a => {
+    html += `<div class="fc-badge" data-count="0">${a.icon}<span class="fc-badge-tooltip">${a.name}</span></div>`;
+  });
 
-  // Stats
-  document.getElementById('fc-rating').textContent = p.rating;
-  document.getElementById('fc-winrate').textContent = p.winrate + '%';
-  document.getElementById('fc-tournaments').textContent = p.tournaments;
+  return html;
+}
 
-  // Badges (medals + achievements)
-  const badgesEl = document.getElementById('fc-badges');
-  let badgesHTML = '';
-
-  if (p.medals.gold > 0) {
-    badgesHTML += `<div class="fc-badge gold" data-count="${p.medals.gold}">🥇<span class="fc-badge-tooltip">Золото × ${p.medals.gold}</span></div>`;
-  }
-  if (p.medals.silver > 0) {
-    badgesHTML += `<div class="fc-badge silver" data-count="${p.medals.silver}">🥈<span class="fc-badge-tooltip">Серебро × ${p.medals.silver}</span></div>`;
-  }
-  if (p.medals.bronze > 0) {
-    badgesHTML += `<div class="fc-badge bronze" data-count="${p.medals.bronze}">🥉<span class="fc-badge-tooltip">Бронза × ${p.medals.bronze}</span></div>`;
-  }
-  for (const a of p.achievements) {
-    badgesHTML += `<div class="fc-badge ${a.type}" data-count="0">${a.icon}<span class="fc-badge-tooltip">${a.name}</span></div>`;
-  }
-  badgesEl.innerHTML = badgesHTML;
-
-  // Jersey
-  document.getElementById('fc-jersey').textContent = '#' + p.jersey;
-
-  // Socials
-  const socialsEl = document.getElementById('fc-socials');
-  socialsEl.innerHTML = p.socials.map(s =>
-    `<a href="${s.url}" class="fc-social" target="_blank" rel="noopener"><i class="${s.icon}"></i></a>`
+function createSocialsHTML(player) {
+  return player.socials.map(s =>
+    `<a href="${s.url}" class="fc-social" target="_blank" rel="noopener" title="${s.type}">
+       <i class="${s.icon}"></i>
+     </a>`
   ).join('');
+}
 
-  // History table
-  const tbody = document.getElementById('fc-history-body');
-  tbody.innerHTML = p.history.map(h => {
-    const placeClass = h.place === 1 ? 'p1' : h.place === 2 ? 'p2' : h.place === 3 ? 'p3' : 'other';
-    return `<tr>
-      <td class="fc-trn-name">${h.name}</td>
-      <td class="fc-trn-date">${h.date}</td>
-      <td><span class="fc-place ${placeClass}">${h.place}</span></td>
+function createHistoryTableHTML(player) {
+  return player.recent_games.map(g => {
+    const placeClass = g.place === 1 ? 'p1' : g.place === 2 ? 'p2' : g.place === 3 ? 'p3' : 'other';
+    const resultClass = g.result === 'win' ? 'win' : 'loss';
+    return `<tr class="${resultClass}">
+      <td class="fc-trn-name">${g.name}</td>
+      <td class="fc-trn-date">${g.date}</td>
+      <td><span class="fc-place ${placeClass}">${g.place}</span></td>
     </tr>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   SHARE — Подсветка карточки (готовый кадр для сторис)
-   ═══════════════════════════════════════════════════════ */
-function shareCard() {
-  const card = document.getElementById('fighter-card');
-  card.classList.remove('flash');
-  // Force reflow so animation restarts
-  void card.offsetWidth;
-  card.classList.add('flash');
+// ════════════════════════════════════════════════════════════════
+// SHARE ФУНКЦИЯ
+// ════════════════════════════════════════════════════════════════
 
-  // Try native share if available
+function shareCard(nickname) {
+  const text = `🔥 ${nickname} — Лютый боец! 🔥 Проверь карточку на Лютых Пляжниках Сургут!`;
+
   if (navigator.share) {
     navigator.share({
-      title: `${PLAYER.nickname} — Лютые пляжники`,
-      text: `🏐 ${PLAYER.nickname} | Рейтинг: ${PLAYER.rating} | Побед: ${PLAYER.winrate}% | Турниров: ${PLAYER.tournaments} | 🥇${PLAYER.medals.gold} 🥈${PLAYER.medals.silver} 🥉${PLAYER.medals.bronze}`,
+      title: `${nickname} — Fighter Card`,
+      text: text,
       url: window.location.href
     }).catch(() => {});
+  } else {
+    alert(text);
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   BACKGROUND PARTICLES
-   ═══════════════════════════════════════════════════════ */
-function createParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.classList.add('bg-particle');
-    p.style.left = Math.random() * 100 + '%';
-    p.style.animationDuration = (6 + Math.random() * 10) + 's';
-    p.style.animationDelay = (Math.random() * 8) + 's';
-    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
-    container.appendChild(p);
-  }
-}
+// ════════════════════════════════════════════════════════════════
+// ИНИЦИАЛИЗАЦИЯ
+// ════════════════════════════════════════════════════════════════
 
-/* ═══════════════════════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  renderCard(PLAYER);
-  createParticles();
+  const container = document.getElementById('cards-container');
+
+  PLAYERS_DATABASE.forEach(player => {
+    const cardHTML = createFighterCard(player);
+    container.insertAdjacentHTML('beforeend', cardHTML);
+  });
 });
 </script>
 </body>
