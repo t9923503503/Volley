@@ -1457,9 +1457,9 @@ button.player-tap:active{opacity:.6}
 
 .trn-mgr-list{max-height:360px;overflow-y:auto}
 .trn-mgr-row{display:flex;align-items:center;gap:8px;padding:10px 12px;
-  border-bottom:1px solid #1e1e30;transition:background .12s}
+  border-bottom:1px solid #1e1e30;transition:background .12s;flex-wrap:wrap}
 .trn-mgr-row:last-child{border-bottom:none}
-.trn-mgr-row:hover{background:rgba(255,255,255,.02)}
+.trn-mgr-row:hover,.trn-mgr-row:active{background:rgba(255,255,255,.03)}
 .trn-mgr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .trn-mgr-dot.open{background:#4caf50}
 .trn-mgr-dot.full{background:var(--red)}
@@ -1474,17 +1474,17 @@ button.player-tap:active{opacity:.6}
 .trn-mgr-badge.hard{background:rgba(233,69,96,.15);color:var(--red)}
 .trn-mgr-badge.medium{background:rgba(255,215,0,.12);color:var(--gold)}
 .trn-mgr-badge.easy{background:rgba(77,168,218,.12);color:#4DA8DA}
-.trn-mgr-actions{display:flex;gap:4px;flex-shrink:0}
-.trn-mgr-edit{width:26px;height:26px;border-radius:6px;border:1px solid #2a2a44;
-  background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;cursor:pointer;
+.trn-mgr-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.trn-mgr-edit{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,215,0,.35);
+  background:rgba(255,215,0,.1);color:var(--gold);font-size:14px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .12s;
   touch-action:manipulation}
-.trn-mgr-edit:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
-.trn-mgr-del{width:26px;height:26px;border-radius:6px;border:none;
-  background:transparent;color:rgba(233,69,96,.4);font-size:12px;cursor:pointer;
+.trn-mgr-edit:hover,.trn-mgr-edit:active{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.2)}
+.trn-mgr-del{width:32px;height:32px;border-radius:8px;border:1px solid rgba(233,69,96,.3);
+  background:rgba(233,69,96,.08);color:var(--red);font-size:13px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .12s;
   touch-action:manipulation}
-.trn-mgr-del:hover{background:rgba(233,69,96,.12);color:var(--red)}
+.trn-mgr-del:hover,.trn-mgr-del:active{background:rgba(233,69,96,.2);color:var(--red)}
 .trn-mgr-empty{text-align:center;padding:22px;color:var(--muted);font-size:12px}
 /* ── Tournament Manager additions ── */
 .trn-form-inp--error{border-color:var(--red)!important}
@@ -1492,17 +1492,17 @@ button.player-tap:active{opacity:.6}
 .trn-mgr-dot.cancelled{background:#333}
 .trn-mgr-stats{font-size:10px;color:var(--muted);margin-top:2px}
 .trn-mgr-hdr-actions{display:flex;gap:5px;align-items:center}
-.trn-mgr-plr{width:26px;height:26px;border-radius:6px;border:1px solid #2a2a44;
-  background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;
-  font-size:13px;display:flex;align-items:center;justify-content:center;
+.trn-mgr-plr{width:32px;height:32px;border-radius:8px;border:1px solid rgba(77,168,218,.35);
+  background:rgba(77,168,218,.1);color:var(--blue);cursor:pointer;
+  font-size:14px;display:flex;align-items:center;justify-content:center;
   transition:all .15s;touch-action:manipulation}
-.trn-mgr-plr:hover{border-color:var(--blue);color:var(--blue);background:rgba(77,168,218,.08)}
-.trn-mgr-clone,.trn-mgr-finish{width:26px;height:26px;border-radius:6px;
-  border:1px solid #2a2a44;background:rgba(255,255,255,.04);color:var(--muted);
-  font-size:12px;cursor:pointer;display:flex;align-items:center;
+.trn-mgr-plr:hover,.trn-mgr-plr:active{border-color:var(--blue);color:var(--blue);background:rgba(77,168,218,.2)}
+.trn-mgr-clone,.trn-mgr-finish{width:32px;height:32px;border-radius:8px;
+  border:1px solid rgba(77,168,218,.3);background:rgba(77,168,218,.08);color:#4DA8DA;
+  font-size:14px;cursor:pointer;display:flex;align-items:center;
   justify-content:center;transition:all .12s;touch-action:manipulation}
-.trn-mgr-clone:hover{border-color:#4DA8DA;color:#4DA8DA;background:rgba(77,168,218,.08)}
-.trn-mgr-finish:hover{border-color:#4caf50;color:#4caf50;background:rgba(76,175,80,.08)}
+.trn-mgr-clone:hover,.trn-mgr-clone:active{border-color:#4DA8DA;color:#4DA8DA;background:rgba(77,168,218,.2)}
+.trn-mgr-finish:hover,.trn-mgr-finish:active{border-color:#4caf50;color:#4caf50;background:rgba(76,175,80,.2)}
 .trn-mgr-export,.trn-mgr-import{padding:5px 10px;border-radius:8px;cursor:pointer;
   font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;
   letter-spacing:.3px;text-transform:uppercase;transition:all .15s;
@@ -2486,8 +2486,10 @@ function migrateProjectData() {
 // ── Backward-compat shims (home screen render uses these) ─────
 /** Non-finished tournaments with computed `registered` for old home render */
 function loadUpcomingTournaments() {
+  const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
   return getTournaments()
     .filter(t => t.status !== 'finished' && t.status !== 'cancelled')
+    .filter(t => !t.date || t.date >= today) // скрываем прошедшие с главной
     .map(t => ({ ...t, registered: t.participants.length }));
 }
 /** Finished tournaments in the legacy manual-archive shape */
@@ -2603,7 +2605,11 @@ function submitTournamentForm() {
       waitlist:     [],
       winners:      [],
     });
-    showToast('Турнир добавлен', 'success');
+    // Автоматически устанавливаем как текущий турнир
+    tournamentMeta.name = formData.name;
+    tournamentMeta.date = formData.date;
+    saveState();
+    showToast('Турнир добавлен и установлен как текущий', 'success');
   }
 
   saveTournaments(arr);
@@ -4153,15 +4159,9 @@ function autoDistribute() {
 // ════════════════════════════════════════════════════════════
 // 9. ROSTER ACTIONS
 // ════════════════════════════════════════════════════════════
-function saveTournamentMeta() {
-  const nameInp = document.getElementById('inp-trn-name');
-  const dateInp = document.getElementById('inp-trn-date');
-  if (nameInp) tournamentMeta.name = nameInp.value.trim();
-  if (dateInp) tournamentMeta.date = dateInp.value;
-  saveState();
-  const label = tournamentMeta.name || 'Без названия';
-  showToast(`🏆 Турнир «${label}» сохранён`);
-}
+// saveTournamentMeta() удалена — теперь tournamentMeta
+// устанавливается автоматически при добавлении турнира
+// через «ТУРНИРЫ РАСПИСАНИЕ» (submitTournamentForm)
 
 function applyRoster() {
   document.querySelectorAll('.rc-inp').forEach(inp => {
@@ -4273,29 +4273,10 @@ function clearHistory() {
 function renderRoster() {
   const today = new Date().toISOString().split('T')[0];
 
-  // ── 1. Новый турнир ──────────────────────────────────────────
   let html = `<div class="page-h">✏️ РОСТЕР</div>
   <div class="page-sub">Настройки турнира и имена игроков</div>
 
-  <div class="trn-meta-card">
-    <div class="trn-meta-title">🏆 Новый турнир</div>
-    <div class="trn-field">
-      <label>Название турнира</label>
-      <input class="trn-input" type="text" id="inp-trn-name"
-        value="${esc(tournamentMeta.name)}"
-        placeholder="Например: Лютые Пляжники #12"
-        oninput="tournamentMeta.name=this.value;saveState()">
-    </div>
-    <div class="trn-field">
-      <label>Дата</label>
-      <input class="trn-input" type="date" id="inp-trn-date"
-        value="${tournamentMeta.date || today}"
-        oninput="tournamentMeta.date=this.value;saveState()">
-    </div>
-    <button class="btn-create-trn" onclick="saveTournamentMeta()">✅ СОЗДАТЬ</button>
-  </div>
-
-  <!-- 2. Формат турнира -->
+  <!-- Формат турнира -->
   <div class="settings-card">
     <div class="sc-title">⚙️ Формат турнира</div>
     <div class="sc-row">
