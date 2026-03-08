@@ -4145,7 +4145,7 @@ function _rosterTrnHtml() {
         <div>
           <label class="trn-form-label">Формат</label>
           <select class="trn-form-sel" id="trnf-format">
-            ${['King of the Court','Round Robin','Олимпийская система','Другой'].map(f =>
+            ${['King of the Court','Царь горы','Случайные связки','Double Trouble','Round Robin','Олимпийская система','Другой'].map(f =>
               `<option value="${f}" ${(editTrn?.format || 'King of the Court') === f ? 'selected' : ''}>${f}</option>`
             ).join('')}
           </select>
