@@ -19,9 +19,91 @@
   --dark:#0d0d1a;--dark2:#13131f;--dark3:#1a1a2e;--dark4:#16213e;
   --card:#1e1e32;--text:#e8e8f0;--muted:#6b6b8a;
   --plus:#22c55e;--minus:#ef4444;
-  --nav-base-h:96px;
+  --nav-base-h:78px;
   --nav-h:calc(var(--nav-base-h) + env(safe-area-inset-top,0px));
 }
+
+/* ── LIGHT THEME — светлая тема ───────────────────────── */
+/* Активируется классом .light на <body>                    */
+body.light{
+  --gold:#C8960C;--gold2:#B07A00;
+  --red:#D32F2F;--blue:#1976D2;--green:#388E3C;--purple:#7B1FA2;
+  --dark:#F5F5F5;--dark2:#FFFFFF;--dark3:#E8E8E8;--dark4:#EEEEEE;
+  --card:#FFFFFF;--text:#1a1a1a;--muted:#666666;
+  --plus:#2E7D32;--minus:#C62828;
+  --border:#D0D0D0;
+  background:#F5F5F5!important;color:#1a1a1a!important;
+}
+body.light #nav{background:#FFFFFF;border-bottom:1px solid #D0D0D0}
+body.light .nav-pill{background:#F0F0F0;border-color:#CCC}
+body.light .nav-pill.active{border-color:var(--pill-c,#C8960C);box-shadow:0 0 8px rgba(200,150,12,.25)}
+body.light .nav-pill .pill-main{color:#555}
+body.light .nav-pill.active .pill-main{color:#1a1a1a}
+body.light .nav-pill.active .pill-sub{color:var(--pill-c,#C8960C)}
+body.light .brand-main{color:#C8960C}
+body.light .brand-sub{color:#888}
+body.light .settings-card,body.light .sb-card,
+body.light .gsh-card,body.light .trn-meta-card{
+  background:#fff;border-color:#D0D0D0}
+body.light .nb{color:#666}
+body.light .nb:hover{color:#1a1a1a}
+body.light .nb.active{color:#C8960C;border-bottom-color:#C8960C}
+body.light .seg-btn{background:#E8E8E8;border-color:#CCC;color:#666}
+body.light .seg-btn.on{background:#C8960C;border-color:#C8960C;color:#fff}
+body.light .dd-menu{background:#fff;border-color:#D0D0D0}
+body.light .dd-item:hover,.dd-item:active{background:#F0F0F0}
+body.light .sc-input,.light select,.light textarea{background:#F0F0F0;border-color:#CCC;color:#1a1a1a}
+body.light .btn-main{background:#C8960C;color:#fff}
+body.light .btn-sec{background:#E8E8E8;color:#1a1a1a;border-color:#CCC}
+body.light button.player-tap{background:#fff!important;border-color:#CCC!important;color:#1a1a1a!important}
+body.light button.player-tap:active{background:#C8960C!important;color:#fff!important}
+body.light .level-block{border-color:#D0D0D0}
+body.light .round-nav-inner{border-top-color:#D0D0D0}
+body.light .pbn{background:#E8E8E8;color:#666;border-color:#CCC}
+body.light input,body.light select,body.light textarea{background:#F0F0F0;border-color:#CCC;color:#1a1a1a}
+body.light .hero-section{background:linear-gradient(135deg,#FAFAFA 0%,#F0E6C8 100%)}
+body.light .trn-card{background:#fff;border-color:#D0D0D0}
+body.light .nav-pill-sep{background:#CCC}
+body.light .pill-dot{background:#CCC}
+body.light .nav-pill.active .pill-dot{background:var(--pill-c,#C8960C)}
+body.light .home-title{color:#1a1a1a;text-shadow:0 4px 24px rgba(200,150,12,.15);-webkit-text-stroke:1px rgba(0,0,0,.06)}
+body.light .home-title span{color:#B07A00}
+body.light .home-badge{background:rgba(200,150,12,.1);border-color:rgba(200,150,12,.3);color:#B07A00}
+body.light .home-tabs{background:rgba(0,0,0,.03);border-color:#D0D0D0}
+body.light .home-tab-btn{color:#666}
+body.light .home-tab-btn.active{background:#C8960C;color:#fff}
+body.light .trn-card{border-color:#D0D0D0;background:#fff}
+body.light .trn-card:hover{border-color:rgba(200,150,12,.5);box-shadow:0 6px 24px rgba(200,150,12,.12)}
+body.light .trn-name{color:#1a1a1a}
+body.light .trn-fmt{color:#B07A00}
+body.light .trn-meta{color:#666}
+body.light .trn-prize{color:#B07A00}
+body.light .trn-st.full{border-color:#CCC;background:rgba(0,0,0,.03);color:#666}
+body.light .trn-prog-bar{background:#E0E0E0}
+body.light .td-btn-reg{background:#C8960C;color:#fff}
+body.light .td-btn-reg:hover{background:#B07A00}
+body.light .td-btn-reg.wait{background:#F0F0F0;border-color:#CCC;color:#666}
+body.light .home-banner{background:linear-gradient(135deg,#fff 0%,#FFF8E8 100%);border-color:#D0D0D0}
+body.light .home-banner-title{color:#1a1a1a}
+body.light .home-banner-sub{color:#666}
+body.light .section-title{color:#1a1a1a}
+body.light .section-title span{color:#B07A00}
+body.light .btn-reg{background:#C8960C;color:#fff}
+body.light .plr-banner{background:linear-gradient(135deg,#FFF8E8 0%,#FFF3D6 50%,#FFFBE8 100%);border-color:rgba(200,150,12,.3)}
+body.light .plr-banner:hover{border-color:rgba(200,150,12,.6);box-shadow:0 8px 32px rgba(200,150,12,.12)}
+body.light .plr-banner::before{background:linear-gradient(180deg,transparent,rgba(200,150,12,.08),transparent)}
+body.light .plr-banner-title{color:#1a1a1a}
+body.light .plr-banner-title span{color:#B07A00}
+body.light .plr-banner-sub{color:#666}
+body.light .plr-banner-pill{background:rgba(200,150,12,.1);border-color:rgba(200,150,12,.3);color:#B07A00}
+body.light .plr-banner-arrow{background:rgba(200,150,12,.1);border-color:rgba(200,150,12,.25);color:#B07A00}
+body.light .plr-banner:hover .plr-banner-arrow{background:#C8960C;color:#fff;border-color:#C8960C}
+body.light .plr-av{border-color:#fff;background:linear-gradient(135deg,#E8E0D0,#D8D0C0)!important;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+body.light .trn-prog-bar{background:#E0E0E0}
+body.light .btn-reg{background:#C8960C;color:#fff;border-color:#C8960C}
+body.light ::placeholder{color:#999}
+body.light ::-webkit-scrollbar-thumb{background:#CCC}
+body.light ::-webkit-scrollbar-track{background:#F0F0F0}
 
 /* ── SOLAR THEME — для пляжа при ярком солнце ─────────── */
 /* Активируется классом .solar на <body>                   */
@@ -97,19 +179,19 @@ body{
 /* ── Верхняя строка: лого + утилиты ──────────────────────── */
 .nav-top{
   display:flex;align-items:center;
-  padding:0 10px;height:38px;
+  padding:0 6px;height:32px;
   border-bottom:1px solid #1e1e34;
-  gap:4px;
+  gap:2px;
 }
 .nav-logo-container{flex-shrink:0;margin-right:4px;padding-left:4px;display:flex;flex-direction:column;justify-content:center;line-height:1;white-space:nowrap}
-.brand-main{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
-.brand-sub{font-size:.55rem;color:rgba(255,255,255,.7);font-weight:400;letter-spacing:.3px;margin-top:1px}
-@media(max-width:380px){.brand-main{font-size:.95rem}}
+.brand-main{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:.85rem;color:var(--gold);text-transform:uppercase;letter-spacing:.3px}
+.brand-sub{font-size:.5rem;color:rgba(255,255,255,.7);font-weight:400;letter-spacing:.2px;margin-top:1px}
+@media(max-width:380px){.brand-main{font-size:.75rem}}
 .nav-spacer{flex:1}
 /* ── Нижние 2 ряда пиллов ─────────────────────────────────── */
 .nav-pills-row{
   display:flex;align-items:center;
-  padding:6px 8px;gap:5px;
+  padding:4px 6px;gap:4px;
   overflow-x:auto;overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
@@ -117,8 +199,8 @@ body{
 .nav-pills-row::-webkit-scrollbar{display:none}
 .nav-pill{
   font-family:'Barlow Condensed',sans-serif;
-  padding:5px 10px 4px;min-width:52px;
-  border-radius:10px;
+  padding:3px 8px 3px;min-width:42px;
+  border-radius:8px;
   background:var(--dark3);
   border:2px solid #2a2a44;
   color:var(--muted);
@@ -137,12 +219,12 @@ body{
   box-shadow:0 0 10px rgba(255,200,50,.15);
 }
 .nav-pill .pill-main{
-  font-size:16px;font-weight:900;letter-spacing:.5px;
+  font-size:13px;font-weight:900;letter-spacing:.3px;
   line-height:1;color:var(--muted);
   transition:color .18s;
 }
 .nav-pill .pill-sub{
-  font-size:8px;font-weight:700;letter-spacing:1px;
+  font-size:7px;font-weight:700;letter-spacing:.8px;
   line-height:1;color:var(--muted);opacity:.6;
   transition:color .18s;
 }
@@ -158,8 +240,8 @@ body{
   background:var(--pill-c,var(--gold));
   box-shadow:0 0 4px var(--pill-c,var(--gold));
 }
-.nav-pill.pill-div-btn{min-width:52px;}
-.nav-pill.pill-div-btn .pill-main{font-size:16px;letter-spacing:.5px;}
+.nav-pill.pill-div-btn{min-width:42px;}
+.nav-pill.pill-div-btn .pill-main{font-size:13px;letter-spacing:.3px;}
 .nav-pill.pill-div-locked{opacity:.45;filter:grayscale(1);cursor:not-allowed!important}
 .nav-pill.pill-div-locked .pill-main::after{content:' 🔒';font-size:10px}
 .nav-pill.pill-div-locked.active{border-color:#3a3a5e;box-shadow:none}
@@ -170,16 +252,16 @@ body{
 /* legacy nb class — kept for icon-only utility buttons in nav-top */
 .nb{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:.5px;
-  padding:0 8px;height:100%;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+  padding:0 5px;height:100%;
   color:var(--muted);background:transparent;border:none;
-  border-bottom:3px solid transparent;
+  border-bottom:2px solid transparent;
   cursor:pointer;white-space:nowrap;
-  display:flex;align-items:center;gap:4px;
+  display:flex;align-items:center;gap:3px;
   transition:color .18s,border-color .18s;
   flex-shrink:0;
 }
-.nb.nb-icon{font-size:20px;padding:0 6px;letter-spacing:0;}
+.nb.nb-icon{font-size:16px;padding:0 4px;letter-spacing:0;}
 .nb:hover{color:var(--text)}
 .nb.active{color:var(--gold);border-bottom-color:var(--gold)}
 .nb-arrow{font-size:9px;opacity:.55;transition:transform .15s}
@@ -829,6 +911,8 @@ body{
   text-align:center;padding:32px 16px;color:var(--muted);font-size:14px;
   background:var(--card);border-radius:12px;border:1px dashed #2a2a40;
 }
+.svod-name-link{cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,255,255,.2);text-underline-offset:2px}
+.svod-name-link:hover{text-decoration-color:var(--gold)}
 
 /* ── СТАТИСТИКА ──────────────────────────────────────────── */
 .stats-grid{display:flex;flex-direction:column;gap:12px;padding-bottom:32px}
@@ -1018,8 +1102,10 @@ body{
 .pcard-achv.purple{background:rgba(199,125,255,.08);border-color:rgba(199,125,255,.25);color:#C77DFF}
 /* ── Tournament history ── */
 .pcard-trn-list{padding:0 14px}
-.pcard-trn-row{display:flex;align-items:center;gap:8px;padding:9px 0;
-  border-bottom:1px solid rgba(255,255,255,.04)}
+.pcard-trn-row{display:flex;align-items:center;gap:8px;padding:9px 6px;
+  border-bottom:1px solid rgba(255,255,255,.04);border-radius:8px;
+  transition:background .15s}
+.pcard-trn-row:hover{background:rgba(255,215,0,.06)}
 .pcard-trn-row:last-child{border-bottom:none}
 .pcard-trn-medal{font-size:18px;width:24px;text-align:center;flex-shrink:0}
 .pcard-trn-info{flex:1;min-width:0}
@@ -1249,8 +1335,11 @@ button.player-tap:active{opacity:.6}
 .home-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;
   border-radius:99px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);
   color:var(--gold);font-size:12px;font-weight:600;margin-bottom:14px}
-.home-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,11vw,76px);
-  line-height:.95;letter-spacing:2px;color:#fff;margin-bottom:10px}
+.home-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,12vw,92px);
+  line-height:.88;letter-spacing:3px;color:#fff;margin-bottom:10px;
+  text-transform:uppercase;word-break:break-word;
+  text-shadow:0 4px 24px rgba(255,215,0,.25),0 2px 0 rgba(0,0,0,.35);
+  -webkit-text-stroke:1px rgba(255,215,0,.15)}
 .home-title span{color:var(--gold)}
 .home-subtitle{color:var(--muted);font-size:13px;line-height:1.55;
   max-width:300px;margin:0 auto 20px}
@@ -1795,7 +1884,7 @@ button.player-tap:active{opacity:.6}
 .pt-search-inp:focus{border-color:rgba(255,215,0,.4)}
 .pt-search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);
   font-size:14px;pointer-events:none}
-.pt-search-results{display:flex;flex-direction:column;gap:3px;max-height:160px;
+.pt-search-results{display:flex;flex-direction:column;gap:3px;max-height:280px;
   overflow-y:auto;border:1px solid #2a2a44;border-radius:9px;
   background:#0f0f20;margin-top:4px}
 .pt-sr-item{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;
@@ -1837,6 +1926,28 @@ button.player-tap:active{opacity:.6}
 .pt-cap-fill{height:100%;border-radius:3px;transition:width .3s;
   background:linear-gradient(90deg,var(--green),var(--gold))}
 .pt-cap-fill.full{background:var(--red)}
+.pt-footer{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #2a2a44;
+  flex-shrink:0;flex-wrap:wrap}
+.pt-btn-export,.pt-btn-import,.pt-btn-close{flex:1;min-width:100px;padding:9px 12px;
+  border-radius:8px;border:1px solid #2a2a44;background:rgba(255,255,255,.05);
+  color:#fff;font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s;touch-action:manipulation}
+.pt-btn-export:hover{background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.25)}
+.pt-btn-import:hover{background:rgba(76,175,80,.12);border-color:rgba(76,175,80,.25)}
+.pt-btn-close:hover{background:rgba(233,69,96,.12);border-color:rgba(233,69,96,.25)}
+
+/* ══ Roster FAB (floating action button) ════════════════════ */
+.roster-fab{
+  position:fixed;bottom:16px;left:16px;z-index:190;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--dark3);border:1px solid #3a3a5e;
+  color:var(--muted);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:.5;
+  transition:opacity .2s,transform .2s,box-shadow .2s;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+.roster-fab:hover,.roster-fab:active{opacity:1;transform:scale(1.1);box-shadow:0 4px 16px rgba(0,0,0,.6)}
 
 /* ══ Tournament Details Modal ═══════════════════════════════ */
 .td-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1050;
@@ -2643,16 +2754,30 @@ function loadUpcomingTournaments() {
 }
 /** Finished tournaments in the legacy manual-archive shape */
 function loadManualTournaments() {
+  const pMap = new Map(); loadPlayerDB().forEach(p => pMap.set(p.id, p));
   return getTournaments()
     .filter(t => t.status === 'finished')
-    .map(t => ({
-      id: t.id, name: t.name, date: t.date,
-      format: t.format, division: t.division,
-      source: t.source || 'manual',
-      playersCount: t.participants.length,
-      winner:       t.winners?.[0] || '',
-      playerResults: [],
-    }));
+    .map(t => {
+      // Resolve winner name from structured winners array
+      let winnerName = '';
+      const w0 = t.winners?.[0];
+      if (typeof w0 === 'string') winnerName = w0;
+      else if (w0?.playerIds?.[0]) winnerName = pMap.get(w0.playerIds[0])?.name || '';
+      // Build playerResults for medal display
+      const pResults = (t.winners || [])
+        .filter(w => typeof w === 'object' && w.playerIds?.length)
+        .flatMap(w => w.playerIds.map(pid => ({
+          name: pMap.get(pid)?.name || '?', pts: w.points, place: w.place
+        })));
+      return {
+        id: t.id, name: t.name, date: t.date,
+        format: t.format, division: t.division,
+        source: t.source || 'manual',
+        playersCount: t.participants?.length || 0,
+        winner: winnerName,
+        playerResults: pResults,
+      };
+    });
 }
 /** Replaces all finished entries in the store (called by home archive CRUD) */
 function saveManualTournaments(manualRecords) {
@@ -2816,6 +2941,8 @@ const PRESETS = {
 function openResultsForm(trnId) {
   const trn = getTournaments().find(t => t.id === trnId);
   if (!trn) { showToast('Турнир не найден', 'error'); return; }
+  // Auto-sync roster → playerDB if DB is empty
+  if (loadPlayerDB().length === 0) syncPlayersFromRoster();
 
   const hasResults = Array.isArray(trn.winners) && trn.winners.length > 0
                      && typeof trn.winners[0] === 'object';
@@ -3258,11 +3385,15 @@ function _renderPtModal() {
   const pct    = Math.min(parts.length / (trn.capacity||1) * 100, 100);
   const isFull = parts.length >= trn.capacity;
 
-  // Search results
+  // Search results — show all if empty, filter if query
   const q = _ptSearch.trim().toLowerCase();
-  const searchResults = q
-    ? db.filter(p => p.name.toLowerCase().includes(q)).slice(0, 10)
-    : [];
+  const filtered = q
+    ? db.filter(p => p.name.toLowerCase().includes(q))
+    : db;
+  // Sort alphabetically by name
+  const searchResults = filtered
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'))
+    .slice(0, q ? 10 : 20); // Show 10 if search, 20 if no query
 
   const gLabel = p => p.gender === 'M' ? 'М' : 'Ж';
 
@@ -3343,13 +3474,131 @@ function _renderPtModal() {
         </div>
         <div class="pt-list">${wlistHtml}</div>
       </div>` : ''}
+    </div>
+    <div class="pt-footer">
+      <button class="pt-btn-export" onclick="ptExportCSV('${escAttr(_ptTrnId)}')">📥 Экспорт CSV</button>
+      <button class="pt-btn-import" onclick="document.getElementById('pt-import-file').click()">📤 Импорт CSV</button>
+      <input type="file" id="pt-import-file" accept=".csv" style="display:none" onchange="ptImportCSV(event)">
+      <button class="pt-btn-close" onclick="closeParticipantsModal()">Закрыть</button>
     </div>`;
 
-  // Keep focus in search after re-render
-  if (_ptSearch) {
-    const inp = document.getElementById('pt-search-inp');
-    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  // Attach search event handlers
+  const inp = document.getElementById('pt-search-inp');
+  if (inp) {
+    // Remove old listeners
+    inp.removeEventListener('input', ptSearchHandler);
+    inp.removeEventListener('focus', ptFocusHandler);
+
+    // Add new listeners
+    inp.addEventListener('input', ptSearchHandler);
+    inp.addEventListener('focus', ptFocusHandler);
+
+    // Keep focus if was searching
+    if (_ptSearch) {
+      inp.focus();
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    }
   }
+}
+
+function ptFocusHandler(e) {
+  // Show all players when input is focused
+  if (!_ptSearch) {
+    _renderPtModal();
+  }
+}
+
+function ptSearchHandler(e) {
+  ptSetSearch(e.target?.value || '');
+}
+
+// ── CSV Export ────────────────────────────────────────────────
+function ptExportCSV(trnId) {
+  const arr = getTournaments();
+  const trn = arr.find(t => t.id === trnId);
+  if (!trn) { showToast('Турнир не найден', 'error'); return; }
+
+  const db = loadPlayerDB();
+  const parts = (trn.participants || []).map(id => db.find(p => p.id === id)).filter(Boolean);
+
+  // CSV header
+  const csv = ['Фамилия,Пол'];
+
+  // Rows
+  parts.forEach(p => {
+    const gender = p.gender === 'M' ? 'М' : 'Ж';
+    csv.push(`"${p.name}",${gender}`);
+  });
+
+  // Download
+  const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `ростер_${trn.name}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  showToast('CSV скачан', 'success');
+}
+
+// ── CSV Import ────────────────────────────────────────────────
+function ptImportCSV(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text = e.target?.result || '';
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) throw new Error('Файл пуст или некорректен');
+
+      const db = loadPlayerDB();
+      const arr = getTournaments();
+      const trn = arr.find(t => t.id === _ptTrnId);
+      if (!trn) throw new Error('Турнир не найден');
+
+      // Skip header (line 0), process data (lines 1+)
+      let added = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Parse CSV: "Фамилия",Пол or Фамилия,Пол
+        const match = line.match(/^"?([^",]+)"?,([МЖ])/);
+        if (!match) continue;
+
+        const name = match[1].trim();
+
+        // Find player in DB
+        const player = db.find(p => p.name.toLowerCase() === name.toLowerCase());
+        if (!player) {
+          console.warn(`Игрок "${name}" не найден в базе`);
+          continue;
+        }
+
+        // Add if not already there
+        if (!trn.participants.includes(player.id) && !trn.waitlist.includes(player.id)) {
+          if (trn.participants.length < trn.capacity) {
+            trn.participants.push(player.id);
+          } else {
+            trn.waitlist = trn.waitlist || [];
+            trn.waitlist.push(player.id);
+          }
+          added++;
+        }
+      }
+
+      saveTournaments(arr);
+      _renderPtModal();
+      showToast(`Импортировано ${added} игроков`, 'success');
+    } catch (err) {
+      console.error('CSV Import error:', err);
+      showToast('❌ Ошибка при импорте: ' + err.message, 'error');
+    }
+
+    // Reset file input
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function ptSetSearch(val) {
@@ -3603,11 +3852,11 @@ function _regModalHtml() {
   const emptyHtml = !_regFormMode ? `
     <div class="reg-empty">
       <div class="reg-empty-text">
-        ${_regResults.length === 0 && document.getElementById('reg-search')?.value?.length > 1
+        ${_regResults.length === 0 && _regLastQuery?.length > 1
           ? '😕 Игрок не найден в базе. Выберите действие:'
           : '🔍 Начните вводить фамилию для поиска'}
       </div>
-      ${_regResults.length === 0 && document.getElementById('reg-search')?.value?.length > 1 ? `
+      ${_regResults.length === 0 && _regLastQuery?.length > 1 ? `
       <div class="reg-new-options">
         <button class="reg-new-btn request" onclick="regShowForm('request')">
           📝 Отправить заявку в базу
@@ -3689,6 +3938,28 @@ function regOnSearch(query) {
   if (spin) spin.classList.add('active');
 
   _regDebounce = setTimeout(async () => {
+    // ── Helper: search localStorage ──
+    function _searchLocal(lq) {
+      const db = loadPlayerDB();
+      return db
+        .filter(p => p.name.toLowerCase().includes(lq))
+        .sort((a, b) => {
+          const aStart = a.name.toLowerCase().startsWith(lq) ? 1 : 0;
+          const bStart = b.name.toLowerCase().startsWith(lq) ? 1 : 0;
+          return bStart - aStart || (b.tournaments || 0) - (a.tournaments || 0);
+        })
+        .slice(0, 10)
+        .map(p => ({
+          id:    p.id,
+          name:  p.name,
+          gender: p.gender,
+          status: 'active',
+          tournaments_played: p.tournaments || 0,
+          total_pts: p.totalPts || 0
+        }));
+    }
+
+    const lq = q.toLowerCase();
     try {
       if (_regIsOnline()) {
         // ── Supabase search (RPC) ──
@@ -3696,31 +3967,18 @@ function regOnSearch(query) {
           p_query: q, p_gender: null, p_limit: 10
         });
         if (error) throw error;
-        _regResults = data || [];
+        // Merge: Supabase results + local-only players (by id dedup)
+        const remote = data || [];
+        const local  = _searchLocal(lq);
+        const seenIds = new Set(remote.map(r => r.id));
+        _regResults = [...remote, ...local.filter(l => !seenIds.has(l.id))].slice(0, 15);
       } else {
-        // ── Fallback: localStorage search ──
-        const db = loadPlayerDB();
-        const lq = q.toLowerCase();
-        _regResults = db
-          .filter(p => p.name.toLowerCase().includes(lq))
-          .sort((a, b) => {
-            const aStart = a.name.toLowerCase().startsWith(lq) ? 1 : 0;
-            const bStart = b.name.toLowerCase().startsWith(lq) ? 1 : 0;
-            return bStart - aStart || (b.tournaments || 0) - (a.tournaments || 0);
-          })
-          .slice(0, 10)
-          .map(p => ({
-            id:    p.id,
-            name:  p.name,
-            gender: p.gender,
-            status: 'active',
-            tournaments_played: p.tournaments || 0,
-            total_pts: p.totalPts || 0
-          }));
+        _regResults = _searchLocal(lq);
       }
     } catch (err) {
-      console.error('[REG] Search error:', err);
-      _regResults = [];
+      console.error('[REG] Search error, fallback to local:', err);
+      // ── Fallback to localStorage on any error ──
+      _regResults = _searchLocal(lq);
     }
     // Убрать спиннер и обновить
     const sp = document.getElementById('reg-spin');
@@ -3748,19 +4006,12 @@ async function regSelectPlayer(playerId, playerName) {
       if (error) throw error;
 
       if (data.ok) {
-        // Успех
-        _regStatusMsg = {
-          type: data.waitlist ? 'waitlist' : 'success',
-          text: data.message
-        };
-        if (el) {
-          el.classList.remove('registering');
-          el.classList.add('registered');
-          el.querySelector('.reg-result-action').textContent = '✅';
-          el.onclick = null;
-        }
         // Синхронизируем с localStorage
         _regSyncLocalParticipant(playerId, data.waitlist);
+        // Закрыть модалку и показать toast
+        closeRegistrationModal();
+        showToast(data.message || playerName + ' зарегистрирован(а)', data.waitlist ? 'warning' : 'success');
+        return;
       } else {
         // RPC вернул ошибку
         throw new Error(data.message || data.error);
@@ -3785,26 +4036,48 @@ async function regSelectPlayer(playerId, playerName) {
       }
       saveTournaments(arr);
 
-      _regStatusMsg = {
-        type: isWaitlist ? 'waitlist' : 'success',
-        text: isWaitlist
-          ? playerName + ' → лист ожидания'
-          : playerName + ' зарегистрирован(а) (' + trn.participants.length + '/' + trn.capacity + ')'
-      };
-      if (el) {
-        el.classList.remove('registering');
-        el.classList.add('registered');
-        el.querySelector('.reg-result-action').textContent = '✅';
-        el.onclick = null;
-      }
+      const msg = isWaitlist
+        ? playerName + ' → лист ожидания'
+        : playerName + ' зарегистрирован(а) (' + trn.participants.length + '/' + trn.capacity + ')';
+      closeRegistrationModal();
+      showToast(msg, isWaitlist ? 'warning' : 'success');
+      return;
     }
   } catch (err) {
-    console.error('[REG] Register error:', err);
-    _regStatusMsg = { type: 'error', text: '❌ ' + (err.message || 'Ошибка регистрации') };
-    // Revert optimistic UI
-    if (el) {
-      el.classList.remove('registering');
-      el.querySelector('.reg-result-action').textContent = '→';
+    console.error('[REG] Register error, fallback to local:', err);
+    // ── Fallback: try localStorage registration ──
+    try {
+      const arr = getTournaments();
+      const trn = arr.find(t => t.id === _regTrnId) || arr.find(t => t.id === _regTrnLocal?.id);
+      if (!trn) throw new Error('Турнир не найден');
+
+      if ((trn.participants||[]).includes(playerId) || (trn.waitlist||[]).includes(playerId)) {
+        throw new Error(playerName + ' уже зарегистрирован(а)');
+      }
+
+      const isWaitlist = (trn.participants||[]).length >= trn.capacity;
+      if (isWaitlist) {
+        trn.waitlist = trn.waitlist || [];
+        trn.waitlist.push(playerId);
+      } else {
+        trn.participants = trn.participants || [];
+        trn.participants.push(playerId);
+        if (trn.participants.length >= trn.capacity) trn.status = 'full';
+      }
+      saveTournaments(arr);
+
+      const msg2 = isWaitlist
+        ? playerName + ' → лист ожидания'
+        : playerName + ' зарегистрирован(а) (' + trn.participants.length + '/' + trn.capacity + ')';
+      closeRegistrationModal();
+      showToast(msg2, isWaitlist ? 'warning' : 'success');
+      return;
+    } catch (localErr) {
+      _regStatusMsg = { type: 'error', text: '❌ ' + (localErr.message || 'Ошибка регистрации') };
+      if (el) {
+        el.classList.remove('registering');
+        el.querySelector('.reg-result-action').textContent = '→';
+      }
     }
   }
 
@@ -4599,25 +4872,41 @@ function buildNav() {
   spacer.className = 'nav-spacer';
   top.appendChild(spacer);
 
-  // ── Solar toggle button ──
-  const solarBtn = document.createElement('button');
-  solarBtn.className = 'nb solar-toggle';
-  solarBtn.title = 'Тема: Пляж / Ночь';
-  solarBtn.textContent = localStorage.getItem('kotc3_solar') === '1' ? '🌙' : '☀️';
-  solarBtn.addEventListener('click', () => {
-    const on = document.body.classList.toggle('solar');
-    localStorage.setItem('kotc3_solar', on ? '1' : '0');
-    solarBtn.textContent = on ? '🌙' : '☀️';
-    document.querySelector('meta[name=theme-color]')?.setAttribute('content', on ? '#000000' : '#0d0d1a');
+  // ── Theme toggle button (dark → light → solar) ──
+  const THEMES = [
+    { name:'dark',  icon:'🌙', color:'#0d0d1a', title:'Тёмная тема' },
+    { name:'light', icon:'☀️', color:'#FFFFFF', title:'Светлая тема' },
+    { name:'solar', icon:'🔥', color:'#000000', title:'Пляж (солнце)' }
+  ];
+  const savedTheme = localStorage.getItem('kotc3_theme') || 'dark';
+  let themeIdx = Math.max(0, THEMES.findIndex(t => t.name === savedTheme));
+
+  const themeBtn = document.createElement('button');
+  themeBtn.className = 'nb solar-toggle';
+  themeBtn.title = THEMES[themeIdx].title;
+  themeBtn.textContent = THEMES[themeIdx].icon;
+
+  function applyTheme(idx) {
+    const t = THEMES[idx];
+    document.body.classList.remove('light','solar');
+    if (t.name !== 'dark') document.body.classList.add(t.name);
+    localStorage.setItem('kotc3_theme', t.name);
+    themeBtn.textContent = t.icon;
+    themeBtn.title = t.title;
+    document.querySelector('meta[name=theme-color]')?.setAttribute('content', t.color);
+  }
+
+  themeBtn.addEventListener('click', () => {
+    themeIdx = (themeIdx + 1) % THEMES.length;
+    applyTheme(themeIdx);
   });
-  top.appendChild(solarBtn);
+  top.appendChild(themeBtn);
 
   [
     { label:'🏠',   tab:'home'    },
     { label:'👤',   tab:'players' },
     { label:'СВОД', tab:'svod'    },
     { label:'СТАТ', tab:'stats'   },
-    { label:'⚙️',   tab:'roster'  },
   ].forEach(({label,tab}) => {
     const b = document.createElement('button');
     b.className = 'nb'; b.dataset.tab = tab;
@@ -4706,6 +4995,16 @@ function buildAll() {
   updateDivisions();
   attachListeners();
   attachSwipe();
+  // ── Roster FAB ──
+  if (!document.getElementById('roster-fab')) {
+    const fab = document.createElement('button');
+    fab.id = 'roster-fab';
+    fab.className = 'roster-fab';
+    fab.title = 'Ростер';
+    fab.textContent = '⚙️';
+    fab.addEventListener('click', () => switchTab('roster'));
+    document.body.appendChild(fab);
+  }
 }
 
 // Перерисовка с сохранением позиции прокрутки и фокуса
@@ -5459,10 +5758,10 @@ function showPlayerCard(name, gender) {
         const pts     = slot?.points ?? null;
         let dateStr   = t.date || '';
         try { dateStr = new Date(t.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'}); } catch(e){}
-        return `<div class="pcard-trn-row">
+        return `<div class="pcard-trn-row" onclick="openTrnDetails('${escAttr(t.id)}')" style="cursor:pointer">
           <span class="pcard-trn-medal">${medal}</span>
           <div class="pcard-trn-info">
-            <div class="pcard-trn-name">${esc(t.name)}</div>
+            <div class="pcard-trn-name">${esc(t.name)} <span style="font-size:10px;color:var(--muted)">→</span></div>
             <div class="pcard-trn-date">📅 ${dateStr}${t.location ? ' · ' + esc(t.location) : ''}</div>
           </div>
           ${pts !== null ? `<span class="pcard-trn-pts">${pts}</span>` : ''}
@@ -5629,7 +5928,7 @@ function renderSvod() {
       const isBubble = bubbleRanks.has(p.globalRank);
       t += `<tr${isBubble ? ' class="bubble-risk"' : ''}>
         <td class="td-rank"><span class="pb ${pbCls(p.globalRank)}">${p.globalRank}${p.globalTied?'<sup>=</sup>':''}</span></td>
-        <td><div class="td-name">${esc(p.name)}</div></td>
+        <td><div class="td-name svod-name-link" onclick="svodOpenCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${esc(p.name)}</div></td>
         <td class="td-court" style="color:${p.courtColor}">${p.courtName}</td>
         <td class="td-pts">${p.pts}</td>
         <td class="td-avg">${avg}</td>
@@ -5667,6 +5966,11 @@ function renderSvod() {
     html += `</div>`;
   });
   return html;
+}
+
+async function svodOpenCard(name, gender) {
+  if (!await showConfirm(`Открыть карточку: ${name}?`)) return;
+  showPlayerCard(name, gender);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5858,7 +6162,7 @@ function renderStats() {
             <th class="td-pts">Оч·2</th><th class="td-avg">avg/р</th>
             <th class="td-rank" style="text-align:right">Итог</th>
           </tr></thead><tbody>`;
-      [...men, ...women].forEach(p => {
+      [...men.map(x=>({...x,gender:'M'})), ...women.map(x=>({...x,gender:'W'}))].forEach(p => {
         const finAvg = p.rPlayed > 0 ? p.pts / p.rPlayed : null;
         const avg    = finAvg != null ? finAvg.toFixed(1) : '—';
         const s1Avg  = s1AvgMap[p.name];
@@ -5870,7 +6174,7 @@ function renderStats() {
         const gp = offset + p.place;
         out += `<tr>
           <td class="td-rank"><span class="pb ${pbCls(p.place)}">${p.place}</span></td>
-          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td><div class="td-name svod-name-link" onclick="svodOpenCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${esc(p.name)}</div></td>
           <td class="td-pts">${p.pts}</td>
           <td class="td-avg">${avg}${trend}</td>
           <td class="td-rank" style="text-align:right"><span class="pb ${pbCls(gp)}" style="font-size:10px;padding:2px 4px">${gp}</span></td>
@@ -5893,7 +6197,7 @@ function renderStats() {
         const fin2 = p.totalPts - p.pts;
         out += `<tr>
           <td class="td-rank"><span class="pb ${pbCls(i+1)}">${i+1}</span></td>
-          <td><div class="td-name">${esc(p.name)}</div></td>
+          <td><div class="td-name svod-name-link" onclick="svodOpenCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${esc(p.name)}</div></td>
           <td class="td-pts">${p.pts}</td>
           <td class="td-pts">${fin2 > 0 ? fin2 : '—'}</td>
           <td class="td-pts" style="color:var(--gold);font-weight:700">${p.totalPts}</td>
@@ -6334,7 +6638,7 @@ function renderHome() {
   function calRow(t) {
     const c = t.status==='open' ? 'g' : 'r';
     return `
-<div class="cal-row">
+<div class="cal-row" onclick="openTrnDetails('${escAttr(t.id)}')">
   <div class="cal-date-box">
     <div class="cal-dn">${t.dayNum}</div>
     <div class="cal-ds">${t.dayStr}</div>
@@ -8112,10 +8416,12 @@ function renderTimerBlock(ci, roundNavHtml='') {
 loadState();
 loadTimerState();  // восстанавливаем таймеры после перезагрузки
 sbLoadConfig();    // загружаем настройки Supabase
-// Solar-тема: восстанавливаем из localStorage
-if (localStorage.getItem('kotc3_solar') === '1') {
-  document.body.classList.add('solar');
-  document.querySelector('meta[name=theme-color]')?.setAttribute('content', '#000000');
+// Тема: восстанавливаем из localStorage (миграция со старого kotc3_solar)
+{
+  let theme = localStorage.getItem('kotc3_theme');
+  if (!theme && localStorage.getItem('kotc3_solar') === '1') { theme = 'solar'; localStorage.setItem('kotc3_theme','solar'); }
+  if (theme === 'light') { document.body.classList.add('light'); document.querySelector('meta[name=theme-color]')?.setAttribute('content','#FFFFFF'); }
+  else if (theme === 'solar') { document.body.classList.add('solar'); document.querySelector('meta[name=theme-color]')?.setAttribute('content','#000000'); }
 }
 gshLoadConfig();   // загружаем настройки Google Sheets
 // Дата по умолчанию — сегодня
