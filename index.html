@@ -1733,6 +1733,16 @@ button.player-tap:active{opacity:.6}
   transition:all .15s;touch-action:manipulation}
 .res-btn-save:hover:not(:disabled){background:#ffe833}
 .res-btn-save:disabled{background:#2a2a44;color:var(--muted);cursor:not-allowed;opacity:.7}
+/* ── Tournament type selector ── */
+.res-type-row{display:flex;align-items:center;gap:8px;padding:8px 0 4px}
+.res-type-lbl{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.res-type-btns{display:flex;gap:4px}
+.res-type-btn{padding:6px 12px;border-radius:7px;border:1px solid #2a2a44;
+  background:rgba(255,255,255,.04);color:var(--muted);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation}
+.res-type-btn.active{background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.45);color:var(--gold)}
+.res-type-btn:hover:not(.active){border-color:#4a4a6e;color:#fff}
 /* ── Points presets ── */
 .res-presets{display:flex;gap:5px;padding:0 0 4px}
 .res-preset-btn{flex:1;padding:8px 4px;border-radius:8px;border:1px solid #2a2a44;
@@ -2266,6 +2276,11 @@ button.player-tap:active{opacity:.6}
 .plr-item-pts{flex-shrink:0;text-align:right}
 .plr-item-pts-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);line-height:1}
 .plr-item-pts-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.plr-zone-badge{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:9px;letter-spacing:.5px;padding:2px 5px;border-radius:4px;align-self:center}
+.zone-hard  {background:rgba(233,69,96,.15);color:#e94560;border:1px solid rgba(233,69,96,.3)}
+.zone-medium{background:rgba(77,168,218,.15);color:#4DA8DA;border:1px solid rgba(77,168,218,.3)}
+.zone-lite  {background:rgba(106,191,105,.15);color:#6ABF69;border:1px solid rgba(106,191,105,.3)}
 .plr-del-btn{flex-shrink:0;width:28px;height:28px;border-radius:7px;border:1px solid #3a2a2a;
   background:rgba(233,69,96,.08);color:rgba(233,69,96,.5);cursor:pointer;font-size:13px;
   display:flex;align-items:center;justify-content:center;transition:all .18s;touch-action:manipulation}
@@ -2384,7 +2399,31 @@ let homeArchiveFormGender  = 'M';  // default gender for next player
 // ── PLAYER DATABASE STATE ───────────────────────────────────
 let playersGender = 'M';
 let playersSearch = '';
-let playersSort   = 'pts'; // 'pts' | 'wins' | 'trn'
+let playersSort   = 'pts'; // 'pts' | 'avg' | 'trn'
+
+// ── RATING SYSTEM — Professional Points ─────────────────────
+const POINTS_TABLE = [
+  100,90,82,76,70,65,60,56,52,48,  // 1-10  (HARD зона)
+  44,42,40,38,36,34,32,30,28,26,   // 11-20 (MEDIUM зона)
+  24,22,20,18,16,14,12,10,8,7,     // 21-30
+  6,5,4,3,2,2,1,1,1,1              // 31-40 (LITE зона)
+];
+function calculateRanking(place) {
+  if (place < 1 || place > POINTS_TABLE.length) return 1;
+  return POINTS_TABLE[place - 1];
+}
+function getPlayerZone(rank) {
+  if (rank <= 10) return 'hard';
+  if (rank <= 20) return 'medium';
+  return 'lite';
+}
+function divisionToType(division) {
+  if (!division) return 'M';
+  const d = division.toLowerCase();
+  if (d.includes('женск')) return 'W';
+  if (d.includes('микст') || d.includes('смешан')) return 'Mix';
+  return 'M';
+}
 
 function loadPlayerDB() {
   try { return JSON.parse(localStorage.getItem('kotc3_playerdb') || '[]'); } catch(e){ return []; }
@@ -2399,7 +2438,10 @@ function addPlayerToDB(name, gender) {
   if (db.find(p => p.name.toLowerCase() === name.toLowerCase() && p.gender === gender)) return false;
   db.push({ id: Date.now() + Math.random(), name, gender,
             addedAt: new Date().toISOString().split('T')[0],
-            tournaments: 0, totalPts: 0, lastSeen: '' });
+            tournaments: 0, totalPts: 0, wins: 0,
+            ratingM: 0, ratingW: 0, ratingMix: 0,
+            tournamentsM: 0, tournamentsW: 0, tournamentsMix: 0,
+            lastSeen: '' });
   savePlayerDB(db);
   return true;
 }
@@ -2960,6 +3002,7 @@ function openResultsForm(trnId) {
     trnId,
     newPlayerSlotIdx: null,
     preset: defaultPreset,
+    trnType: trn.ratingType || divisionToType(trn.division),
     slots: hasResults
       ? trn.winners.map(w => ({ ...w, playerIds: [...w.playerIds] }))
       : [
@@ -2991,6 +3034,18 @@ function openResultsForm(trnId) {
       </div>
       <div class="res-modal-body">
         ${partChip}
+        <!-- Tournament type selector for rating -->
+        <div class="res-type-row">
+          <span class="res-type-lbl">🏆 Тип турнира (рейтинг):</span>
+          <div class="res-type-btns" id="res-type-btns">
+            <button class="res-type-btn ${_resState.trnType==='M'?'active':''}"
+              onclick="resSetTrnType('M')">🏋️ М</button>
+            <button class="res-type-btn ${_resState.trnType==='W'?'active':''}"
+              onclick="resSetTrnType('W')">👩 Ж</button>
+            <button class="res-type-btn ${_resState.trnType==='Mix'?'active':''}"
+              onclick="resSetTrnType('Mix')">🤝 Микст</button>
+          </div>
+        </div>
         <!-- Points presets -->
         <div class="res-presets" id="res-presets">
           ${Object.entries(PRESETS).map(([key, p]) => `
@@ -3028,6 +3083,15 @@ function openResultsForm(trnId) {
 function closeResultsModal() {
   document.getElementById('results-modal')?.remove();
   _resState = null;
+}
+function resSetTrnType(type) {
+  if (!_resState) return;
+  _resState.trnType = type;
+  document.querySelectorAll('.res-type-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(
+      type === 'M' ? 'М' : type === 'W' ? 'Ж' : 'Микст'
+    ));
+  });
 }
 
 /** Mark finished without recording results */
@@ -3238,7 +3302,10 @@ function resCreateNewPlayer() {
     id:          'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
     name, gender,
     addedAt:     new Date().toISOString().split('T')[0],
-    tournaments: 0, totalPts: 0, wins: 0, lastSeen: '',
+    tournaments: 0, totalPts: 0, wins: 0,
+    ratingM: 0, ratingW: 0, ratingMix: 0,
+    tournamentsM: 0, tournamentsW: 0, tournamentsMix: 0,
+    lastSeen: '',
   };
   db.push(newPlayer);
   savePlayerDB(db);
@@ -3270,6 +3337,9 @@ function saveResults() {
 
   const isFirstSave = trn.status !== 'finished';
   const filled      = _resState.slots.filter(s => s.playerIds.length > 0);
+
+  // Save rating type chosen by user
+  trn.ratingType = _resState.trnType || divisionToType(trn.division);
 
   // Audit log — black box
   if (!Array.isArray(trn.history)) trn.history = [];
@@ -3309,32 +3379,69 @@ function _syncWinnerStats(slots, date) {
 
 /**
  * Recalculate ALL player stats from scratch by replaying every finished
- * tournament. Call this after bulk imports, data repairs, or results edits.
+ * tournament. Handles both kotc3_tournaments (new system) and kotc3_history
+ * (old King of Court system). Call after bulk imports, data repairs, or edits.
  * @param {boolean} silent — skip the success toast (used after saveResults)
  */
 function recalcAllPlayerStats(silent = false) {
   const db          = loadPlayerDB();
   const tournaments = getTournaments();
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('kotc3_history') || '[]'); } catch(e) {}
 
   // Reset counters — keep identity fields intact
-  db.forEach(p => { p.tournaments = 0; p.totalPts = 0; p.wins = 0; });
+  db.forEach(p => {
+    p.tournaments = 0; p.totalPts = 0; p.wins = 0;
+    p.ratingM = 0; p.ratingW = 0; p.ratingMix = 0;
+    p.tournamentsM = 0; p.tournamentsW = 0; p.tournamentsMix = 0;
+  });
 
+  // ── New system: kotc3_tournaments ────────────────────────
   tournaments
     .filter(t => t.status === 'finished' && Array.isArray(t.winners))
     .forEach(t => {
+      const tType = t.ratingType || divisionToType(t.division);
       t.winners.forEach(slot => {
-        // Guard: only process object-format winners
         if (typeof slot !== 'object' || !Array.isArray(slot.playerIds)) return;
+        const ratingPts = calculateRanking(slot.place);
         slot.playerIds.forEach(id => {
           const p = db.find(p => p.id === id);
           if (!p) return;
           p.tournaments = (p.tournaments || 0) + 1;
           p.totalPts    = (p.totalPts    || 0) + (Number(slot.points) || 0);
           p.wins        = (p.wins        || 0) + (slot.place === 1 ? 1 : 0);
+          if (tType === 'M')      { p.ratingM   = (p.ratingM   ||0)+ratingPts; p.tournamentsM++; }
+          else if (tType === 'W') { p.ratingW   = (p.ratingW   ||0)+ratingPts; p.tournamentsW++; }
+          else                    { p.ratingMix = (p.ratingMix ||0)+ratingPts; p.tournamentsMix++; }
           if (t.date > (p.lastSeen || '')) p.lastSeen = t.date;
         });
       });
     });
+
+  // ── Old system: kotc3_history — place by sorted position ─
+  // King of Court events mix M and W — credit each player in their own gender column
+  history.forEach(snap => {
+    if (!Array.isArray(snap.players) || !snap.players.length) return;
+    const genders = new Set(snap.players.map(p => p.gender).filter(Boolean));
+    const isMixed = genders.size > 1;
+    snap.players.forEach((sp, idx) => {
+      const p = db.find(d =>
+        d.name.toLowerCase() === (sp.name||'').toLowerCase() && d.gender === sp.gender
+      );
+      if (!p) return;
+      const ratingPts = calculateRanking(idx + 1); // sorted desc → idx 0 = 1st place
+      p.tournaments = (p.tournaments || 0) + 1;
+      p.totalPts    = (p.totalPts    || 0) + (sp.totalPts || 0);
+      p.wins        = (p.wins        || 0) + (idx === 0 ? 1 : 0);
+      // Mixed KotC: credit in player's own gender column so М/Ж tabs show data
+      const tType = isMixed ? sp.gender : (genders.has('W') ? 'W' : 'M');
+      if (tType === 'M')      { p.ratingM   = (p.ratingM   ||0)+ratingPts; p.tournamentsM++; }
+      else if (tType === 'W') { p.ratingW   = (p.ratingW   ||0)+ratingPts; p.tournamentsW++; }
+      else                    { p.ratingMix = (p.ratingMix ||0)+ratingPts; p.tournamentsMix++; }
+      if (snap.date > (p.lastSeen || '')) p.lastSeen = snap.date;
+    });
+  });
+
   savePlayerDB(db);
   if (!silent) showToast('Статистика пересчитана', 'success');
 }
@@ -5041,7 +5148,7 @@ async function switchTab(id) {
 
   // Re-render content on demand
   if (id === 'home')    screen.innerHTML = renderHome();
-  if (id === 'players') { playersSearch=''; screen.innerHTML = renderPlayers(); }
+  if (id === 'players') { playersSearch=''; recalcAllPlayerStats(true); screen.innerHTML = renderPlayers(); }
   if (id === 'svod')    screen.innerHTML = renderSvod();
   if (id === 'roster') {
     if (!rosterUnlocked) {
@@ -5706,11 +5813,12 @@ function showPlayerCard(name, gender) {
   const joinedStr = dbPlayer?.addedAt ? `📅 с ${dbPlayer.addedAt}` : '';
 
   // DB stats row (only if dbPlayer exists)
+  const totalRating = (dbPlayer?.ratingM||0) + (dbPlayer?.ratingW||0) + (dbPlayer?.ratingMix||0);
   const dbStatsHtml = dbPlayer ? `
     <div class="pcard-summary">
       <div class="pcard-stat-box">
-        <div class="pcard-stat-val">${dbPlayer.totalPts||0}</div>
-        <div class="pcard-stat-lbl">⚡ Очки</div>
+        <div class="pcard-stat-val">${totalRating}</div>
+        <div class="pcard-stat-lbl">🔥 Рейтинг</div>
       </div>
       <div class="pcard-stat-box">
         <div class="pcard-stat-val">${wins}</div>
@@ -6363,40 +6471,63 @@ function renderStats() {
 }
 
 // ════════════════════════════════════════════════════════════
-// PLAYER DATABASE SCREEN
+// PLAYER DATABASE SCREEN — Рейтинг лютых игроков
 // ════════════════════════════════════════════════════════════
 function renderPlayers() {
-  const db  = loadPlayerDB();
-  const all = db.filter(p => p.gender === playersGender);
-  const q   = playersSearch.trim().toLowerCase();
+  const db = loadPlayerDB();
+  const g  = playersGender; // 'M' | 'W' | 'Mix'
+  const q  = playersSearch.trim().toLowerCase();
 
-  const sortFn = playersSort === 'wins' ? (a,b) => (b.wins||0) - (a.wins||0)
-               : playersSort === 'trn'  ? (a,b) => (b.tournaments||0) - (a.tournaments||0)
-               :                          (a,b) => (b.totalPts||0)    - (a.totalPts||0);
+  // Rating/tournament field names for current tab
+  const ratingField = g === 'M' ? 'ratingM' : g === 'W' ? 'ratingW' : 'ratingMix';
+  const trnField    = g === 'M' ? 'tournamentsM' : g === 'W' ? 'tournamentsW' : 'tournamentsMix';
+
+  // Players for current tab
+  const all = g === 'Mix'
+    ? db.filter(p => (p.ratingMix||0) > 0 || (p.tournamentsMix||0) > 0)
+    : db.filter(p => p.gender === g);
+
+  const sortFn = playersSort === 'trn' ? (a,b) => (b[trnField]||0) - (a[trnField]||0)
+               : playersSort === 'avg' ? (a,b) => {
+                   const aa = (a[trnField]||0) > 0 ? (a[ratingField]||0)/(a[trnField]||0) : 0;
+                   const ba = (b[trnField]||0) > 0 ? (b[ratingField]||0)/(b[trnField]||0) : 0;
+                   return ba - aa;
+                 }
+               :                         (a,b) => (b[ratingField]||0) - (a[ratingField]||0);
 
   const allSorted = all.slice().sort(sortFn);
   const list = q ? allSorted.filter(p => p.name.toLowerCase().includes(q)) : allSorted;
 
   const totalM   = db.filter(p=>p.gender==='M').length;
   const totalW   = db.filter(p=>p.gender==='W').length;
-  const allTrn   = db.reduce((s,p)=>s+(p.tournaments||0),0);
+  const totalMix = db.filter(p=>(p.ratingMix||0)>0||(p.tournamentsMix||0)>0).length;
 
   function rankClass(i){ return i===0?'gold':i===1?'silver':i===2?'bronze':''; }
   function medal(i){ return i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1; }
 
-  // Podium (only when not searching, top-3 exists)
-  const top3 = !q && allSorted.length >= 2;
-  const sortValOf = p => playersSort === 'wins' ? (p.wins||0)
-                       : playersSort === 'trn'  ? (p.tournaments||0)
-                       :                          (p.totalPts||0);
-  const sortLbl = playersSort === 'wins' ? 'поб.' : playersSort === 'trn' ? 'турн.' : 'оч.';
+  const sortValOf = p => {
+    if (playersSort === 'trn') return p[trnField]||0;
+    if (playersSort === 'avg') return (p[trnField]||0) > 0
+      ? ((p[ratingField]||0)/(p[trnField]||0)).toFixed(1) : '—';
+    return p[ratingField]||0;
+  };
+  const sortLbl = playersSort === 'trn' ? 'турн.' : playersSort === 'avg' ? 'средн.' : 'рейт.';
 
+  // Zone styling by rank position
+  const zoneMeta = (rank) => {
+    if (rank <= 10) return { cls: 'zone-hard',   lbl: 'HARD',   color: '#e94560' };
+    if (rank <= 20) return { cls: 'zone-medium', lbl: 'MEDIUM', color: '#4DA8DA' };
+    return              { cls: 'zone-lite',   lbl: 'LITE',   color: '#6ABF69' };
+  };
+
+  // Podium (only when not searching, 2+ players)
+  const top3 = !q && allSorted.length >= 2;
   const podiumHtml = top3 ? (() => {
     const [p1, p2, p3] = allSorted;
-    const pod = (p, cls, medal) => p ? `
+    const pod = (p, cls, med) => p ? `
       <div class="plr-pod-item">
         <div class="plr-pod-col ${cls}">
-          <span class="plr-pod-medal">${medal}</span>
+          <span class="plr-pod-medal">${med}</span>
           <span class="plr-pod-name">${esc(p.name.split(' ')[0])}</span>
           <span class="plr-pod-pts ${cls}">${sortValOf(p)}</span>
           <span class="plr-pod-lbl">${sortLbl}</span>
@@ -6407,30 +6538,40 @@ function renderPlayers() {
 
   const itemsHtml = list.length === 0 ? `
     <div class="plr-empty">
-      <div class="plr-empty-icon">${q ? '🔍' : playersGender==='M'?'🏋️':'👩'}</div>
-      ${q ? `Нет совпадений для «${esc(q)}»` : 'Нет игроков. Добавляйте и редактируйте через ⚙️ Ростер.'}
-    </div>` : list.map((p, i) => `
-    <div class="plr-item" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">
+      <div class="plr-empty-icon">${q ? '🔍' : g==='M'?'🏋️':g==='W'?'👩':'🤝'}</div>
+      ${q ? `Нет совпадений для «${esc(q)}»`
+          : g==='Mix' ? 'Нет игроков с рейтингом микст. Проведите микст-турнир.'
+          : 'Нет игроков. Добавляйте и редактируйте через ⚙️ Ростер.'}
+    </div>` : list.map((p, i) => {
+      const zn     = zoneMeta(i + 1);
+      const rPts   = p[ratingField] || 0;
+      const tCount = p[trnField]    || 0;
+      const avg    = tCount > 0 ? (rPts / tCount).toFixed(1) : '—';
+      return `
+    <div class="plr-item" style="border-left:3px solid ${zn.color}"
+         onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">
       <div class="plr-item-rank ${rankClass(i)}">${medal(i)}</div>
       <div class="plr-item-info">
         <div class="plr-item-name">${esc(p.name)}</div>
         <div class="plr-item-meta">
-          <span>🏆 ${p.tournaments||0} турн.</span>
-          <span>⚡ ${p.totalPts||0} оч.</span>
-          <span>🎯 ${p.wins||0} поб.</span>
+          <span>🏆 ${tCount} турн.</span>
+          <span>⚡ ${rPts} рейт.</span>
+          <span>📊 ${avg} ср.</span>
         </div>
       </div>
       <div class="plr-item-pts">
         <div class="plr-item-pts-val">${sortValOf(p)}</div>
         <div class="plr-item-pts-lbl">${sortLbl}</div>
       </div>
-    </div>`).join('');
+      <div class="plr-zone-badge ${zn.cls}">${zn.lbl}</div>
+    </div>`;
+    }).join('');
 
   return `
 <div class="plr-wrap">
   <div class="plr-header">
-    <div class="plr-title">👤 РЕЙТИНГ ИГРОКОВ</div>
-    <div class="plr-sub">Управление составом, история участий, статистика</div>
+    <div class="plr-title">🔥 РЕЙТИНГ ЛЮТЫХ ИГРОКОВ</div>
+    <div class="plr-sub">Professional Points — места, зоны, статистика</div>
   </div>
 
   <!-- Stats chips -->
@@ -6444,25 +6585,26 @@ function renderPlayers() {
       <div class="plr-stat-chip-lbl">👩 Женщин</div>
     </div>
     <div class="plr-stat-chip">
+      <div class="plr-stat-chip-val">${totalMix}</div>
+      <div class="plr-stat-chip-lbl">🤝 Микст</div>
+    </div>
+    <div class="plr-stat-chip">
       <div class="plr-stat-chip-val">${db.length}</div>
       <div class="plr-stat-chip-lbl">Всего</div>
     </div>
-    <div class="plr-stat-chip">
-      <div class="plr-stat-chip-val">${allTrn}</div>
-      <div class="plr-stat-chip-lbl">Участий</div>
-    </div>
   </div>
 
-  <!-- Gender tabs -->
+  <!-- Tabs: М / Ж / Микст -->
   <div class="plr-tabs">
-    <button class="plr-tab ${playersGender==='M'?'active':''}" onclick="setPlayersGender('M')">🏋️ Мужчины (${totalM})</button>
-    <button class="plr-tab ${playersGender==='W'?'active':''}" onclick="setPlayersGender('W')">👩 Женщины (${totalW})</button>
+    <button class="plr-tab ${g==='M'?'active':''}" onclick="setPlayersGender('M')">🏋️ М (${totalM})</button>
+    <button class="plr-tab ${g==='W'?'active':''}" onclick="setPlayersGender('W')">👩 Ж (${totalW})</button>
+    <button class="plr-tab ${g==='Mix'?'active':''}" onclick="setPlayersGender('Mix')">🤝 Микст (${totalMix})</button>
   </div>
 
   <!-- Sort -->
   <div class="plr-sort-row">
-    <button class="plr-sort-btn ${playersSort==='pts'?'active':''}" onclick="setPlayersSort('pts')">⚡ Очки</button>
-    <button class="plr-sort-btn ${playersSort==='wins'?'active':''}" onclick="setPlayersSort('wins')">🎯 Победы</button>
+    <button class="plr-sort-btn ${playersSort==='pts'?'active':''}" onclick="setPlayersSort('pts')">⚡ Рейтинг</button>
+    <button class="plr-sort-btn ${playersSort==='avg'?'active':''}" onclick="setPlayersSort('avg')">📊 Средний</button>
     <button class="plr-sort-btn ${playersSort==='trn'?'active':''}" onclick="setPlayersSort('trn')">🏆 Турниры</button>
   </div>
 
