@@ -4561,7 +4561,7 @@ function _rosterTrnHtml() {
         <div>
           <label class="trn-form-label">Формат</label>
           <select class="trn-form-sel" id="trnf-format">
-            ${['King of the Court','Round Robin','Олимпийская система','Другой'].map(f =>
+            ${['King of the Court','Царь горы','Случайные связки','Double Trouble','Round Robin','Олимпийская система','Другой'].map(f =>
               `<option value="${f}" ${(editTrn?.format || 'King of the Court') === f ? 'selected' : ''}>${f}</option>`
             ).join('')}
           </select>
@@ -4581,11 +4581,6 @@ function _rosterTrnHtml() {
               `<option value="${v}" ${(editTrn?.level || 'medium') === v ? 'selected' : ''}>${l}</option>`
             ).join('')}
           </select>
-        </div>
-        <div>
-          <label class="trn-form-label">Призовой фонд</label>
-          <input class="trn-form-inp" id="trnf-prize" type="text" placeholder="₽50 000"
-            value="${esc(editTrn?.prize || '')}">
         </div>
         <div>
           <label class="trn-form-label">Мест (ёмкость)</label>
@@ -6903,7 +6898,7 @@ function renderHome() {
     <div class="trn-name">${t.name}</div>
     <div class="trn-meta">🕐 <span>${t.date}, ${t.time}</span></div>
     <div class="trn-meta">📍 <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${t.location}</span></div>
-    <div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>
+    ${t.prize ? `<div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>` : ''}
     <div class="trn-prog">
       <div class="trn-prog-hdr">
         <span class="trn-prog-lbl">Регистрация</span>
