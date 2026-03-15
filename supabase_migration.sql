@@ -334,13 +334,145 @@ END;
 $$;
 
 
--- ── 8. ROW LEVEL SECURITY ────────────────────────────────────
--- Базовые политики: чтение всем, запись через RPC (SECURITY DEFINER).
+-- ── 8. RPC: submit_player_request ────────────────────────────
+-- Безопасная подача заявки в очередь модерации.
+-- Повторная pending-заявка на тот же турнир не дублируется.
+-- ──────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION submit_player_request(
+  p_name          TEXT,
+  p_gender        TEXT,
+  p_phone         TEXT DEFAULT NULL,
+  p_tournament_id UUID DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_req player_requests%ROWTYPE;
+BEGIN
+  p_name := trim(coalesce(p_name, ''));
+  IF p_name = '' THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'NAME_REQUIRED', 'message', 'Укажите имя игрока');
+  END IF;
+
+  IF p_gender NOT IN ('M', 'W') THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'INVALID_GENDER', 'message', 'Пол должен быть M или W');
+  END IF;
+
+  SELECT * INTO v_req
+    FROM player_requests
+   WHERE lower(trim(name)) = lower(p_name)
+     AND gender = p_gender
+     AND status = 'pending'
+     AND (
+       (tournament_id IS NULL AND p_tournament_id IS NULL)
+       OR tournament_id = p_tournament_id
+     )
+   ORDER BY created_at DESC
+   LIMIT 1;
+
+  IF FOUND THEN
+    RETURN jsonb_build_object(
+      'ok', true,
+      'duplicate', true,
+      'request_id', v_req.id,
+      'message', p_name || ' уже ожидает проверки'
+    );
+  END IF;
+
+  INSERT INTO player_requests (name, gender, phone, tournament_id, status)
+  VALUES (p_name, p_gender, NULLIF(trim(coalesce(p_phone, '')), ''), p_tournament_id, 'pending')
+  RETURNING * INTO v_req;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'duplicate', false,
+    'request_id', v_req.id,
+    'message', p_name || ' добавлен(а) в очередь на проверку'
+  );
+END;
+$$;
+
+
+-- ── 9. RPC: create_temporary_player ──────────────────────────
+-- Создаёт временного игрока или возвращает существующий профиль.
+-- Используется публичным фронтендом вместо прямой INSERT в players.
+-- ──────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION create_temporary_player(
+  p_name   TEXT,
+  p_gender TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_player  players%ROWTYPE;
+  v_created BOOLEAN := false;
+BEGIN
+  p_name := trim(coalesce(p_name, ''));
+  IF p_name = '' THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'NAME_REQUIRED', 'message', 'Укажите имя игрока');
+  END IF;
+
+  IF p_gender NOT IN ('M', 'W') THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'INVALID_GENDER', 'message', 'Пол должен быть M или W');
+  END IF;
+
+  BEGIN
+    INSERT INTO players (name, gender, status)
+    VALUES (p_name, p_gender, 'temporary')
+    RETURNING * INTO v_player;
+    v_created := true;
+  EXCEPTION
+    WHEN unique_violation THEN
+      SELECT * INTO v_player
+        FROM players
+       WHERE lower(trim(name)) = lower(p_name)
+         AND gender = p_gender
+       LIMIT 1;
+  END;
+
+  IF v_player.id IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'PLAYER_NOT_FOUND', 'message', 'Не удалось создать профиль игрока');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'created', v_created,
+    'player', jsonb_build_object(
+      'id', v_player.id,
+      'name', v_player.name,
+      'gender', v_player.gender,
+      'status', v_player.status,
+      'tournaments_played', v_player.tournaments_played,
+      'total_pts', v_player.total_pts
+    ),
+    'message', CASE
+      WHEN v_created THEN v_player.name || ' создан(а) как временный игрок'
+      WHEN v_player.status = 'temporary' THEN v_player.name || ' уже есть как временный игрок'
+      ELSE v_player.name || ' уже есть в базе'
+    END
+  );
+END;
+$$;
+
+
+-- ── 10. ROW LEVEL SECURITY ───────────────────────────────────
+-- Базовые политики: чтение всем, запись только через RPC.
 -- ──────────────────────────────────────────────────────────────
 ALTER TABLE players                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tournaments            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tournament_participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE player_requests        ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS players_insert      ON players;
+DROP POLICY IF EXISTS players_update      ON players;
+DROP POLICY IF EXISTS tournaments_insert  ON tournaments;
+DROP POLICY IF EXISTS tournaments_update  ON tournaments;
+DROP POLICY IF EXISTS tp_insert           ON tournament_participants;
+DROP POLICY IF EXISTS pr_insert           ON player_requests;
 
 -- Чтение — всем аутентифицированным и анонимным (приложение без auth)
 DO $$ BEGIN
@@ -348,38 +480,20 @@ DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'players_select') THEN
     CREATE POLICY players_select ON players FOR SELECT USING (true);
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'players_insert') THEN
-    CREATE POLICY players_insert ON players FOR INSERT WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'players_update') THEN
-    CREATE POLICY players_update ON players FOR UPDATE USING (true);
-  END IF;
 
   -- tournaments
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tournaments_select') THEN
     CREATE POLICY tournaments_select ON tournaments FOR SELECT USING (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tournaments_insert') THEN
-    CREATE POLICY tournaments_insert ON tournaments FOR INSERT WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tournaments_update') THEN
-    CREATE POLICY tournaments_update ON tournaments FOR UPDATE USING (true);
   END IF;
 
   -- tournament_participants
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tp_select') THEN
     CREATE POLICY tp_select ON tournament_participants FOR SELECT USING (true);
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'tp_insert') THEN
-    CREATE POLICY tp_insert ON tournament_participants FOR INSERT WITH CHECK (true);
-  END IF;
 
   -- player_requests
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'pr_select') THEN
     CREATE POLICY pr_select ON player_requests FOR SELECT USING (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'pr_insert') THEN
-    CREATE POLICY pr_insert ON player_requests FOR INSERT WITH CHECK (true);
   END IF;
 END $$;
 
@@ -783,13 +897,266 @@ DO $$ BEGIN
 END $$;
 ALTER TABLE merge_audit ENABLE ROW LEVEL SECURITY;
 
+-- ── 14. SECURE ROOM SYNC ────────────────────────────────────
+-- Синхронизация состояния турнира через room_code + room_secret.
+-- Прямой доступ к таблице закрыт, всё идёт через RPC.
+-- ──────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS kotc_sessions (
+  room_code         TEXT PRIMARY KEY,
+  room_secret_hash  TEXT NOT NULL,
+  state             JSONB DEFAULT '{}'::jsonb,
+  created_at        TIMESTAMPTZ DEFAULT now(),
+  updated_at        TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_kotc_sessions_updated_at
+  ON kotc_sessions (updated_at DESC);
+
+ALTER TABLE kotc_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS kotc_sessions_select ON kotc_sessions;
+DROP POLICY IF EXISTS kotc_sessions_insert ON kotc_sessions;
+DROP POLICY IF EXISTS kotc_sessions_update ON kotc_sessions;
+
+REVOKE ALL ON TABLE kotc_sessions FROM PUBLIC, anon, authenticated;
+
+DO $$
+BEGIN
+  BEGIN
+    ALTER PUBLICATION supabase_realtime DROP TABLE kotc_sessions;
+  EXCEPTION
+    WHEN undefined_object THEN NULL;
+    WHEN invalid_parameter_value THEN NULL;
+  END;
+END $$;
+
+CREATE OR REPLACE FUNCTION room_secret_sha256(p_secret TEXT)
+RETURNS TEXT
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  SELECT encode(digest(coalesce(p_secret, ''), 'sha256'), 'hex')
+$$;
+
+CREATE OR REPLACE FUNCTION create_room(
+  p_room_code     TEXT,
+  p_room_secret   TEXT,
+  p_initial_state JSONB DEFAULT '{}'::jsonb
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_code   TEXT := upper(trim(coalesce(p_room_code, '')));
+  v_secret TEXT := trim(coalesce(p_room_secret, ''));
+  v_row    kotc_sessions%ROWTYPE;
+BEGIN
+  IF v_code = '' THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_CODE_REQUIRED', 'message', 'Укажите код комнаты');
+  END IF;
+
+  IF length(v_secret) < 6 THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_SECRET_SHORT', 'message', 'Секрет комнаты должен быть не короче 6 символов');
+  END IF;
+
+  SELECT * INTO v_row
+    FROM kotc_sessions
+   WHERE room_code = v_code
+     FOR UPDATE;
+
+  IF NOT FOUND THEN
+    INSERT INTO kotc_sessions (room_code, room_secret_hash, state)
+    VALUES (v_code, room_secret_sha256(v_secret), coalesce(p_initial_state, '{}'::jsonb))
+    RETURNING * INTO v_row;
+
+    RETURN jsonb_build_object(
+      'ok', true,
+      'created', true,
+      'room_code', v_row.room_code,
+      'state', v_row.state,
+      'updated_at', v_row.updated_at,
+      'message', 'Комната создана'
+    );
+  END IF;
+
+  IF v_row.room_secret_hash <> room_secret_sha256(v_secret) THEN
+    RETURN jsonb_build_object(
+      'ok', false,
+      'error', 'ROOM_SECRET_MISMATCH',
+      'message', 'Неверный секрет комнаты'
+    );
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'created', false,
+    'room_code', v_row.room_code,
+    'state', v_row.state,
+    'updated_at', v_row.updated_at,
+    'message', 'Комната подключена'
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION get_room_state(
+  p_room_code   TEXT,
+  p_room_secret TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_code   TEXT := upper(trim(coalesce(p_room_code, '')));
+  v_secret TEXT := trim(coalesce(p_room_secret, ''));
+  v_row    kotc_sessions%ROWTYPE;
+BEGIN
+  SELECT * INTO v_row
+    FROM kotc_sessions
+   WHERE room_code = v_code;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_NOT_FOUND', 'message', 'Комната не найдена');
+  END IF;
+
+  IF v_row.room_secret_hash <> room_secret_sha256(v_secret) THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_SECRET_MISMATCH', 'message', 'Неверный секрет комнаты');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'room_code', v_row.room_code,
+    'state', v_row.state,
+    'updated_at', v_row.updated_at
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION push_room_state(
+  p_room_code   TEXT,
+  p_room_secret TEXT,
+  p_state       JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_code   TEXT := upper(trim(coalesce(p_room_code, '')));
+  v_secret TEXT := trim(coalesce(p_room_secret, ''));
+  v_row    kotc_sessions%ROWTYPE;
+BEGIN
+  SELECT * INTO v_row
+    FROM kotc_sessions
+   WHERE room_code = v_code
+     FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_NOT_FOUND', 'message', 'Комната не найдена');
+  END IF;
+
+  IF v_row.room_secret_hash <> room_secret_sha256(v_secret) THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_SECRET_MISMATCH', 'message', 'Неверный секрет комнаты');
+  END IF;
+
+  UPDATE kotc_sessions
+     SET state = coalesce(p_state, '{}'::jsonb),
+         updated_at = now()
+   WHERE room_code = v_code
+   RETURNING * INTO v_row;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'updated_at', v_row.updated_at,
+    'message', 'Состояние комнаты сохранено'
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION rotate_room_secret(
+  p_room_code       TEXT,
+  p_room_secret     TEXT,
+  p_new_room_secret TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_code       TEXT := upper(trim(coalesce(p_room_code, '')));
+  v_secret     TEXT := trim(coalesce(p_room_secret, ''));
+  v_new_secret TEXT := trim(coalesce(p_new_room_secret, ''));
+  v_row        kotc_sessions%ROWTYPE;
+BEGIN
+  IF length(v_new_secret) < 6 THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_SECRET_SHORT', 'message', 'Новый секрет должен быть не короче 6 символов');
+  END IF;
+
+  SELECT * INTO v_row
+    FROM kotc_sessions
+   WHERE room_code = v_code
+     FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_NOT_FOUND', 'message', 'Комната не найдена');
+  END IF;
+
+  IF v_row.room_secret_hash <> room_secret_sha256(v_secret) THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'ROOM_SECRET_MISMATCH', 'message', 'Неверный текущий секрет');
+  END IF;
+
+  UPDATE kotc_sessions
+     SET room_secret_hash = room_secret_sha256(v_new_secret),
+         updated_at = now()
+   WHERE room_code = v_code
+   RETURNING * INTO v_row;
+
+  RETURN jsonb_build_object(
+    'ok', true,
+    'updated_at', v_row.updated_at,
+    'message', 'Секрет комнаты обновлён'
+  );
+END;
+$$;
+
+-- Права на RPC:
+-- публичному фронтенду оставляем только search / signup / safe register.
+REVOKE ALL ON FUNCTION search_players(TEXT, TEXT, INT)            FROM PUBLIC;
+REVOKE ALL ON FUNCTION safe_register_player(UUID, UUID)           FROM PUBLIC;
+REVOKE ALL ON FUNCTION submit_player_request(TEXT, TEXT, TEXT, UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION create_temporary_player(TEXT, TEXT)        FROM PUBLIC;
+REVOKE ALL ON FUNCTION safe_cancel_registration(UUID, UUID)       FROM PUBLIC;
+REVOKE ALL ON FUNCTION approve_player_request(UUID)               FROM PUBLIC;
+REVOKE ALL ON FUNCTION merge_players(UUID, UUID)                  FROM PUBLIC;
+REVOKE ALL ON FUNCTION room_secret_sha256(TEXT)                   FROM PUBLIC;
+REVOKE ALL ON FUNCTION create_room(TEXT, TEXT, JSONB)             FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_room_state(TEXT, TEXT)                 FROM PUBLIC;
+REVOKE ALL ON FUNCTION push_room_state(TEXT, TEXT, JSONB)         FROM PUBLIC;
+REVOKE ALL ON FUNCTION rotate_room_secret(TEXT, TEXT, TEXT)       FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION search_players(TEXT, TEXT, INT)            TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION safe_register_player(UUID, UUID)           TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION submit_player_request(TEXT, TEXT, TEXT, UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION create_temporary_player(TEXT, TEXT)        TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION safe_cancel_registration(UUID, UUID)       TO authenticated;
+GRANT EXECUTE ON FUNCTION approve_player_request(UUID)               TO authenticated;
+GRANT EXECUTE ON FUNCTION merge_players(UUID, UUID)                  TO authenticated;
+GRANT EXECUTE ON FUNCTION create_room(TEXT, TEXT, JSONB)             TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_room_state(TEXT, TEXT)                 TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION push_room_state(TEXT, TEXT, JSONB)         TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION rotate_room_secret(TEXT, TEXT, TEXT)       TO anon, authenticated;
+
 
 -- ══════════════════════════════════════════════════════════════
 -- ИТОГО:
 --   Таблицы:  players, tournaments, tournament_participants,
---             player_requests, merge_audit
+--             player_requests, merge_audit, kotc_sessions
 --   RPC:      safe_register_player (+ gender constraints)
+--             submit_player_request
+--             create_temporary_player
 --             safe_cancel_registration (+ auto-promote waitlist)
 --             merge_players (+ audit trail)
+--             create_room / get_room_state / push_room_state
+--             rotate_room_secret
 --             search_players, approve_player_request
 -- ══════════════════════════════════════════════════════════════
