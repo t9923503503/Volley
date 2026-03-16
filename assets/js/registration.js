@@ -77,7 +77,7 @@ function _regModalHtml() {
   const resultsHtml = _regResults.length > 0
     ? _regResults.map(p => `
         <div class="reg-result-item" id="reg-p-${p.id}"
-          onclick="regSelectPlayer('${p.id}', '${esc(p.name)}')">
+          onclick="regSelectPlayer('${escAttr(p.id)}', '${escAttr(p.name)}')">
           <div class="reg-result-avatar ${p.gender}">
             ${p.gender === 'M' ? '🏋️' : '👩'}
           </div>
@@ -114,7 +114,7 @@ function _regModalHtml() {
   const formHtml = _regFormMode ? _regFormHtml() : '';
 
   const statusHtml = _regStatusMsg
-    ? `<div class="reg-status ${_regStatusMsg.type}">${_regStatusMsg.text}</div>` : '';
+    ? `<div class="reg-status ${_regStatusMsg.type}">${esc(_regStatusMsg.text)}</div>` : '';
 
   return `
   <div class="reg-modal">
@@ -727,13 +727,13 @@ function _rosterTrnHtml() {
       </div>
       <span class="trn-mgr-badge ${t.level || 'medium'}">${levelLbl}</span>
       <div class="trn-mgr-actions">
-        <button class="trn-mgr-edit"  onclick="openTrnEdit('${t.id}')"  title="Редактировать">✏️</button>
-        <button class="trn-mgr-clone" onclick="cloneTrn('${t.id}')"     title="Дублировать">📋</button>
+        <button class="trn-mgr-edit"  onclick="openTrnEdit('${escAttr(t.id)}')"  title="Редактировать">✏️</button>
+        <button class="trn-mgr-clone" onclick="cloneTrn('${escAttr(t.id)}')"     title="Дублировать">📋</button>
         ${isActive
-          ? `<button class="trn-mgr-finish" onclick="finishTrn('${t.id}')" title="Завершить">✅</button>`
-          : `<button class="trn-mgr-finish" onclick="openResultsForm('${t.id}')" title="Редактировать результаты" style="font-size:11px">📊</button>`}
-        <button class="trn-mgr-plr" onclick="openParticipantsModal('${t.id}')" title="Участники">👥</button>
-        <button class="trn-mgr-del"   onclick="deleteTrn('${t.id}')"   title="Удалить">✕</button>
+          ? `<button class="trn-mgr-finish" onclick="finishTrn('${escAttr(t.id)}')" title="Завершить">✅</button>`
+          : `<button class="trn-mgr-finish" onclick="openResultsForm('${escAttr(t.id)}')" title="Редактировать результаты" style="font-size:11px">📊</button>`}
+        <button class="trn-mgr-plr" onclick="openParticipantsModal('${escAttr(t.id)}')" title="Участники">👥</button>
+        <button class="trn-mgr-del"   onclick="deleteTrn('${escAttr(t.id)}')"   title="Удалить">✕</button>
       </div>
     </div>`;
   }).join('')

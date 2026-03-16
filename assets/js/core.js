@@ -48,7 +48,7 @@ function rosterAcShow(inp) {
   _rcAcInputId = inp.id;
 
   dd.innerHTML = hits.map(p => `
-    <div class="rc-ac-item" onmousedown="rosterAcPick('${esc(p.name)}')">
+    <div class="rc-ac-item" onmousedown="rosterAcPick('${escAttr(p.name)}')">
       <span class="rc-ac-name">${esc(p.name)}</span>
       <span class="rc-ac-meta">${p.tournaments||0}т · ${p.totalPts||0}оч</span>
     </div>`).join('<div class="rc-ac-sep"></div>');
@@ -831,7 +831,7 @@ function _renderPtModal() {
     <div class="pt-search-results">
       ${searchResults.map(p => {
         const alreadyIn = allIds.has(p.id);
-        return `<div class="pt-sr-item" onclick="${alreadyIn ? '' : `ptAddPlayer('${p.id}')`}"
+        return `<div class="pt-sr-item" onclick="${alreadyIn ? '' : `ptAddPlayer('${escAttr(p.id)}')`}"
           style="${alreadyIn ? 'opacity:.45;cursor:default' : ''}">
           <span class="pt-sr-badge ${p.gender}">${gLabel(p)}</span>
           <span class="pt-sr-name">${esc(p.name)}</span>
@@ -849,7 +849,7 @@ function _renderPtModal() {
         <span class="pt-item-num">${i+1}</span>
         <span class="pt-item-name">${esc(p.name)}</span>
         <span class="pt-item-g ${p.gender}">${gLabel(p)}</span>
-        <button class="pt-item-del" onclick="ptRemoveParticipant('${p.id}')" title="Убрать">✕</button>
+        <button class="pt-item-del" onclick="ptRemoveParticipant('${escAttr(p.id)}')" title="Убрать">✕</button>
       </div>`).join('')
     : '<div class="pt-empty">Участников нет. Найдите игрока выше.</div>';
 
@@ -860,9 +860,9 @@ function _renderPtModal() {
         <span class="pt-item-name">${esc(p.name)}</span>
         <span class="pt-item-g ${p.gender}">${gLabel(p)}</span>
         ${!isFull
-          ? `<button class="pt-item-promote" onclick="ptPromoteWaitlist('${p.id}')">→ Добавить</button>`
+          ? `<button class="pt-item-promote" onclick="ptPromoteWaitlist('${escAttr(p.id)}')">→ Добавить</button>`
           : ''}
-        <button class="pt-item-del" onclick="ptRemoveWaitlist('${p.id}')" title="Убрать">✕</button>
+        <button class="pt-item-del" onclick="ptRemoveWaitlist('${escAttr(p.id)}')" title="Убрать">✕</button>
       </div>`).join('')
     : '<div class="pt-empty">Лист ожидания пуст.</div>';
 
@@ -954,10 +954,15 @@ function ptExportCSV(trnId) {
   // CSV header
   const csv = ['Фамилия,Пол'];
 
-  // Rows
+  // Rows (escape quotes and CSV formula injection)
+  const csvSafe = s => {
+    let v = String(s).replace(/"/g, '""');
+    if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+    return `"${v}"`;
+  };
   parts.forEach(p => {
     const gender = p.gender === 'M' ? 'М' : 'Ж';
-    csv.push(`"${p.name}",${gender}`);
+    csv.push(`${csvSafe(p.name)},${gender}`);
   });
 
   // Download
@@ -966,6 +971,7 @@ function ptExportCSV(trnId) {
   link.href = URL.createObjectURL(blob);
   link.download = `ростер_${trn.name}_${new Date().toISOString().split('T')[0]}.csv`;
   link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 5000);
   showToast('CSV скачан', 'success');
 }
 

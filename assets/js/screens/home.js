@@ -115,25 +115,25 @@ function renderHome() {
     const ac = t.status==='open' ? 'var(--gold)' : '#2a2a44';
     const div = t.division==='Мужской'?'♂':'♀';
     return `
-<div class="trn-card" onclick="openTrnDetails('${t.id}')" style="cursor:pointer">
+<div class="trn-card" onclick="openTrnDetails('${escAttr(t.id)}')" style="cursor:pointer">
   <div class="trn-card-accent" style="background:${ac}"></div>
   <div class="trn-card-body">
     <div class="trn-card-head">
       <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
         <span class="trn-lv ${t.level}">${t.level.toUpperCase()}</span>
         <span style="font-size:10px;color:var(--muted);background:rgba(255,255,255,.06);
-          padding:2px 7px;border-radius:6px">${t.division}</span>
+          padding:2px 7px;border-radius:6px">${esc(t.division)}</span>
       </div>
       <span class="trn-st ${t.status}">
         <span class="trn-st-dot"></span>
         ${t.status==='open'?'ОТКРЫТ':'ЗАПОЛНЕНО'}
       </span>
     </div>
-    <div class="trn-fmt">👑 ${t.format}</div>
-    <div class="trn-name">${t.name}</div>
-    <div class="trn-meta">🕐 <span>${t.date}, ${t.time}</span></div>
-    <div class="trn-meta">📍 <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${t.location}</span></div>
-    ${t.prize ? `<div class="trn-prize">🏆 Призовой фонд: ${t.prize}</div>` : ''}
+    <div class="trn-fmt">👑 ${esc(t.format)}</div>
+    <div class="trn-name">${esc(t.name)}</div>
+    <div class="trn-meta">🕐 <span>${esc(t.date)}, ${esc(t.time)}</span></div>
+    <div class="trn-meta">📍 <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${esc(t.location)}</span></div>
+    ${t.prize ? `<div class="trn-prize">🏆 Призовой фонд: ${esc(t.prize)}</div>` : ''}
     <div class="trn-prog">
       <div class="trn-prog-hdr">
         <span class="trn-prog-lbl">Регистрация</span>
@@ -144,7 +144,7 @@ function renderHome() {
       </div>
     </div>
     <button class="trn-btn ${t.status}"
-      onclick="event.stopPropagation();openTrnDetails('${t.id}')">
+      onclick="event.stopPropagation();openTrnDetails('${escAttr(t.id)}')">
       ${t.status==='open'?'⚡ Записаться':'📋 В лист ожидания'}
     </button>
   </div>
@@ -160,11 +160,11 @@ function renderHome() {
     <div class="cal-ds">${t.dayStr}</div>
   </div>
   <div class="cal-info">
-    <div class="cal-info-name">${t.name}</div>
+    <div class="cal-info-name">${esc(t.name)}</div>
     <div class="cal-info-meta">
-      <span>🕐 ${t.time}</span>
+      <span>🕐 ${esc(t.time)}</span>
       <span class="trn-lv ${t.level}" style="font-size:9px;padding:1px 5px">${t.level.toUpperCase()}</span>
-      <span>${t.division}</span>
+      <span>${esc(t.division)}</span>
     </div>
   </div>
   <div class="cal-right">
@@ -345,8 +345,8 @@ function renderHome() {
     return `
   <button class="plr-banner" onclick="switchTab('players')">
     <div class="plr-banner-avatars">
-      <div class="plr-av" title="${topM?topM.name:'Мужчины'}">${av1}</div>
-      <div class="plr-av" title="${topW?topW.name:'Женщины'}">${av2}</div>
+      <div class="plr-av" title="${topM?escAttr(topM.name):'Мужчины'}">${av1}</div>
+      <div class="plr-av" title="${topW?escAttr(topW.name):'Женщины'}">${av2}</div>
       <div class="plr-av">${av3}</div>
     </div>
     <div class="plr-banner-body">

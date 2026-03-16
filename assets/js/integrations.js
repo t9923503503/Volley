@@ -597,7 +597,7 @@ function renderSupabaseCard() {
 
     <div class="sb-input-row">
       <label>Код комнаты</label>
-      <input class="sb-input" type="text" value="${sbConfig.roomCode}"
+      <input class="sb-input" type="text" value="${escAttr(sbConfig.roomCode)}"
         placeholder="Например: SURGUT-01"
         style="text-transform:uppercase;letter-spacing:2px;font-weight:700"
         ${live ? 'readonly' : ''}
@@ -694,7 +694,7 @@ function renderGSheetsCard() {
     <div class="gsh-input-row">
       <label>OAuth 2.0 Client ID</label>
       <input class="gsh-input" type="text" id="gsh-client-id"
-        value="${gshConfig.clientId}"
+        value="${escAttr(gshConfig.clientId)}"
         placeholder="xxxxxxx.apps.googleusercontent.com"
         oninput="gshConfig.clientId=this.value.trim();gshSaveConfig();gshRefreshCard()">
       <div class="gsh-hint">
@@ -706,7 +706,7 @@ function renderGSheetsCard() {
     <div class="gsh-input-row">
       <label>Spreadsheet ID <span style="opacity:.5">(необязательно)</span></label>
       <input class="gsh-input" type="text" id="gsh-sheet-id"
-        value="${gshConfig.spreadsheetId}"
+        value="${escAttr(gshConfig.spreadsheetId)}"
         placeholder="Оставьте пустым — создаст новую таблицу"
         oninput="gshConfig.spreadsheetId=this.value.trim();gshSaveConfig()">
       <div class="gsh-hint">ID из URL: docs.google.com/spreadsheets/d/<b style="color:#34a853">ВОТ_ЭТО</b>/edit</div>
@@ -917,17 +917,17 @@ function exportTournamentPDF(id) {
   const top5rows = t.players.slice(0,5).map((p,i) => `
     <tr class="podium-row top${i+1}">
       <td class="place-cell"><span class="medal m${i+1}">${medals[i]}</span></td>
-      <td class="name-cell">${p.gender==='M'?'🏋️':'👩'} ${p.name}</td>
-      <td class="court-cell">${p.courtName||'—'}</td>
+      <td class="name-cell">${p.gender==='M'?'🏋️':'👩'} ${esc(p.name)}</td>
+      <td class="court-cell">${esc(p.courtName||'—')}</td>
       <td class="pts-cell">${p.totalPts}</td>
     </tr>`).join('');
 
   const allRows = t.players.map((p,i) => `
     <tr class="${i%2===0?'even':'odd'}${i<3?' top'+(i+1):''}">
       <td class="place-cell"><span class="rank-num">${i+1}</span></td>
-      <td class="name-cell">${p.gender==='M'?'🏋️':'👩'} ${p.name}</td>
+      <td class="name-cell">${p.gender==='M'?'🏋️':'👩'} ${esc(p.name)}</td>
       <td class="gender-cell">${p.gender==='M'?'Муж':'Жен'}</td>
-      <td class="court-cell">${p.courtName||'—'}</td>
+      <td class="court-cell">${esc(p.courtName||'—')}</td>
       <td class="pts-cell">${p.totalPts} оч</td>
     </tr>`).join('');
 
@@ -935,7 +935,7 @@ function exportTournamentPDF(id) {
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>КОТС — ${t.name}</title>
+<title>КОТС — ${esc(t.name)}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -1058,7 +1058,7 @@ function exportTournamentPDF(id) {
 
 <div class="header">
   <div class="brand">👑 КОРОЛЬ ПЛОЩАДКИ · ПРОТОКОЛ ТУРНИРА</div>
-  <div class="trn-name">${t.name || 'Турнир'}</div>
+  <div class="trn-name">${esc(t.name || 'Турнир')}</div>
   <div class="trn-date">📅 ${dateStr}</div>
 </div>
 

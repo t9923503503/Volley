@@ -267,6 +267,14 @@ window.addEventListener('scroll', ()=>{
   document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 120);
 });
 
+// Handlers moved from inline onclick (CSP compliance)
+document.getElementById('scrollTopBtn').addEventListener('click', () => {
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('pcard-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closePcard();
+});
+
 // ════════════════════════════════════════════════════════════
 // 20. LOGO (inline base64 for offline PWA)
 // ════════════════════════════════════════════════════════════
