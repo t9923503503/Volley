@@ -909,9 +909,7 @@ function exportTournamentPDF(id) {
   const t = history.find(h => h.id === id);
   if (!t) return;
 
-  const dateStr = t.date
-    ? new Date(t.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})
-    : '—';
+  const dateStr = fmtDateLong(t.date);
   const medals = ['🥇','🥈','🥉','4','5'];
   const podiumColors = ['#ffc832','#c0c0c0','#cd7f32','#aaaaaa','#aaaaaa'];
 

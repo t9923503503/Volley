@@ -96,7 +96,7 @@ function renderCourt(ci) {
       </div>`;
     }
   }
-  html += `<button class="btn-reset-court" id="rcbtn-${ci}" onclick="resetCourtGuard(${ci},'↺ Сбросить очки ${meta.name}')">↺ Сбросить очки ${meta.name}</button>`;
+  html += `<button class="btn-reset-court" id="rcbtn-${ci}" onclick="resetCourtGuard(${ci},'↺ Сбросить очки ${escAttr(meta.name)}')">↺ Сбросить очки ${esc(meta.name)}</button>`;
   return html;
 }
 

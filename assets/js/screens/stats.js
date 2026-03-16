@@ -12,8 +12,7 @@ function shareTopAvg() {
     .filter(p => p.rTotal > 0)
     .sort((a,b) => b.avgVal - a.avgVal)
     .slice(0, 3);
-  const medals = ['🥇','🥈','🥉'];
-  const lines  = topAvg.map((p,i) => `${medals[i]} ${p.name} — ${p.avgVal.toFixed(1)} avg/раунд`);
+  const lines  = topAvg.map((p,i) => `${MEDALS_3[i]} ${p.name} — ${p.avgVal.toFixed(1)} avg/раунд`);
   shareText(`📈 Топ по эффективности\n${lines.join('\n')}\n#KingBeach`);
 }
 
@@ -44,10 +43,9 @@ function shareChemistry() {
   });
   const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
   if (!entries.length) return;
-  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
   const lines = entries.map(([key, pts], i) => {
     const [man, woman] = key.split('\x00');
-    return `${medals[i]} ${man} + ${woman} — ${pts}оч`;
+    return `${MEDALS_5[i]} ${man} + ${woman} — ${pts}оч`;
   });
   shareText(`💜 Идеальная химия — Топ 5\n${lines.join('\n')}\n#KingBeach`);
 }
@@ -226,7 +224,6 @@ function renderStats() {
         .slice(0, 3);
       if (!topAvg.length) return '';
       const maxAvg = topAvg[0].avgVal || 1;
-      const medals = ['🥇','🥈','🥉'];
       return `<div class="stat-card" style="position:relative">
         <button class="share-btn" onclick="shareTopAvg()" title="Поделиться">📤</button>
         <div class="stat-card-title">📈 ТОП ПО ЭФФЕКТИВНОСТИ</div>
@@ -234,7 +231,7 @@ function renderStats() {
         ${topAvg.map((p,i) => {
           const pct = Math.round(p.avgVal / maxAvg * 100);
           return `<div class="avg-row">
-            <span class="avg-rank">${medals[i]}</span>
+            <span class="avg-rank">${MEDALS_3[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
                 <button class="bar-name player-tap" onclick="showPlayerCard('${escAttr(p.name)}','${escAttr(p.gender)}')">${p.genderIcon} ${esc(p.name)}</button>
@@ -286,7 +283,6 @@ function renderStats() {
       });
       const entries = Object.entries(pairMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
       if (!entries.length) return '';
-      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
       const maxPts = entries[0][1] || 1;
       return `<div class="stat-card chem-card" style="position:relative">
         <button class="share-btn" onclick="shareChemistry()" title="Поделиться">📤</button>
@@ -296,7 +292,7 @@ function renderStats() {
           const [man, woman] = key.split('\x00');
           const pct = Math.round(pts / maxPts * 100);
           return `<div class="avg-row">
-            <span class="avg-rank">${medals[i]}</span>
+            <span class="avg-rank">${MEDALS_5[i]}</span>
             <div class="avg-bar-wrap">
               <div class="bar-lbl" style="margin-bottom:2px">
                 <span class="bar-name" style="font-size:13px"><button class="player-tap" onclick="showPlayerCard('${escAttr(man)}','M')">🏋️ ${esc(man)}</button> <span style="color:#9b5de5">+</span> <button class="player-tap" onclick="showPlayerCard('${escAttr(woman)}','W')">👩 ${esc(woman)}</button></span>
@@ -359,7 +355,7 @@ function renderRating() {
       <tr>
         <td style="text-align:center;padding:8px 4px">${medal}</td>
         <td style="text-align:center;padding:8px 4px">${idx + 1}</td>
-        <td style="padding:8px 4px">${p.name}</td>
+        <td style="padding:8px 4px">${esc(p.name)}</td>
         <td style="text-align:center;padding:8px 4px">${gender}</td>
         <td style="text-align:right;padding:8px 4px;font-weight:700;color:var(--gold)">${p.totalPts}</td>
       </tr>`;

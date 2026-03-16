@@ -86,14 +86,13 @@ function _refreshArchPlrList() {
 }
 
 function _archPlrListHtml() {
-  const medals = ['🥇','🥈','🥉'];
   if (!homeArchiveFormPlayers.length)
     return '<div class="arch-plr-empty">Игроки не добавлены — очки не запишутся в базу</div>';
   return `<div class="arch-plr-count">${homeArchiveFormPlayers.length} игроков</div>
 <div class="arch-plr-list">` +
     homeArchiveFormPlayers.map((p,i) => `
   <div class="arch-plr-row">
-    <span class="arch-plr-row-rank">${medals[i]||i+1}</span>
+    <span class="arch-plr-row-rank">${MEDALS_3[i]||i+1}</span>
     <span class="arch-plr-row-name">${esc(p.name)}</span>
     <span class="arch-plr-row-g ${p.gender}">${p.gender==='M'?'М':'Ж'}</span>
     <span class="arch-plr-row-pts">${p.pts}</span>
@@ -197,7 +196,7 @@ function renderHome() {
   function archCardHtml(t) {
     const isApp = t.source === 'app';
     let dateStr = '—';
-    try { dateStr = t.date ? new Date(t.date+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}) : '—'; } catch(e){}
+    dateStr = fmtDateLong(t.date);
     const winner = t.winner || (t.players && t.players[0] ? t.players[0].name : '');
     const cnt    = t.playersCount || (t.players ? t.players.length : 0);
     const rds    = t.rPlayed ? `🏐 ${t.rPlayed} раундов` : '';
@@ -225,10 +224,9 @@ function renderHome() {
     ${t.playerResults?.length>1 ? `
     <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:3px">
       ${t.playerResults.slice(0,5).map((p,i)=>{
-        const medals=['🥇','🥈','🥉'];
         return `<span style="font-size:10px;padding:2px 7px;border-radius:5px;
           background:rgba(255,255,255,.05);border:1px solid #2a2a40;color:var(--muted)">
-          ${medals[i]||'·'} ${esc(p.name)} ${p.pts?`<b style="color:var(--gold)">${p.pts}</b>`:''}
+          ${MEDALS_3[i]||'·'} ${esc(p.name)} ${p.pts?`<b style="color:var(--gold)">${p.pts}</b>`:''}
         </span>`;
       }).join('')}
       ${t.playerResults.length>5?`<span style="font-size:10px;color:var(--muted)">+${t.playerResults.length-5}</span>`:''}
@@ -467,9 +465,8 @@ function renderHistory() {
   }
 
   html += history.map(t => {
-    const dateStr = t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'}) : '—';
+    const dateStr = fmtDateLong(t.date);
     const top = t.players.slice(0,5);
-    const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
     return `<div class="hist-card">
       <div class="hist-hdr">
         <div>
@@ -490,7 +487,7 @@ function renderHistory() {
       </div>
       <div class="hist-podium">
         ${top.map((p,i) => `<div class="hist-row">
-          <span class="hist-place-num">${medals[i]||i+1}</span>
+          <span class="hist-place-num">${MEDALS_5[i]||i+1}</span>
           <span class="hist-p-name">${p.gender==='M'?'🏋️':'👩'} ${esc(p.name)}</span>
           <span style="font-size:10px;color:var(--muted)">${p.courtName||''}</span>
           <span class="hist-p-pts">${p.totalPts} оч</span>

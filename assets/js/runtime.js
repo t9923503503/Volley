@@ -255,12 +255,32 @@ function esc(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':
 /** Escape a string for safe use inside onclick="fn('...')" HTML attributes */
 function escAttr(s){ return esc(String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")); }
 
+
+// ── Shared constants ──────────────────────────────────────
+const MEDALS_3 = ['🥇','🥈','🥉'];
+const MEDALS_5 = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+const TOAST_DURATION = 2500;
+
+/** Safe JSON parse from localStorage with fallback */
+function loadJSON(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+  catch(e) { return fallback; }
+}
+
+/** Format a RU date string from ISO: "3 марта 2026" */
+function fmtDateLong(iso) {
+  if (!iso) return '—';
+  try {
+    return new Date(iso+'T12:00:00')
+      .toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  } catch(e) { return '—'; }
+}
 let _toastTimer=null;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(()=>t.classList.remove('show'), 2500);
+  _toastTimer = setTimeout(()=>t.classList.remove('show'), TOAST_DURATION);
 }
 
 window.addEventListener('scroll', ()=>{

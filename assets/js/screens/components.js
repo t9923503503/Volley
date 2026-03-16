@@ -69,7 +69,7 @@ function showPlayerCard(name, gender) {
   // ── Tournament history from kotc3_tournaments ─────────────
   const allTrns = getTournaments();
   const pid     = dbPlayer?.id;
-  const MEDALS  = ['🥇','🥈','🥉'];
+  const MEDALS  = MEDALS_3;
 
   // Tournaments where player participated or placed
   const trnHistory = pid ? allTrns
