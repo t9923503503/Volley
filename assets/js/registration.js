@@ -701,6 +701,17 @@ function _rosterTrnHtml() {
           <input class="trn-form-inp" id="trnf-cap" type="number" min="4" max="200"
             value="${editTrn?.capacity || 24}">
         </div>
+        <div class="trn-form-full">
+          <label class="trn-form-label trn-form-toggle-label">
+            <input type="checkbox" id="trnf-prize-toggle" ${editTrn?.prize ? 'checked' : ''}
+              onchange="document.getElementById('trnf-prize-wrap').style.display=this.checked?'':'none'">
+            Призовой фонд
+          </label>
+          <div id="trnf-prize-wrap" style="display:${editTrn?.prize ? '' : 'none'}">
+            <input class="trn-form-inp" id="trnf-prize" type="text" placeholder="Например: 10 000 ₽"
+              value="${esc(editTrn?.prize || '')}">
+          </div>
+        </div>
       </div>
       <div class="trn-form-btns">
         <button class="trn-form-save" onclick="submitTournamentForm()">

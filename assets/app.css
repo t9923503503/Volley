@@ -1594,6 +1594,8 @@ button.player-tap:active{opacity:.6}
 .trn-form-sel option{background:#1a1a2e}
 .trn-form-label{font-size:10px;color:var(--muted);text-transform:uppercase;
   letter-spacing:.5px;margin-bottom:3px;display:block}
+.trn-form-toggle-label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.trn-form-toggle-label input[type="checkbox"]{accent-color:var(--gold);width:15px;height:15px;cursor:pointer}
 .trn-form-btns{display:flex;gap:7px}
 .trn-form-save{flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;
   background:var(--gold);color:#111;font-family:'Barlow Condensed',sans-serif;

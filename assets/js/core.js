@@ -199,7 +199,7 @@ function submitTournamentForm() {
     format:   g('trnf-format'),
     division: g('trnf-div'),
     level:    g('trnf-level'),
-    prize:    g('trnf-prize'),
+    prize:    document.getElementById('trnf-prize-toggle')?.checked ? g('trnf-prize') : '',
     capacity: parseInt(document.getElementById('trnf-cap')?.value || '0', 10),
   };
 
@@ -216,13 +216,17 @@ function submitTournamentForm() {
   );
 
   let firstError = null;
-  const REQUIRED = ['name','date','time','location','format','division','level','prize'];
+  const REQUIRED = ['name','date','time','location','format','division','level'];
   REQUIRED.forEach(field => {
     if (!formData[field]) {
       document.getElementById(idMap[field])?.classList.add('trn-form-inp--error');
       if (!firstError) firstError = 'Заполните поле «' + field + '»';
     }
   });
+  if (document.getElementById('trnf-prize-toggle')?.checked && !formData.prize) {
+    document.getElementById('trnf-prize')?.classList.add('trn-form-inp--error');
+    if (!firstError) firstError = 'Заполните поле «Призовой фонд» или отключите его';
+  }
   if (!formData.capacity || formData.capacity < 4 || formData.capacity > 999) {
     document.getElementById('trnf-cap')?.classList.add('trn-form-inp--error');
     if (!firstError) firstError = formData.capacity > 999
@@ -279,7 +283,11 @@ function cloneTrn(id) {
     set('trnf-format', src.format);
     set('trnf-div',    src.division);
     set('trnf-level',  src.level);
-    set('trnf-prize',  src.prize);
+    if (src.prize) {
+      const tog = document.getElementById('trnf-prize-toggle');
+      if (tog) { tog.checked = true; tog.dispatchEvent(new Event('change')); }
+      set('trnf-prize', src.prize);
+    }
     set('trnf-cap',    src.capacity);
     document.getElementById('trnf-name')?.focus();
   }, 60);
