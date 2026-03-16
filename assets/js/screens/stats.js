@@ -62,8 +62,11 @@ function renderStats() {
   }
   const total  = allP.reduce((s,p)=>s+p.pts, 0);
   const avgGlob= (total/allP.length).toFixed(1);
-  const rPlayed= (() => { let s=0; for(let ci=0;ci<nc;ci++) s+=scores[ci].flat().filter(x=>x!==null).length; return s; })();
-  const divVol = DIV_KEYS.reduce((o,k)=>({...o,[k]:(divScores[k]||[]).flat().reduce((s,x)=>s+(x||0),0)}),{});
+  const _flatScores = Array.from({length:nc}, (_,ci) => scores[ci].flat());
+  const rPlayed= (() => { let s=0; for(let ci=0;ci<nc;ci++) s+=_flatScores[ci].filter(x=>x!==null).length; return s; })();
+  const _flatDivScores = {};
+  DIV_KEYS.forEach(k => { _flatDivScores[k] = (divScores[k]||[]).flat(); });
+  const divVol = DIV_KEYS.reduce((o,k)=>({...o,[k]:_flatDivScores[k].reduce((s,x)=>s+(x||0),0)}),{});
 
   // Enrich allP with combined total (Stage 1 + Finals)
   const allPEnriched = allP.map(p => {
@@ -88,9 +91,9 @@ function renderStats() {
     .sort((a,b)=>a.vari-b.vari).slice(0,5);
 
   const courtEff = Array.from({length:nc},(_,ci)=>{
-    const sc = scores[ci] || [];
-    const t = sc.flat().reduce((s,x)=>s+(x||0),0);
-    const n = sc.flat().filter(x=>x!==null&&x!==undefined).length||1;
+    const flat = _flatScores[ci];
+    const t = flat.reduce((s,x)=>s+(x||0),0);
+    const n = flat.filter(x=>x!==null&&x!==undefined).length||1;
     return { name:(COURT_META[ci]||{}).name||`Корт ${ci+1}`, color:(COURT_META[ci]||{}).color||'#888', total:t, avg:(t/n).toFixed(1) };
   });
 

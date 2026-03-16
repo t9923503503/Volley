@@ -574,5 +574,5 @@ async function _switchTabInner(id) {
 
   screen.classList.add('active');
   syncNavActive();
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo({top:0, behavior:'auto'});
 }

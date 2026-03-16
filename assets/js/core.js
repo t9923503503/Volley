@@ -223,9 +223,11 @@ function submitTournamentForm() {
       if (!firstError) firstError = 'Заполните поле «' + field + '»';
     }
   });
-  if (!formData.capacity || formData.capacity < 4) {
+  if (!formData.capacity || formData.capacity < 4 || formData.capacity > 999) {
     document.getElementById('trnf-cap')?.classList.add('trn-form-inp--error');
-    if (!firstError) firstError = 'Минимальная вместимость — 4 участника';
+    if (!firstError) firstError = formData.capacity > 999
+      ? 'Максимальная вместимость — 999 участников'
+      : 'Минимальная вместимость — 4 участника';
   }
   if (firstError) { showToast(firstError, 'error'); return; }
 
@@ -1154,12 +1156,12 @@ function openTrnDetails(trnId) {
     <div class="td-accent"></div>
     <div class="td-body">
       <div class="td-chips-row">
-        <span class="td-chip lv-${trn.level || 'medium'}">${LV_LABELS[trn.level] || trn.level?.toUpperCase()}</span>
+        <span class="td-chip lv-${trn.level || 'medium'}">${LV_LABELS[trn.level] || esc((trn.level||'').toUpperCase())}</span>
         <span class="td-chip">${esc(trn.division || '')}</span>
         <span class="td-chip st-${trn.status}">${ST_LABELS[trn.status] || trn.status}</span>
       </div>
       <div class="td-name">${esc(trn.name)}</div>
-      <div class="td-info-row">🕐 <span>${formatTrnDate(trn.date)}${trn.time ? ', ' + trn.time : ''}</span></div>
+      <div class="td-info-row">🕐 <span>${formatTrnDate(trn.date)}${trn.time ? ', ' + esc(trn.time) : ''}</span></div>
       <div class="td-info-row">📍 <span>${esc(trn.location || '—')}</span></div>
       <div class="td-info-row">👑 <span>${esc(trn.format || 'King of the Court')}</span></div>
       ${trn.prize ? `<div class="td-prize-row">🏆 Призовой фонд: ${esc(trn.prize)}</div>` : ''}

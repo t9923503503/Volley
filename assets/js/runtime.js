@@ -71,6 +71,9 @@ function scoreClickHandler(e) {
       if (tr.count >= 2) { playComboSound(); }
       else               { playScoreSound(dir); }
     } else {
+      if (Object.keys(_comboTracker).length > 100) {
+        for (const k in _comboTracker) delete _comboTracker[k];
+      }
       _comboTracker[key] = { t: now, count: 1 };
       playScoreSound(dir);
     }
@@ -109,16 +112,22 @@ function scoreClickHandler(e) {
   }
 }
 
-function updateCourtWidget(ci, mi, ri, val) {
+function _updateScoreDisp(sd, val) {
   const mx = val>=15, zr = val===0;
-  // Score display
+  sd.className = `score-disp${mx?' mx':zr?' zr':''}`;
+  sd.textContent = '';
+  sd.append(String(val));
+  const lbl = document.createElement('span');
+  lbl.className = 'score-max-lbl';
+  lbl.textContent = mx ? 'МАХ' : '/15';
+  sd.appendChild(lbl);
+  sd.classList.add('pop');
+  setTimeout(()=>sd.classList.remove('pop'), 250);
+}
+
+function updateCourtWidget(ci, mi, ri, val) {
   const sd = document.getElementById(`sd-${ci}-${mi}-${ri}`);
-  if (sd) {
-    sd.className = `score-disp${mx?' mx':zr?' zr':''}`;
-    sd.innerHTML = `${val}<span class="score-max-lbl">${mx?'МАХ':'/15'}</span>`;
-    sd.classList.add('pop');
-    setTimeout(()=>sd.classList.remove('pop'), 250);
-  }
+  if (sd) _updateScoreDisp(sd, val);
   // Buttons
   const card = document.getElementById(`card-${ci}-${mi}-${ri}`);
   if (card) {
@@ -139,14 +148,8 @@ function updateCourtWidget(ci, mi, ri, val) {
 
 function updateDivWidget(key, mi, ri, val) {
   const Nd = divRoster[key].men.length;
-  const mx = val>=15, zr = val===0;
   const sd = document.getElementById(`dsd-${key}-${mi}-${ri}`);
-  if (sd) {
-    sd.className = `score-disp${mx?' mx':zr?' zr':''}`;
-    sd.innerHTML = `${val}<span class="score-max-lbl">${mx?'МАХ':'/15'}</span>`;
-    sd.classList.add('pop');
-    setTimeout(()=>sd.classList.remove('pop'), 250);
-  }
+  if (sd) _updateScoreDisp(sd, val);
   const card = document.getElementById(`dcard-${key}-${mi}-${ri}`);
   if (card) {
     card.querySelector('.score-btn.minus').disabled = val<=0;
