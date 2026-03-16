@@ -166,12 +166,16 @@ function showPasswordPrompt({
     ov.classList.add('open');
     setTimeout(() => inp.focus(), 100);
 
+    function onEsc(e) { if (e.key === 'Escape') cleanup(false); }
+    document.addEventListener('keydown', onEsc);
+
     function cleanup(result) {
       ov.classList.remove('open');
       okBtn.onclick = null;
       cancelBtn.onclick = null;
       inp.onkeydown = null;
       inp2.onkeydown = null;
+      document.removeEventListener('keydown', onEsc);
       resolve(result);
     }
 

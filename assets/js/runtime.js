@@ -306,12 +306,19 @@ function showConfirm(msg) {
     const ov = document.getElementById('confirm-overlay');
     document.getElementById('confirm-msg').textContent = msg;
     ov.classList.add('open');
+    document.getElementById('confirm-ok').focus();
     function cleanup(result) {
       ov.classList.remove('open');
       document.getElementById('confirm-ok').onclick = null;
       document.getElementById('confirm-cancel').onclick = null;
+      document.removeEventListener('keydown', onKey);
       resolve(result);
     }
+    function onKey(e) {
+      if (e.key === 'Escape') cleanup(false);
+      if (e.key === 'Enter')  cleanup(true);
+    }
+    document.addEventListener('keydown', onKey);
     document.getElementById('confirm-ok').onclick     = () => cleanup(true);
     document.getElementById('confirm-cancel').onclick = () => cleanup(false);
   });

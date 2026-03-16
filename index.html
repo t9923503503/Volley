@@ -32,31 +32,31 @@
 <div id="dd-backdrop"></div>
 
 <!-- ── SCREENS ───────────────────────────────────────────── -->
-<div id="screens"></div>
+<main id="screens"></main>
 
 <!-- ── TOAST ─────────────────────────────────────────────── -->
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <button id="scrollTopBtn" aria-label="Наверх">▲</button>
 
 <script type="module" src="assets/js/main.js"></script>
 
 <!-- Custom confirm modal -->
-<div id="pwd-overlay">
+<div id="pwd-overlay" role="dialog" aria-modal="true" aria-labelledby="pwd-title">
   <div id="pwd-box">
     <div class="pwd-title" id="pwd-title">🔒 РОСТЕР</div>
     <div class="pwd-sub" id="pwd-sub">Введите пароль для доступа</div>
-    <input id="pwd-input" type="password" placeholder="Пароль">
-    <input id="pwd-input-2" type="password" placeholder="Повторите пароль" style="display:none">
+    <input id="pwd-input" type="password" placeholder="Пароль" autocomplete="current-password">
+    <input id="pwd-input-2" type="password" placeholder="Повторите пароль" autocomplete="new-password" style="display:none">
     <div id="pwd-note"></div>
-    <div id="pwd-error"></div>
+    <div id="pwd-error" role="alert"></div>
     <button id="pwd-ok">Войти</button>
     <br><button id="pwd-cancel">Отмена</button>
   </div>
 </div>
-<div id="pcard-overlay">
+<div id="pcard-overlay" role="dialog" aria-modal="true" aria-label="Карточка игрока">
   <div class="pcard-box" id="pcard-box"></div>
 </div>
-<div id="confirm-overlay">
+<div id="confirm-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-msg">
   <div id="confirm-box">
     <div id="confirm-msg"></div>
     <div class="confirm-btns">
