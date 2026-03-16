@@ -312,6 +312,7 @@ function sbStartPolling() {
   sbStopPolling();
   sbPollTimer = setInterval(() => { sbPollOnce(); }, SB_POLL_MS);
 }
+window.addEventListener('beforeunload', () => { sbStopPolling(); clearTimeout(sbSaveTimer); });
 async function sbPollOnce() {
   if (!sbEnsureClient() || sbStatus !== 'live' || sbIsApplying || sbIsPolling) return;
   sbIsPolling = true;

@@ -90,9 +90,10 @@ function renderStats() {
     .sort((a,b)=>a.vari-b.vari).slice(0,5);
 
   const courtEff = Array.from({length:nc},(_,ci)=>{
-    const t = scores[ci].flat().reduce((s,x)=>s+x,0);
-    const n = scores[ci].flat().filter(x=>x!==null).length||1;
-    return { name:COURT_META[ci].name, color:COURT_META[ci].color, total:t, avg:(t/n).toFixed(1) };
+    const sc = scores[ci] || [];
+    const t = sc.flat().reduce((s,x)=>s+(x||0),0);
+    const n = sc.flat().filter(x=>x!==null&&x!==undefined).length||1;
+    return { name:(COURT_META[ci]||{}).name||`Корт ${ci+1}`, color:(COURT_META[ci]||{}).color||'#888', total:t, avg:(t/n).toFixed(1) };
   });
 
   // ── Финалы и итоговый рейтинг (только если финалы активны) ─

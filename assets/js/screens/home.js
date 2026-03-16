@@ -107,8 +107,8 @@ function renderHome() {
   const openCount = T.filter(t => t.status === 'open').length;
 
   // helpers
-  const pct  = (r,c) => Math.min(r/c*100, 100);
-  const pcls = (r,c) => { const p=r/c; return p>=1?'r':p>=.8?'y':'g'; };
+  const pct  = (r,c) => c ? Math.min(r/c*100, 100) : 0;
+  const pcls = (r,c) => { if (!c) return 'g'; const p=r/c; return p>=1?'r':p>=.8?'y':'g'; };
 
   function cardHtml(t) {
     const c  = pcls(t.participants.length, t.capacity);
