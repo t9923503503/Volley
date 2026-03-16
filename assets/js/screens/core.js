@@ -522,7 +522,13 @@ function safeRender() {
 // ════════════════════════════════════════════════════════════
 // 7. TAB SWITCHING
 // ════════════════════════════════════════════════════════════
+let _switchTabBusy = false;
 async function switchTab(id) {
+  if (_switchTabBusy) return;
+  _switchTabBusy = true;
+  try { await _switchTabInner(id); } finally { _switchTabBusy = false; }
+}
+async function _switchTabInner(id) {
   closeDropdown();
   // Если запрошен неактивный дивизион — перенаправляем на первый активный
   if (typeof id === 'string' && DIV_KEYS.includes(id) && !activeDivKeys().includes(id)) {

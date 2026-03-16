@@ -577,7 +577,7 @@ function importData(file) {
   if (!file) return;
   const reader = new FileReader();
   reader.onerror = () => showToast('Не удалось прочитать файл', 'error');
-  reader.onload  = e => {
+  reader.onload  = async e => {
     let parsed;
     try { parsed = JSON.parse(e.target.result); }
     catch { showToast('❌ Повреждённый файл — не является валидным JSON', 'error'); return; }
@@ -608,9 +608,9 @@ function importData(file) {
     const ps  = playersArr.length;
     const ver = parsed.version ? ` (v${parsed.version})` : '';
 
-    if (!confirm(
-      `Восстановить данные из бэкапа${ver}?\n\n` +
-      `• ${ps} игроков\n• ${ts} турниров\n\n` +
+    if (!await showConfirm(
+      `Восстановить данные из бэкапа${ver}?\n` +
+      `• ${ps} игроков • ${ts} турниров\n` +
       `⚠️ Текущие данные будут ПОЛНОСТЬЮ ЗАМЕНЕНЫ.`
     )) return;
 

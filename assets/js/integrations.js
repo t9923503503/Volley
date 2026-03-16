@@ -1091,10 +1091,11 @@ function exportTournamentPDF(id) {
 
 </body></html>`;
 
-  const w = window.open('', '_blank', 'width=800,height=900');
-  if (!w) { alert('Разрешите всплывающие окна для этого сайта'); return; }
-  w.document.write(html);
-  w.document.close();
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const w    = window.open(url, '_blank', 'width=800,height=900');
+  if (!w) { showToast('⚠️ Разрешите всплывающие окна для этого сайта'); URL.revokeObjectURL(url); return; }
+  w.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
 }
 
 function deleteHistory(id) {

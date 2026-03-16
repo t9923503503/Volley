@@ -420,8 +420,8 @@ function resSetTrnType(type) {
 }
 
 /** Mark finished without recording results */
-function finishTrnNoResults(trnId) {
-  if (!confirm('Завершить турнир без записи результатов?')) return;
+async function finishTrnNoResults(trnId) {
+  if (!await showConfirm('Завершить турнир без записи результатов?')) return;
   const arr = getTournaments();
   const t   = arr.find(t => t.id === trnId);
   if (t) { t.status = 'finished'; saveTournaments(arr); }
@@ -772,8 +772,8 @@ function recalcAllPlayerStats(silent = false) {
 }
 
 /** Delete: remove by id with confirmation */
-function deleteTrn(id) {
-  if (!confirm('Удалить турнир? Действие необратимо.')) return;
+async function deleteTrn(id) {
+  if (!await showConfirm('Удалить турнир? Действие необратимо.')) return;
   saveTournaments(getTournaments().filter(t => t.id !== id));
   _refreshRosterTrn();
   showToast('Турнир удалён', 'success');

@@ -283,8 +283,16 @@ function showToast(msg) {
   _toastTimer = setTimeout(()=>t.classList.remove('show'), TOAST_DURATION);
 }
 
-window.addEventListener('scroll', ()=>{
+function _onScroll() {
   document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 120);
+}
+window.addEventListener('scroll', _onScroll, { passive: true });
+window.addEventListener('beforeunload', () => window.removeEventListener('scroll', _onScroll));
+
+// Global unhandled promise rejection handler
+window.addEventListener('unhandledrejection', event => {
+  console.error('Unhandled promise rejection:', event.reason);
+  showToast('❌ ' + (event.reason?.message || 'Неизвестная ошибка'));
 });
 
 // Handlers moved from inline onclick (CSP compliance)

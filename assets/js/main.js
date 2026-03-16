@@ -104,11 +104,10 @@ async function bootstrapApp() {
 function showBootstrapError(error) {
   console.error('Volley bootstrap failed:', error);
   const message = error?.message || 'Unknown bootstrap error';
-  document.body.insertAdjacentHTML('beforeend', `
-    <div style="position:fixed;inset:16px 16px auto;z-index:9999;background:#301226;color:#fff;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.16);font:600 14px/1.4 Barlow,sans-serif;box-shadow:0 16px 48px rgba(0,0,0,.35)">
-      Ошибка запуска приложения: ${message}
-    </div>
-  `);
+  const div = document.createElement('div');
+  div.style.cssText = 'position:fixed;inset:16px 16px auto;z-index:9999;background:#301226;color:#fff;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.16);font:600 14px/1.4 Barlow,sans-serif;box-shadow:0 16px 48px rgba(0,0,0,.35)';
+  div.textContent = 'Ошибка запуска приложения: ' + message;
+  document.body.appendChild(div);
 }
 
 (async function startApp() {

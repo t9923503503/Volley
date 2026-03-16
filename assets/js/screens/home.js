@@ -364,12 +364,12 @@ function renderHome() {
       <div class="card-top-row">
         <div class="hex-border hex-avatar">
           <div class="hex-inner">
-            <img src="https://via.placeholder.com/150/ff5e00/fff?text=PLAYER" alt="Mamedov" class="avatar-img" loading="lazy">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%23ff5e00' width='150' height='150'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-size='28' font-weight='700'%3EPLAYER%3C/text%3E%3C/svg%3E" alt="Mamedov" class="avatar-img" loading="lazy">
           </div>
         </div>
         <div class="hex-border hex-logo">
           <div class="hex-inner">
-            <img src="https://via.placeholder.com/100/111/ff5e00?text=LOGO" alt="Lyutye Logo" class="logo-img" loading="lazy">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23111' width='100' height='100'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23ff5e00' font-family='sans-serif' font-size='18' font-weight='700'%3ELOGO%3C/text%3E%3C/svg%3E" alt="Lyutye Logo" class="logo-img" loading="lazy">
           </div>
         </div>
       </div>

@@ -18,7 +18,7 @@ function showTournament(trnId) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
           <div>
             <h2 style="font-size:1.5rem;margin:0;color:#fff;font-weight:700">${esc(trn.name)}</h2>
-            <div style="font-size:12px;color:#999;margin-top:4px">🗓️ ${trn.date || '—'} · 🕐 ${trn.time || '—'}</div>
+            <div style="font-size:12px;color:#999;margin-top:4px">🗓️ ${esc(trn.date || '—')} · 🕐 ${esc(trn.time || '—')}</div>
           </div>
           <button onclick="this.closest('[style*=fixed]').remove()" style="background:transparent;border:1px solid #2a2a44;color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:18px;width:32px;height:32px;display:flex;align-items:center;justify-content:center">✕</button>
         </div>
@@ -26,7 +26,7 @@ function showTournament(trnId) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div style="background:#1a1e24;padding:12px;border-radius:8px;border:1px solid #1e1e34">
             <div style="font-size:11px;color:#999">Уровень</div>
-            <div style="font-size:14px;color:#fff;font-weight:600;margin-top:4px">${trn.level ? trn.level.toUpperCase() : '—'}</div>
+            <div style="font-size:14px;color:#fff;font-weight:600;margin-top:4px">${trn.level ? esc(trn.level.toUpperCase()) : '—'}</div>
           </div>
           <div style="background:#1a1e24;padding:12px;border-radius:8px;border:1px solid #1e1e34">
             <div style="font-size:11px;color:#999">Тип</div>
