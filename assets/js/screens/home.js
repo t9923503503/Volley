@@ -364,12 +364,12 @@ function renderHome() {
       <div class="card-top-row">
         <div class="hex-border hex-avatar">
           <div class="hex-inner">
-            <img src="https://via.placeholder.com/150/ff5e00/fff?text=PLAYER" alt="Mamedov" class="avatar-img">
+            <img src="https://via.placeholder.com/150/ff5e00/fff?text=PLAYER" alt="Mamedov" class="avatar-img" loading="lazy">
           </div>
         </div>
         <div class="hex-border hex-logo">
           <div class="hex-inner">
-            <img src="https://via.placeholder.com/100/111/ff5e00?text=LOGO" alt="Lyutye Logo" class="logo-img">
+            <img src="https://via.placeholder.com/100/111/ff5e00?text=LOGO" alt="Lyutye Logo" class="logo-img" loading="lazy">
           </div>
         </div>
       </div>

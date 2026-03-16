@@ -499,18 +499,23 @@ function buildAll() {
   }
 }
 
-// Перерисовка с сохранением позиции прокрутки и фокуса
+// Перерисовка с сохранением позиции прокрутки и фокуса (debounced)
+let _safeRenderRaf = null;
 function safeRender() {
-  const _scrollPos = window.scrollY;
-  const _focusId   = document.activeElement?.id;
-  const _focusSel  = [document.activeElement?.selectionStart, document.activeElement?.selectionEnd];
-  buildAll();
-  switchTab(activeTabId != null ? activeTabId : 0);
-  window.scrollTo(0, _scrollPos);
-  if (_focusId) {
-    const el = document.getElementById(_focusId);
-    if (el) { el.focus(); try { el.setSelectionRange(_focusSel[0], _focusSel[1]); } catch(e){} }
-  }
+  if (_safeRenderRaf) return; // coalesce rapid calls
+  _safeRenderRaf = requestAnimationFrame(() => {
+    _safeRenderRaf = null;
+    const _scrollPos = window.scrollY;
+    const _focusId   = document.activeElement?.id;
+    const _focusSel  = [document.activeElement?.selectionStart, document.activeElement?.selectionEnd];
+    buildAll();
+    switchTab(activeTabId != null ? activeTabId : 0);
+    window.scrollTo(0, _scrollPos);
+    if (_focusId) {
+      const el = document.getElementById(_focusId);
+      if (el) { el.focus(); try { el.setSelectionRange(_focusSel[0], _focusSel[1]); } catch(e){} }
+    }
+  });
 }
 
 

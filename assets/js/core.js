@@ -8,9 +8,11 @@ function setPlayersGender(g) {
   if (inp) inp.value = '';
   refreshPlayersScreen();
 }
+let _plrSearchTimer = null;
 function setPlayersSearch(val) {
   playersSearch = val;
-  refreshPlayersScreen();
+  clearTimeout(_plrSearchTimer);
+  _plrSearchTimer = setTimeout(refreshPlayersScreen, 150);
 }
 function setPlayersSort(key) {
   playersSort = key;
@@ -1037,9 +1039,11 @@ function ptImportCSV(event) {
   reader.readAsText(file);
 }
 
+let _ptSearchTimer = null;
 function ptSetSearch(val) {
   _ptSearch = val;
-  _renderPtModal();
+  clearTimeout(_ptSearchTimer);
+  _ptSearchTimer = setTimeout(_renderPtModal, 150);
 }
 
 function ptAddPlayer(playerId) {
